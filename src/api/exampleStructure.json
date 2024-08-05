@@ -1,0 +1,61 @@
+{
+  "14345": {
+    "home": {
+      "light": "#000000",
+      "dark": "#FFFFFF",
+      "children": []
+    },
+    "pages": {
+      "173074301": {
+        "light": "#000000",
+        "dark": "#FFFFFF",
+        "children": [
+          {
+            "type": "vstack",
+            "id": "13431",
+            "padding": "",
+            "gap": "medium",
+            "alignment": "center",
+            "reverse": false,
+            "grow": "true",
+            "width": "100",
+            "height": "100",
+            "backgroundColor": "",
+            "order": "1",
+            "children": [
+              {
+                "type": "button",
+                "id": "12434",
+                "icon": "",
+                "size": "medium",
+                "appearance": "",
+                "grow": true,
+                "width": "100",
+                "height": "100",
+                "url": "https://www.google.com",
+                "order": "1"
+              },
+              {
+                "type": "button",
+                "id": "124346",
+                "icon": "",
+                "size": "medium",
+                "appearance": "",
+                "grow": true,
+                "width": "100",
+                "height": "100",
+                "url": "173074302",
+                "order": "2"
+              }
+            ]
+          }
+        ]
+      },
+      "173074302": {
+        "light": "#000000",
+        "dark": "#FFFFFF",
+        "children": []
+      }
+    }
+  }
+}

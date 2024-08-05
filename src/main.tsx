@@ -8,9 +8,9 @@ Devvit.configure({
 });
 
 Devvit.addMenuItem({
-  location: 'subreddit', // Add the menu item to the subreddit
-  label: 'Create Freestyle Post', // Label for the menu item
-  forUserType: 'moderator', // Only show the menu item to moderators
+  location: 'subreddit', 
+  label: 'Create Freestyle Hub', 
+  forUserType: 'moderator',
   onPress: async (_, context) => {
     const { reddit, userId } = context;
     const currentSubreddit = await reddit.getCurrentSubreddit();
@@ -49,11 +49,11 @@ const createPost = Devvit.createForm(
           label: `Creator`,
           type: 'string',
           defaultValue: `${data.username}`,
-          disabled: true, // Disable the field
+          disabled: true,
         },
       ],
-      title: 'Create Hub', // Title of the form
-      acceptLabel: 'Create', // Label for the submit button
+      title: 'Create Freestyle Hub', 
+      acceptLabel: 'Create', 
     } as const;
   },
   async ({ values }, context) => {
@@ -67,7 +67,7 @@ const createPost = Devvit.createForm(
         <vstack>
           <text color="black white">Loading...</text>
         </vstack>
-      ), // Preview of the post
+      ), 
     });
 
     const svc = new PinPost(post.id, context);
@@ -81,9 +81,9 @@ const createPost = Devvit.createForm(
     context.ui.showToast(`Success! Check your inbox.`);
 
     await reddit.sendPrivateMessage({
-      to: username, // Username of the recipient
-      subject: 'Set up your Community Hub', // Subject of the private message
-      text: `View your post to set it up: ${post.url}`, // Text of the private message
+      to: username, 
+      subject: 'Set up your Freestyle Hub', 
+      text: `View your post to set it up: ${post.url}`, 
     });
   }
 );
@@ -91,6 +91,6 @@ const createPost = Devvit.createForm(
 Devvit.addCustomPostType({
   name: 'pInfo',
   height: 'tall',
-  render: App, // Render function for the custom post type
+  render: App, 
 });
 export default Devvit;
