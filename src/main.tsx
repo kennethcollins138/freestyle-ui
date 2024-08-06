@@ -77,7 +77,6 @@ const createPost = Devvit.createForm(
       header: `Welcome to ${subName}`, // Header of the post
       createdAt: new Date().toISOString(), // Current timestamp
       owners: [username], // List of owners
-      featuredImage: 'devvit-logo.png', // Example featured image
       primaryColor: {
         light: '#FF4500',
         dark: null,

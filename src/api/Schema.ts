@@ -171,7 +171,6 @@ export class Schema {
       createdAt: z.string().datetime(),
       createdBy: z.string().min(1),
       owners: z.array(z.string()).min(1),
-      featuredImage: z.string().min(1),
       primaryColor: Schema.color,
       title: z.string().min(1),
       header: z.string().min(1),
@@ -186,5 +185,7 @@ export class Schema {
     .strict();
 
     // Plan on having reddit page create multiple pages.
-    static postsSchema = z.record(Schema.appInstance);
+    static postSchema = z.record(Schema.appInstance);
 }
+
+export type PageSchema = z.infer<typeof Schema.PageSchema>;

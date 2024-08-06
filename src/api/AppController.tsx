@@ -1,6 +1,6 @@
 import { Devvit } from '@devvit/public-api';
 import { Redis } from './Redis.js';
-import type { AppInstance } from './Schema.js';
+import type { AppInstance, PageSchema } from './Schema.js';
 
 /**
  * The AppController class provides methods to manage app instances stored in Redis.
@@ -157,4 +157,20 @@ export class AppController {
 
     return appInstance;
   }
+
+  /** 
+  * Adds a new page for pagination. Can pass base empty page here.
+  * @param pageId - generatedId from util.ts for identifying page from PaginationButton.
+  * @param newPage - data from new page to fill.
+  * @returns json of data to render components
+  **/
+  async addPage(pageId: string, newPage: PageSchema): Promise<AppInstance> {
+    const appInstance = await this.getAppInstance();
+    appInstance.pages[pageId] = newPage;
+
+    const rdx = new Redis(this.context.redis);
+    await rdx.appInstanceUpdate(this.postId, { pages: appInstance.pages });
+    return appInstance;
+  }
+
 }
