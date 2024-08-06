@@ -121,8 +121,8 @@ export const App: Devvit.CustomPostComponent = async (context: Context) => {
 		// TODO: Need to add updateChildrenOrder functionality
 
 		return (
-			<vstack lightBackgroundColor={currentPost.primaryColor.light} darkBackgroundColor={currentPost.primaryColor.dark}>
-
-			</vstack>
+			<blocks>
+				
+			</blocks>
 		);
 }

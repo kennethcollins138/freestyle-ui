@@ -16,7 +16,6 @@ export type PageProps = {
   route: Route;
   navigate: (route: Route, params?: RouteParams) => void;
   params: RouteParams;
-
   currentUserUsername: string;
   isOwner: boolean;
   appPost: z.infer<(typeof Schema)['appInstance']>;
