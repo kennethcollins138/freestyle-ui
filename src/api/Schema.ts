@@ -1,3 +1,16 @@
+/*
+DOCUMENTATION:
+
+Schema Class makes it simple to define different models types of data models.
+I have a standard set for each of my components. Expected values and default values from forms make this possible.
+Each Element: stacks, buttons, etc.. are defined below.
+Schema is set up to support multiple posts without overriding other posts.
+As of Devvit Version 0.1, you have a maximum of 500 MB of storage and can pull 5 MB at a time. Can't request more than 1000 commands a second.
+AppInstance will be used to handle base post once the Post is created.
+Config is used for app settings. Don't have many app settings outside of UI config.
+*/
+
+
 import { z } from 'zod';
 import { ALL_ICON_NAMES } from '@devvit/public-api';
 
@@ -7,7 +20,7 @@ export type Config = z.input<typeof Schema.configSchema>;
 export class Schema {
   static configSchema = z.object({});
 
-  // Base Colors to change light dark mode colors
+  // If user specifies different light/dark modes than default.
   static color = z
     .object({
       light: z.string().min(1),
