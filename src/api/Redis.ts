@@ -11,13 +11,23 @@ type CreateUpdateUpsertContext = {
   currentUserId?: string;
 };
 
+/**
+ * The Redis class provides methods to perform CRUD operations on app instances and configurations stored in Redis.
+ */
 export class Redis {
-	// Contsruct class for CRUD
   #redis: Devvit.Context['redis'];
+
+  /**
+   * Constructs an instance of the Redis class.
+   * @param redis - The Redis context from Devvit.
+   */
   constructor(redis: Devvit.Context['redis']) {
     this.#redis = redis;
   }
-	// Keys we are storing for various operations like postID as appInstance
+
+  /**
+   * Defines keys used for various operations like storing user data, config, and app instances.
+   */
   static keys = {
     user(userId: string) {
       return `user:${userId}` as const;
@@ -30,7 +40,11 @@ export class Redis {
     },
   };
 
-  // Fetch and Validates config data
+  /**
+   * Fetches and validates configuration data from Redis.
+   * @returns The configuration data.
+   * @throws Will throw an error if the config cannot be found.
+   */
   async configGet(): Promise<Config> {
     const maybeState = await this.#redis.get(Redis.keys.config());
 
@@ -41,7 +55,11 @@ export class Redis {
     return Schema.configSchema.parseAsync(maybeState);
   }
 
-	// Updated config by merging old and new config
+  /**
+   * Updates the configuration in Redis by merging old and new configurations.
+   * @param params - The new configuration parameters.
+   * @param context - Optional context for transaction handling and current user ID.
+   */
   async configUpsert(
     params: Config,
     { context }: { context?: CreateUpdateUpsertContext } = {}
@@ -54,7 +72,12 @@ export class Redis {
     await client.set(Redis.keys.config(), JSON.stringify({ ...oldConfig, ...parsedParams }));
   }
 
-  // Grabs app data based off its postID
+  /**
+   * Fetches an app instance by its ID from Redis.
+   * @param id - The ID of the app instance.
+   * @returns The app instance.
+   * @throws Will throw an error if the app instance cannot be found.
+   */
   async appInstanceGet(id: string): Promise<AppInstance> {
     const maybeState = await this.#redis.get(Redis.keys.appInstance(id));
 
@@ -65,7 +88,14 @@ export class Redis {
     return Schema.appInstance.parseAsync(maybeState);
   }
 
-	// Creates a new post, used from menu action
+  /**
+   * Creates a new app instance in Redis.
+   * @param id - The ID of the new app instance.
+   * @param params - The parameters for the new app instance.
+   * @param context - Optional context for transaction handling and current user ID.
+   * @returns The created app instance.
+   * @throws Will throw an error if an app instance with the given ID already exists.
+   */
   async appInstanceCreate(
     id: string,
     params: AppInstance,
@@ -84,7 +114,14 @@ export class Redis {
     return parsedParams;
   }
 
-	// Updates existing app.
+  /**
+   * Updates an existing app instance in Redis.
+   * @param id - The ID of the app instance to update.
+   * @param params - The parameters to update the app instance with.
+   * @param context - Optional context for transaction handling and current user ID.
+   * @returns The updated app instance.
+   * @throws Will throw an error if the app instance cannot be found.
+   */
   async appInstanceUpdate(
     id: string,
     params: Partial<AppInstance>,
@@ -107,7 +144,11 @@ export class Redis {
     return parsedParams;
   }
 
-	// Can use this for deleting a stack or element, 
+  /**
+   * Deletes a node by its ID from an app instance.
+   * @param appInstanceId - The ID of the app instance.
+   * @param nodeId - The ID of the node to delete.
+   */
   async deleteNode(appInstanceId: string, nodeId: string): Promise<void> {
     const appInstance = await this.appInstanceGet(appInstanceId);
 
@@ -130,7 +171,12 @@ export class Redis {
 
     await this.#redis.set(Redis.keys.appInstance(appInstanceId), JSON.stringify(appInstance));
   }
-	// Edit an element based on its id number
+
+  /**
+   * Edits an element in an app instance.
+   * @param appInstanceId - The ID of the app instance.
+   * @param updatedElement - The element to update.
+   */
   async editElement(appInstanceId: string, updatedElement: any): Promise<void> {
     const appInstance = await this.appInstanceGet(appInstanceId);
 
@@ -154,7 +200,12 @@ export class Redis {
     await this.#redis.set(Redis.keys.appInstance(appInstanceId), JSON.stringify(appInstance));
   }
 
-	// Add Element within stack or page
+  /**
+   * Adds a child element to a parent element in an app instance.
+   * @param appInstanceId - The ID of the app instance.
+   * @param parentElementId - The ID of the parent element.
+   * @param newChild - The new child element to add.
+   */
   async addChild(appInstanceId: string, parentElementId: string, newChild: any): Promise<void> {
     const appInstance = await this.appInstanceGet(appInstanceId);
 
@@ -180,7 +231,12 @@ export class Redis {
     await this.#redis.set(Redis.keys.appInstance(appInstanceId), JSON.stringify(appInstance));
   }
 
-	// Grab page for pagination
+  /**
+   * Reads a whole page or the home page from an app instance.
+   * @param appInstanceId - The ID of the app instance.
+   * @param pageId - The ID of the page to read. Use 'home' to read the home page.
+   * @returns The page data.
+   */
   async readWholePage(appInstanceId: string, pageId: string): Promise<any> {
     const appInstance = await this.appInstanceGet(appInstanceId);
     if (pageId === 'home') {
@@ -189,7 +245,13 @@ export class Redis {
     return appInstance.pages[pageId];
   }
 
-	async readImmediateChildren(appInstanceId: string, parentElementId: string): Promise<any[]> {
+  /**
+   * Reads the immediate children of a specified parent element in an app instance.
+   * @param appInstanceId - The ID of the app instance.
+   * @param parentElementId - The ID of the parent element.
+   * @returns The immediate children of the parent element.
+   */
+  async readImmediateChildren(appInstanceId: string, parentElementId: string): Promise<any[]> {
     const appInstance = await this.appInstanceGet(appInstanceId);
 
     const findImmediateChildren = (elements: any[]): any[] => {
@@ -220,6 +282,12 @@ export class Redis {
     return children;
   }
 
+  /**
+   * Updates the order of the immediate children of a parent element in an app instance.
+   * @param appInstanceId - The ID of the app instance.
+   * @param parentElementId - The ID of the parent element.
+   * @param newOrder - The new order of the children IDs.
+   */
   async updateChildrenOrder(
     appInstanceId: string,
     parentElementId: string,
@@ -245,5 +313,4 @@ export class Redis {
 
     await this.#redis.set(Redis.keys.appInstance(appInstanceId), JSON.stringify(appInstance));
   }
-	
 }
