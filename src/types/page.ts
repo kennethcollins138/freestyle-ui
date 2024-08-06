@@ -26,7 +26,7 @@ export type PageProps = {
     clonePost: AppController['clonePost'];
     deleteNode: AppController['deleteNode'];
     readWholePage: AppController['readWholePage'];
-    readImmediateChildren: AppController['readImmediateChildren'];
-    updateChildrenOrder: AppController['updateChildrenOrder'];
+    // readImmediateChildren: AppController['readImmediateChildren'];
+    // updateChildrenOrder: AppController['updateChildrenOrder'];
   };
 };

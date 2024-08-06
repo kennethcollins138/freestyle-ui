@@ -2,6 +2,8 @@ import type { Context } from '@devvit/public-api';
 import { Devvit } from '@devvit/public-api';
 import { AppController } from '../api/AppController.js';
 import type { PageProps, Route, RouteParams } from '../types/page.js';
+import { Page } from '../components/Page.js';
+import { WelcomePage } from './welcome.js';
 
 const getPageForRoute = (route: Route): ((props: PageProps) => JSX.Element) => {
   switch (route) {
@@ -15,8 +17,8 @@ const getPageForRoute = (route: Route): ((props: PageProps) => JSX.Element) => {
     //   return AdminConfigurePage;
     // case 'frequently_asked_questions':
     //   return FrequentlyAskedQuestionsPage;
-    // case 'welcome':
-    //   return WelcomePage;
+    case 'welcome':
+      return WelcomePage;
     // case 'pin_detail':
     //   return PinDetailPage;
     default:
@@ -119,10 +121,26 @@ export const App: Devvit.CustomPostComponent = async (context: Context) => {
 		// };
 
 		// TODO: Need to add updateChildrenOrder functionality
-
+		const Page = getPageForRoute(route);
 		return (
 			<blocks>
-				
+				<Page
+					navigate={navigate}
+					route={route}
+					params={routeParams}
+					context={context}
+					appPost={currentPost}
+					isOwner={isOwner}
+					currentUserUsername={currentUserUsername ?? ''}
+					postMethods={{
+						updateAppPost,
+						updateAppElement,
+						addElement,
+						clonePost,
+						deleteNode,
+						readWholePage,
+					}}
+				/>
 			</blocks>
 		);
 }

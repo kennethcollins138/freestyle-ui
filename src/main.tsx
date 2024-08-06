@@ -78,13 +78,13 @@ const createPost = Devvit.createForm(
       createdAt: new Date().toISOString(), // Current timestamp
       owners: [username], // List of owners
       primaryColor: {
-        light: '#FF4500',
-        dark: '#00000',
+        light: '#FFFFFF',
+        dark: '#1A1A1B',
       }, // Example primary color
       subheader: '', // Subheader
       home: {
         light: '#FFFFFF',
-        dark: '#000000',
+        dark: '#1A1A1B',
         children: [],
       }, // Example home configuration
       pages: {}, // Initially empty pages
@@ -106,4 +106,5 @@ Devvit.addCustomPostType({
   height: 'tall',
   render: App, 
 });
+
 export default Devvit;
