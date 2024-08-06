@@ -79,7 +79,7 @@ const createPost = Devvit.createForm(
       owners: [username], // List of owners
       primaryColor: {
         light: '#FF4500',
-        dark: null,
+        dark: '#00000',
       }, // Example primary color
       subheader: '', // Subheader
       home: {

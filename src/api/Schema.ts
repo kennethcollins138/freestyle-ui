@@ -24,7 +24,7 @@ export class Schema {
   static color = z
     .object({
       light: z.string().min(1),
-      dark: z.string().min(1).nullable(),
+      dark: z.string().min(1)
     })
     .strict();
 
