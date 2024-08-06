@@ -44,11 +44,16 @@ export class AppController {
   /**
    * Creates a new app instance in Redis.
    * @param params - The parameters for the new app instance.
+   * @param username - The username of the creator.
    * @returns The created app instance.
    */
-  async createAppInstance(params: AppInstance): Promise<AppInstance> {
+  async createAppInstance(params: Omit<AppInstance, 'createdBy'>, username: string): Promise<AppInstance> {
+    const appInstance: AppInstance = {
+      ...params,
+      createdBy: username,
+    };
     const rdx = new Redis(this.context.redis);
-    return rdx.appInstanceCreate(this.postId, params);
+    return rdx.appInstanceCreate(this.postId, appInstance);
   }
 
   /**
@@ -132,7 +137,7 @@ export class AppController {
       ),
     });
 
-    const newAppParams = {
+    const newAppParams: AppInstance = {
       ...appInstance,
       createdAt: cloneCreated,
       createdBy: cloneCreator ?? '',

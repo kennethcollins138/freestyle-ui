@@ -1,5 +1,5 @@
 import { Devvit } from '@devvit/public-api';
-import { PinPost } from './api/PinPost.js';
+import { AppController } from './api/AppController.js';
 import { App } from './pages/app.js';
 
 Devvit.configure({
@@ -33,20 +33,20 @@ const createPost = Devvit.createForm(
       fields: [
         {
           name: 'title',
-          label: `Post Title`,
+          label: 'Post Title',
           type: 'string',
           defaultValue: `${data.subName} Info`, // Default value for the field
         },
         {
           name: 'subName', 
-          label: `Subreddit`,
+          label: 'Subreddit',
           type: 'string',
           defaultValue: `${data.subName}`,
           disabled: true,
         },
         {
           name: 'username',
-          label: `Creator`,
+          label: 'Creator',
           type: 'string',
           defaultValue: `${data.username}`,
           disabled: true,
@@ -70,15 +70,29 @@ const createPost = Devvit.createForm(
       ), 
     });
 
-    const svc = new PinPost(post.id, context);
-    await svc.createPinPost({
-      username, // Username of the creator
+    const svc = new AppController(post.id, context);
+    await svc.createAppInstance({
       title, // Title of the post
       url: post.url, // URL of the post
-      header: `Welcome to ${post.subredditName}`, // Header of the post
-    });
+      header: `Welcome to ${subName}`, // Header of the post
+      createdAt: new Date().toISOString(), // Current timestamp
+      owners: [username], // List of owners
+      featuredImage: 'devvit-logo.png', // Example featured image
+      primaryColor: {
+        light: '#FF4500',
+        dark: null,
+      }, // Example primary color
+      subheader: '', // Subheader
+      home: {
+        light: '#FFFFFF',
+        dark: '#000000',
+        children: [],
+      }, // Example home configuration
+      pages: {}, // Initially empty pages
+      status: 'draft', // Initial status
+    }, username);
 
-    context.ui.showToast(`Success! Check your inbox.`);
+    context.ui.showToast('Success! Check your inbox.');
 
     await reddit.sendPrivateMessage({
       to: username, 
