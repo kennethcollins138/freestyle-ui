@@ -157,7 +157,6 @@ export class Schema {
 
   // Define Page schema
   static PageSchema = z.object({
-    id: z.string(),
     light: z.string(),
     dark: z.string().nullable(),
     children: z.array(Schema.ElementSchema),
@@ -175,11 +174,7 @@ export class Schema {
       title: z.string().min(1),
       header: z.string().min(1),
       subheader: z.string(),
-      home: z.object({
-        light: z.string(),
-        dark: z.string().nullable(),
-        children: z.array(Schema.ElementSchema),
-      }),
+      home: Schema.PageSchema,
       pages: z.record(Schema.PageSchema), // Techinically Same as Home page, but setup for pagination
     })
     .strict();

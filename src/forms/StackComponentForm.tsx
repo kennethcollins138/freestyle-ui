@@ -11,7 +11,7 @@ interface StackFormData {
 
 export const StackComponentForm = (
   context: Devvit.Context, 
-  type: 'hstack' | 'vstack' | 'zstack', 
+  type: 'HStack' | 'VStack' | 'ZStack', 
   onSubmit: (data: StackFormData) => void
 ) => {
   return context.useForm(
