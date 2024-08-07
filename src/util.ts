@@ -9,3 +9,5 @@ export const randomId = (): string => {
     }
     return newU;
   };
+
+  export const deepClone = <T>(object: T): T => JSON.parse(JSON.stringify(object));
