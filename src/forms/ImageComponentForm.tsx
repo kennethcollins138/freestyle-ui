@@ -2,32 +2,72 @@ import { Devvit } from '@devvit/public-api';
 
 interface ImageFormData {
   url: string;
-  width: string;
-  height: string;
-  resizeMode: 'fit' | 'fill' | 'cover';
+  width: Devvit.Blocks.SizeString;
+  height: Devvit.Blocks.SizeString;
+  resizeMode: Devvit.Blocks.ImageResizeMode;
+  imageWidth: number;
+  imageHeight: number;
 }
 
 export const ImageComponentForm = (context: Devvit.Context, onSubmit: (data: ImageFormData) => void) => {
   return context.useForm(
     {
       fields: [
-        { name: 'url', label: 'Image URL', type: 'string', required: true },
-        { name: 'width', label: 'Width', type: 'string', defaultValue: '100' },
-        { name: 'height', label: 'Height', type: 'string', defaultValue: '100' },
+        {
+          name: 'url',
+          label: 'Image URL',
+          type: 'string',
+          required: true
+        },
+        {
+          name: 'width',
+          label: 'Width',
+          type: 'string',
+          required: true,
+          defaultValue: '100%'
+        },
+        {
+          name: 'height',
+          label: 'Height',
+          type: 'string',
+          required: true,
+          defaultValue: 'auto'
+        },
         {
           name: 'resizeMode',
           label: 'Resize Mode',
-          type: 'select',
-          options: [
-            { label: 'Fit', value: 'fit' },
-            { label: 'Fill', value: 'fill' },
-            { label: 'Cover', value: 'cover' }
-          ],
+          type: 'string',
+          required: true,
+          defaultValue: 'fit'
+        },
+        {
+          name: 'imageWidth',
+          label: 'Image Width',
+          type: 'number',
+          required: true,
+          defaultValue: 1024
+        },
+        {
+          name: 'imageHeight',
+          label: 'Image Height',
+          type: 'number',
+          required: true,
+          defaultValue: 150
         }
       ],
-      title: 'Add Image',
+      title: 'Add Image Element',
       acceptLabel: 'Add',
     },
-    onSubmit
+    (values) => {
+      const formData: ImageFormData = {
+        url: values.url as string,
+        width: values.width as Devvit.Blocks.SizeString,
+        height: values.height as Devvit.Blocks.SizeString,
+        resizeMode: values.resizeMode as Devvit.Blocks.ImageResizeMode,
+        imageWidth: values.imageWidth as number,
+        imageHeight: values.imageHeight as number,
+      };
+      onSubmit(formData);
+    }
   );
 };

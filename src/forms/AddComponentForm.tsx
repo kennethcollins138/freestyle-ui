@@ -1,6 +1,10 @@
 import { Devvit } from '@devvit/public-api';
 
-export const AddComponentForm = (context: Devvit.Context, onComponentTypeSelected: (componentType: string) => void) => {
+interface AddComponentFormProps {
+  onComponentTypeSelected: (componentType: string) => void;
+}
+
+export const AddComponentForm = (context: Devvit.Context, onSubmit: (data: { componentType: string }) => void) => {
   return context.useForm(
     {
       fields: [
@@ -23,10 +27,11 @@ export const AddComponentForm = (context: Devvit.Context, onComponentTypeSelecte
         },
       ],
       title: 'Add New Component',
-      acceptLabel: 'Next',
+      acceptLabel: 'Add',
     },
-    async (data) => {
-      onComponentTypeSelected(data.componentType);
+    (data) => {
+      const componentType = Array.isArray(data.componentType) ? data.componentType[0] : data.componentType;
+      onSubmit({ componentType });
     }
   );
 };

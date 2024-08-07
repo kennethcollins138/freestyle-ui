@@ -4,12 +4,11 @@ import { AppController } from '../api/AppController.js';
 import type { PageProps, Route, RouteParams } from '../types/page.js';
 import { Page } from '../components/Page.js';
 import { WelcomePage } from './welcome.js';
+import { HomePage } from './home.js';
 
 const getPageForRoute = (route: Route): ((props: PageProps) => JSX.Element) => {
   switch (route) {
     case 'home':
-      // to-do: this should not be async.
-      // @ts-expect-error
       return HomePage;
     // case 'admin':
     //   return AdminPage;

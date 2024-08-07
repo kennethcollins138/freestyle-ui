@@ -5,8 +5,8 @@ type ImageElementProps = {
   width: Devvit.Blocks.SizeString;
   height: Devvit.Blocks.SizeString;
   resizeMode: Devvit.Blocks.ImageResizeMode;
-  imageWidth: Int16Array;
-  imageHeight: Int16Array;
+  imageWidth: number;
+  imageHeight: number;
 };
 
 export const ImageElement = ({ url, width, height, resizeMode,imageWidth, imageHeight }: ImageElementProps): JSX.Element => {
