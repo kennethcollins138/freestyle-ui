@@ -20,7 +20,7 @@ export default Devvit;
 
 type ComponentType = z.infer<typeof Schema.ElementSchema>;
 
-export const HomePage = async ({
+export const HomePage = ({
   navigate,
   context,
   appPost,
@@ -31,9 +31,12 @@ export const HomePage = async ({
     addElement, clonePost,
     deleteNode, readWholePage
   },
-}: PageProps): Promise<JSX.Element> => {
-  const { useState } = context;
-  const [pageStructure, setPageStructure] = useState<z.infer<typeof Schema['PageSchema']>>(appPost.home);
+}: PageProps): JSX.Element => {
+  const { useState, useInterval } = context;
+  const [pageStructure, setPageStructure] = useState<z.infer<typeof Schema['HomeSchema']>>(appPost.home);
+
+  console.log('Rendering HomePage'); // Added logging
+  console.log('HomePage - appPost:', appPost);
 
   const handleAddComponent = async (type: string, data: any) => {
     const newComponent: ComponentType = {

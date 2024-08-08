@@ -64,32 +64,19 @@ const createPost = Devvit.createForm(
       title, // Title of the post
       subredditName: subName, // Name of the subreddit
       preview: (
-        <vstack>
+        <vstack alignment='center middle'>
           <text color="black white">Loading...</text>
         </vstack>
       ), 
     });
 
-    const svc = new AppController(post.id, context);
-    await svc.createAppInstance({
+    const appController = new AppController(post.id, context);
+    await appController.createNewPost({
+      username, // Username of the creator
       title, // Title of the post
       url: post.url, // URL of the post
       header: `Welcome to ${subName}`, // Header of the post
-      createdAt: new Date().toISOString(), // Current timestamp
-      owners: [username], // List of owners
-      primaryColor: {
-        light: '#FFFFFF',
-        dark: '#1A1A1B',
-      }, // Example primary color
-      subheader: '', // Subheader
-      home: {
-        light: '#FFFFFF',
-        dark: '#1A1A1B',
-        children: [],
-      }, // Example home configuration
-      pages: {}, // Initially empty pages
-      status: 'draft', // Initial status
-    }, username);
+    });
 
     context.ui.showToast('Success! Check your inbox.');
 

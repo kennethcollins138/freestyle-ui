@@ -8,6 +8,7 @@ type StepProps = Pick<PageProps, 'appPost' | 'postMethods' | 'context'> & {
 };
 
 const Step1 = ({ onNextPressed }: StepProps): JSX.Element => {
+  console.log('Rendering Step1'); 
   return (
     <vstack padding="small">
       <text color="black white" size="large" alignment="top center" weight="bold">
@@ -160,6 +161,7 @@ const Step3 = ({
 };
 
 const IsNotOwner = (): JSX.Element => {
+  console.log('Rendering IsNotOwner'); 
   return <text color="black white">Post is getting ready for launch...</text>;
 };
 
@@ -173,14 +175,20 @@ export const WelcomePage = ({
   const { useState } = context;
   const [step, setStep] = useState(1);
 
+  console.log('WelcomePage - appPost status:', appPost.status); 
+  console.log('WelcomePage - isOwner:', isOwner); 
+
   if (appPost.status !== 'draft') {
-    navigate('welcome');
+    console.log('Navigating to home'); 
+    navigate('home');
     return null;
   }
 
   if (!isOwner) {
     return <IsNotOwner />;
   }
+
+  console.log('Rendering WelcomePage step:', step); 
 
   if (step === 1) {
     return (
@@ -195,7 +203,7 @@ export const WelcomePage = ({
   }
   if (step === 2) {
     return (
-      <Step1
+      <Step2
         onNextPressed={() => setStep(3)}
         onPreviousPressed={() => setStep(1)}
         context={context}
@@ -204,7 +212,6 @@ export const WelcomePage = ({
       />
     );
   }
-
   if (step === 3) {
     return (
       <Step3
@@ -220,4 +227,4 @@ export const WelcomePage = ({
   }
 
   return null;
-}
+};
