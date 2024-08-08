@@ -16,6 +16,10 @@ import { ALL_ICON_NAMES } from '@devvit/public-api';
 
 export type AppInstance = z.input<(typeof Schema)['appInstance']>;
 export type Config = z.input<typeof Schema.configSchema>;
+export type PageSchema = z.infer<typeof Schema.PageSchema>;
+export type PostSchema = z.infer<typeof Schema.PostSchema>;
+export type ElementSchema = z.infer<typeof Schema.ElementSchema>;
+export type HomeSchema = z.infer<typeof Schema.HomeSchema>;
 
 export class Schema {
   static configSchema = z.object({});
@@ -157,11 +161,17 @@ export class Schema {
 
   // Define Page schema
   static PageSchema = z.object({
+    id: z.string(),
     light: z.string(),
     dark: z.string().nullable(),
     children: z.array(Schema.ElementSchema),
   });
 
+  static HomeSchema = z.object({
+    light: z.string(),
+    dark: z.string().nullable(),
+    children: z.array(Schema.ElementSchema),
+  });
   // appInstance defines the base post instance
   static appInstance = z
     .object({
@@ -174,13 +184,11 @@ export class Schema {
       title: z.string().min(1),
       header: z.string().min(1),
       subheader: z.string(),
-      home: Schema.PageSchema,
+      home: Schema.HomeSchema,
       pages: z.record(Schema.PageSchema), // Techinically Same as Home page, but setup for pagination
     })
     .strict();
 
-    // Plan on having reddit page create multiple pages.
-    static postSchema = z.record(Schema.appInstance);
+    // Plan on having reddit page create multiple posts.
+    static PostSchema = z.record(Schema.appInstance);
 }
-
-export type PageSchema = z.infer<typeof Schema.PageSchema>;
