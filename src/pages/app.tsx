@@ -27,29 +27,15 @@ export const App: Devvit.CustomPostComponent = async (context: Context) => {
 
   console.log('Post ID:', postId);
 
-  const [currentPost, setCurrentPost] = useState<{ 
-    status: "draft" | "live"; 
-    url: string | null; 
-    createdAt: string; 
-    createdBy: string; 
-    owners: string[]; 
-    primaryColor: { light: string; dark: string }; 
-    title: string; 
-    header: string; 
-    subheader: string; 
-    home: { light: string; dark: string | null; children: any[] }; 
-    pages: Record<string, { light: string; dark: string | null; children: any[]; id: string }>
-  } | null>(async () => {
+  const [currentPost, setCurrentPost] = useState(async () => {
     const svc = new AppController(postId, context);
-    const appInstance = await svc.loadAppInstance();
-    console.log('Retrieved app instance:', appInstance);
-    return appInstance;
+    return await svc.loadAppInstance();
   });
 
   const [[route, routeParams], setRouteConfig] = useState<[Route, RouteParams]>(async () => {
-    const post = await currentPost;
-    console.log('App instance status:', post?.status);
-    if (post?.status === 'draft') {
+    // TODO: won't be null need to fix this
+    // @ts-expect-error
+    if (currentPost.status === 'draft') {
       return ['welcome', {}];
     }
     return ['home', {}];
@@ -147,7 +133,7 @@ export const App: Devvit.CustomPostComponent = async (context: Context) => {
   }
 
   return (
-    <blocks>
+    <vstack>
       <PageComponent
         navigate={navigate}
         route={route}
@@ -165,6 +151,6 @@ export const App: Devvit.CustomPostComponent = async (context: Context) => {
           readWholePage,
         }}
       />
-    </blocks>
+    </vstack>
   );
 };
