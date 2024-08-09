@@ -8,9 +8,9 @@ type StepProps = Pick<PageProps, 'appPost' | 'postMethods' | 'context'> & {
 };
 
 const Step1 = ({ onNextPressed }: StepProps): JSX.Element => {
-  console.log('Rendering Step1'); 
+  console.log('Rendering Step1');
   return (
-    <vstack padding="small">
+    <vstack padding="small" alignment="center middle">
       <text color="black white" size="large" alignment="top center" weight="bold">
         Set up a Freestyle UI Post!
       </text>
@@ -18,6 +18,7 @@ const Step1 = ({ onNextPressed }: StepProps): JSX.Element => {
       <text color="black white" size="small" alignment="top center" weight="bold">
         Give Mods the power to control the UI for their needs.
       </text>
+      <spacer size="small" />
       <vstack alignment="center bottom">
         <button onPress={onNextPressed} size="medium" appearance="primary">
           Get Started
@@ -35,19 +36,20 @@ const Step2 = ({
 }: StepProps): JSX.Element => {
   const { useForm } = context;
 
+  // Hooks are declared at the top level
   const colorForm = useForm(
     {
       fields: [
         {
           name: 'light',
-          label: 'Color',
+          label: 'Light Color',
           type: 'string',
           defaultValue: appPost.primaryColor.light,
           required: true,
         },
         {
           name: 'dark',
-          label: 'Color',
+          label: 'Dark Color',
           type: 'string',
           defaultValue: appPost.primaryColor.dark,
           required: true,
@@ -106,19 +108,48 @@ const Step2 = ({
   );
 
   return (
-    <vstack padding="small">
-      <text color="black white" size="large" alignment="top center" weight="bold">
-        Customize Your Post Colors
-      </text>
-      {colorForm}
-      <spacer size="medium" />
-      {addOwnerForm}
-      <vstack alignment="center bottom">
-        <button onPress={onNextPressed} size="medium" appearance="primary">
-          Next
-        </button>
+    <vstack>
+      <vstack padding="small">
+        <text color="black white" size="large" alignment="top center" weight="bold">
+          Make it your own
+        </text>
+        <spacer size="small" />
+        <text color="black white" size="small" alignment="top center" weight="bold">
+          You can do this later, too!
+        </text>
+      </vstack>
+      <zstack>
+        <vstack cornerRadius="large" width={100} height={100} alignment="middle center">
+          <image url="squirtle-sax.gif" imageWidth={175} imageHeight={175} resizeMode="fit" />
+        </vstack>
+        <hstack alignment="middle end" width={100} height={100} padding="small">
+          <button
+            onPress={onNextPressed}
+            size="large"
+            icon="caret-right"
+            appearance="primary"
+          ></button>
+        </hstack>
+      </zstack>
+      <vstack alignment="center">
+        <hstack>
+          <button
+            onPress={() => context.ui.showForm(colorForm)}
+            icon="topic-art"
+            appearance="plain"
+          >
+            Color
+          </button>
+          <spacer size="small" />
+          
+          <spacer size="small" />
+          <button onPress={() => context.ui.showForm(addOwnerForm)} icon="mod" appearance="plain">
+            Owners
+          </button>
+        </hstack>
       </vstack>
     </vstack>
+    
   );
 };
 
@@ -161,7 +192,7 @@ const Step3 = ({
 };
 
 const IsNotOwner = (): JSX.Element => {
-  console.log('Rendering IsNotOwner'); 
+  console.log('Rendering IsNotOwner');
   return <text color="black white">Post is getting ready for launch...</text>;
 };
 
@@ -175,11 +206,11 @@ export const WelcomePage = ({
   const { useState } = context;
   const [step, setStep] = useState(1);
 
-  console.log('WelcomePage - appPost status:', appPost.status); 
-  console.log('WelcomePage - isOwner:', isOwner); 
+  console.log('WelcomePage - appPost status:', appPost.status);
+  console.log('WelcomePage - isOwner:', isOwner);
 
   if (appPost.status !== 'draft') {
-    console.log('Navigating to home'); 
+    console.log('Navigating to home');
     navigate('home');
     return null;
   }
@@ -188,7 +219,7 @@ export const WelcomePage = ({
     return <IsNotOwner />;
   }
 
-  console.log('Rendering WelcomePage step:', step); 
+  console.log('Rendering WelcomePage step:', step);
 
   if (step === 1) {
     return (
