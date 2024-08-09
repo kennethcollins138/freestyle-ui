@@ -17,7 +17,7 @@ const getPageForRoute = (route: Route): ((props: PageProps) => JSX.Element) => {
   }
 };
 
-export const App: Devvit.CustomPostComponent = async (context: Context) => {
+export const App: Devvit.CustomPostComponent = (context: Context) => {
   const { useState, postId, reddit } = context;
 
   if (!postId) {
@@ -126,11 +126,12 @@ export const App: Devvit.CustomPostComponent = async (context: Context) => {
 
   if (!currentPost) {
     return (
-      <blocks>
-        <text>Loading...</text>
-      </blocks>
+      <vstack alignment='center'>
+        <text color="red">Failed to load post data. Please try again later.</text>
+      </vstack>
     );
   }
+  
 
   return (
     <vstack>

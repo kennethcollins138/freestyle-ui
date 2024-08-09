@@ -1,0 +1,111 @@
+Binding app to definition devvit.actor.reddit.ContextAction
+Instantiated app
+No implementation found for RenderPostComposer
+Binding app to definition devvit.ui.events.v1alpha.UIEventHandler
+Binding app to server complete.
+Loaded actor class
+Loading app 0ab7b55b-75e8-4519-a585-7a72aa03af29.local
+Instantiated config
+Binding app to definition devvit.reddit.custom_post.v1alpha.CustomPost
+Instantiated config
+Loaded actor class
+Binding app to definition devvit.ui.events.v1alpha.UIEventHandler
+Instantiated app
+Binding app to definition devvit.actor.reddit.ContextAction
+Binding app to server complete.
+No implementation found for RenderPostComposer
+Loading app 0ab7b55b-75e8-4519-a585-7a72aa03af29.local
+Binding app to definition devvit.reddit.custom_post.v1alpha.CustomPost
+Instantiated config
+Binding app to definition devvit.reddit.custom_post.v1alpha.CustomPost
+Loaded actor class
+Instantiated app
+Binding app to definition devvit.actor.reddit.ContextAction
+Loading app 0ab7b55b-75e8-4519-a585-7a72aa03af29.local
+Binding app to server complete.
+No implementation found for RenderPostComposer
+Binding app to definition devvit.ui.events.v1alpha.UIEventHandler
+Loading app 0ab7b55b-75e8-4519-a585-7a72aa03af29.local
+Binding app to definition devvit.reddit.custom_post.v1alpha.CustomPost
+No implementation found for RenderPostComposer
+Instantiated config
+Loaded actor class
+Binding app to definition devvit.ui.events.v1alpha.UIEventHandler
+Instantiated app
+Binding app to definition devvit.actor.reddit.ContextAction
+Binding app to server complete.
+INITIALIZED POST ID MAIN.tsx t3_1enp94l
+Post ID: t3_1enp94l
+Post ID: t3_1enp94l
+Post ID: t3_1enp94l
+Error loading AppInstance from Redis: Error: Cannot find app instance with id: t3_1enp94l!
+    at _Redis.appInstanceGet (main.js:22082:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async AppController.loadAppInstance (main.js:22267:24)
+    at async UseStateHook.<anonymous> (main.js:23361:12)
+    at async UseStateHook.onUIEvent (main.js:11190:28)
+    at async BlocksHandler._BlocksHandler_attemptHook2 (main.js:11727:7)
+    at async BlocksHandler._BlocksHandler_handleMainQueue2 (main.js:11742:5)
+    at async BlocksHandler.handle (main.js:11629:11)
+    at async executeWithSourceMap (/srv/index.cjs:144457:12)
+    at async /srv/index.cjs:144677:27
+Post ID: t3_1enp94l
+Post ID: t3_1enp94l
+Error loading async state:  TypeError: Cannot read properties of null (reading 'status')
+    at UseStateHook.<anonymous> (main.js:23364:21)
+    at UseStateHook.onStateLoaded (main.js:11216:172)
+    at registerHook (main.js:11574:23)
+    at useState (main.js:11243:16)
+    at Object.App [as render] (main.js:23363:50)
+    at UIComponentBindings (main.js:11848:49)
+    at BlocksHandler._BlocksHandler_render2 (main.js:11779:21)
+    at BlocksHandler._BlocksHandler_renderRoot2 (main.js:11754:104)
+    at BlocksHandler._BlocksHandler_loadHooks2 (main.js:11703:92)
+    at BlocksHandler._BlocksHandler_handleMainQueue2 (main.js:11746:91)
+Post ID: t3_1enp94l
+Post ID: t3_1enp94l
+Post ID: t3_1enp94l
+Invalid state:  loading undefined
+Post ID: t3_1enp94l
+Post ID: t3_1enp94l
+Instantiated config
+Binding app to definition devvit.reddit.custom_post.v1alpha.CustomPost
+Binding app to definition devvit.actor.reddit.ContextAction
+Loading app 0ab7b55b-75e8-4519-a585-7a72aa03af29.local
+No implementation found for RenderPostComposer
+Binding app to server complete.
+Instantiated app
+Loaded actor class
+Binding app to definition devvit.ui.events.v1alpha.UIEventHandler
+Post ID: t3_1enp94l
+Post ID: t3_1enp94l
+Post ID: t3_1enp94l
+Post ID: t3_1enp94l
+Post ID: t3_1enp94l
+Post ID: t3_1enp94l
+Error loading AppInstance from Redis: Error: Cannot find app instance with id: t3_1enp94l!
+    at _Redis.appInstanceGet (main.js:22082:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async AppController.loadAppInstance (main.js:22267:24)
+    at async UseStateHook.<anonymous> (main.js:23361:12)
+    at async UseStateHook.onUIEvent (main.js:11190:28)
+    at async BlocksHandler._BlocksHandler_attemptHook2 (main.js:11727:7)
+    at async BlocksHandler._BlocksHandler_handleMainQueue2 (main.js:11742:5)
+    at async BlocksHandler.handle (main.js:11629:11)
+    at async executeWithSourceMap (/srv/index.cjs:144457:12)
+    at async /srv/index.cjs:144677:27
+Post ID: t3_1enp94l
+Post ID: t3_1enp94l
+Error loading async state:  TypeError: Cannot read properties of null (reading 'status')
+    at UseStateHook.<anonymous> (main.js:23364:21)
+    at UseStateHook.onStateLoaded (main.js:11216:172)
+    at registerHook (main.js:11574:23)
+    at useState (main.js:11243:16)
+    at Object.App [as render] (main.js:23363:50)
+    at UIComponentBindings (main.js:11848:49)
+    at BlocksHandler._BlocksHandler_render2 (main.js:11779:21)
+    at BlocksHandler._BlocksHandler_renderRoot2 (main.js:11754:104)
+    at BlocksHandler._BlocksHandler_loadHooks2 (main.js:11703:92)
+    at BlocksHandler._BlocksHandler_handleMainQueue2 (main.js:11746:91)
+Post ID: t3_1enp94l
+Post ID: t3_1enp94l

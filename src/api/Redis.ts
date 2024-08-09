@@ -203,13 +203,9 @@ export class Redis {
   async createNewPost(postId: string, newAppInstance: AppInstance): Promise<void> {
     const existingPost = await this.#redis.get(Redis.keys.appInstance(postId));
     if (existingPost) {
-      throw new Error(`Post with ID ${postId} already exists.`);
+       throw new Error(`Post with ID ${postId} already exists.`);
     }
-
-    const newPost: z.infer<typeof Schema.PostSchema> = {
-      [postId]: newAppInstance,
-    };
-
-    await this.#redis.set(Redis.keys.appInstance(postId), JSON.stringify(newPost));
-  }
+ 
+    await this.#redis.set(Redis.keys.appInstance(postId), JSON.stringify(newAppInstance));
+ }
 }

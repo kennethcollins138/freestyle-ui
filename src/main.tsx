@@ -79,6 +79,7 @@ const createPost = Devvit.createForm(
       header: `Welcome to ${subName}`, // Header of the post
     });
 
+    
     context.ui.showToast('Success! Check your inbox.');
 
     await reddit.sendPrivateMessage({
