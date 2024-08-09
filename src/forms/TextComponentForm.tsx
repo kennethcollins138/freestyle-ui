@@ -15,15 +15,15 @@ interface TextFormData {
   height?: Devvit.Blocks.SizeString;
 }
 
-export const TextComponentForm = (context: Devvit.Context, onSubmit: (data: TextFormData) => void) => {
-  return context.useForm(
+export const TextComponentForm = ({ context, onSubmit }: { context: Devvit.Context, onSubmit: (data: TextFormData) => void }) => {
+  const form = context.useForm(
     {
       fields: [
         {
           name: 'text',
           label: 'Text',
           type: 'string',
-          required: true
+          required: true,
         },
         {
           name: 'style',
@@ -32,9 +32,9 @@ export const TextComponentForm = (context: Devvit.Context, onSubmit: (data: Text
           options: [
             { label: 'Body', value: 'body' },
             { label: 'Metadata', value: 'metadata' },
-            { label: 'Heading', value: 'heading' }
+            { label: 'Heading', value: 'heading' },
           ],
-          required: false
+          required: false,
         },
         {
           name: 'size',
@@ -46,9 +46,9 @@ export const TextComponentForm = (context: Devvit.Context, onSubmit: (data: Text
             { label: 'Medium', value: 'medium' },
             { label: 'Large', value: 'large' },
             { label: 'XLarge', value: 'xlarge' },
-            { label: 'XXLarge', value: 'xxlarge' }
+            { label: 'XXLarge', value: 'xxlarge' },
           ],
-          required: false
+          required: false,
         },
         {
           name: 'weight',
@@ -56,15 +56,15 @@ export const TextComponentForm = (context: Devvit.Context, onSubmit: (data: Text
           type: 'select',
           options: [
             { label: 'Regular', value: 'regular' },
-            { label: 'Bold', value: 'bold' }
+            { label: 'Bold', value: 'bold' },
           ],
-          required: false
+          required: false,
         },
         {
           name: 'color',
           label: 'Color',
           type: 'string',
-          required: false
+          required: false,
         },
         {
           name: 'alignment',
@@ -79,9 +79,9 @@ export const TextComponentForm = (context: Devvit.Context, onSubmit: (data: Text
             { label: 'Middle End', value: 'middle end' },
             { label: 'Bottom Start', value: 'bottom start' },
             { label: 'Bottom Center', value: 'bottom center' },
-            { label: 'Bottom End', value: 'bottom end' }
+            { label: 'Bottom End', value: 'bottom end' },
           ],
-          required: false
+          required: false,
         },
         {
           name: 'outline',
@@ -90,23 +90,23 @@ export const TextComponentForm = (context: Devvit.Context, onSubmit: (data: Text
           options: [
             { label: 'None', value: 'none' },
             { label: 'Thin', value: 'thin' },
-            { label: 'Thick', value: 'thick' }
+            { label: 'Thick', value: 'thick' },
           ],
-          required: false
+          required: false,
         },
         {
           name: 'selectable',
           label: 'Selectable',
           type: 'boolean',
           defaultValue: false,
-          required: false
+          required: false,
         },
         {
           name: 'wrap',
           label: 'Wrap',
           type: 'boolean',
           defaultValue: false,
-          required: false
+          required: false,
         },
         {
           name: 'overflow',
@@ -114,22 +114,22 @@ export const TextComponentForm = (context: Devvit.Context, onSubmit: (data: Text
           type: 'select',
           options: [
             { label: 'Ellipsis', value: 'ellipsis' },
-            { label: 'Clip', value: 'clip' }
+            { label: 'Clip', value: 'clip' },
           ],
-          required: false
+          required: false,
         },
         {
           name: 'width',
           label: 'Width',
           type: 'string',
-          required: false
+          required: false,
         },
         {
           name: 'height',
           label: 'Height',
           type: 'string',
-          required: false
-        }
+          required: false,
+        },
       ],
       title: 'Add Text Element',
       acceptLabel: 'Add',
@@ -137,19 +137,21 @@ export const TextComponentForm = (context: Devvit.Context, onSubmit: (data: Text
     (values) => {
       const formData: TextFormData = {
         text: values.text as string,
-        style: values.style ? values.style[0] as Devvit.Blocks.TextStyle : undefined,
-        size: values.size ? values.size[0] as Devvit.Blocks.TextSize : undefined,
-        weight: values.weight ? values.weight[0] as Devvit.Blocks.TextWeight : undefined,
+        style: values.style ? (values.style[0] as Devvit.Blocks.TextStyle) : undefined,
+        size: values.size ? (values.size[0] as Devvit.Blocks.TextSize) : undefined,
+        weight: values.weight ? (values.weight[0] as Devvit.Blocks.TextWeight) : undefined,
         color: values.color as string,
-        alignment: values.alignment ? values.alignment[0] as Devvit.Blocks.Alignment : undefined,
-        outline: values.outline ? values.outline[0] as Devvit.Blocks.Thickness : undefined,
+        alignment: values.alignment ? (values.alignment[0] as Devvit.Blocks.Alignment) : undefined,
+        outline: values.outline ? (values.outline[0] as Devvit.Blocks.Thickness) : undefined,
         selectable: values.selectable as boolean,
         wrap: values.wrap as boolean,
-        overflow: values.overflow ? values.overflow[0] as Devvit.Blocks.TextOverflow : undefined,
+        overflow: values.overflow ? (values.overflow[0] as Devvit.Blocks.TextOverflow) : undefined,
         width: values.width as Devvit.Blocks.SizeString,
         height: values.height as Devvit.Blocks.SizeString,
       };
       onSubmit(formData);
     }
   );
+
+  return form; // Return the form key
 };

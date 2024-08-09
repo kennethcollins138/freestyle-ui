@@ -1,6 +1,11 @@
 import { Devvit } from '@devvit/public-api';
 
-interface ImageFormData {
+export interface ImageComponentFormProps {
+  context: Devvit.Context;
+  onSubmit: (data: ImageFormData) => void;
+}
+
+export interface ImageFormData {
   url: string;
   width: Devvit.Blocks.SizeString;
   height: Devvit.Blocks.SizeString;
@@ -9,7 +14,7 @@ interface ImageFormData {
   imageHeight: number;
 }
 
-export const ImageComponentForm = (context: Devvit.Context, onSubmit: (data: ImageFormData) => void) => {
+export const ImageComponentForm = ({ context, onSubmit }: ImageComponentFormProps) => {
   return context.useForm(
     {
       fields: [

@@ -9,11 +9,17 @@ interface StackFormData {
   backgroundColor?: string;
 }
 
-export const StackComponentForm = (
-  context: Devvit.Context, 
-  type: 'HStack' | 'VStack' | 'ZStack', 
-  onSubmit: (data: StackFormData) => void
-) => {
+interface StackComponentFormProps {
+  context: Devvit.Context;
+  type: 'HStack' | 'VStack' | 'ZStack';
+  onSubmit: (data: StackFormData) => void;
+}
+
+export const StackComponentForm = ({
+  context, 
+  type, 
+  onSubmit
+}: StackComponentFormProps) => {
   return context.useForm(
     {
       fields: [

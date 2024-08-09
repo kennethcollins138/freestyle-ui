@@ -32,8 +32,20 @@ export const HomePage = ({
     deleteNode, readWholePage
   },
 }: PageProps): JSX.Element => {
-  const { useState, useInterval } = context;
+  const { useState } = context;
   const [pageStructure, setPageStructure] = useState<z.infer<typeof Schema['HomeSchema']>>(appPost.home);
+
+  // Prepare forms outside of event handlers
+  const addComponentForm = AddComponentForm({ context, onSubmit: handleComponentTypeSelected });
+  const stackComponentForms = {
+    VStack: StackComponentForm({ context, type: 'VStack', onSubmit: (data) => handleAddComponent('VStack', data) }),
+    HStack: StackComponentForm({ context, type: 'HStack', onSubmit: (data) => handleAddComponent('HStack', data) }),
+    ZStack: StackComponentForm({ context, type: 'ZStack', onSubmit: (data) => handleAddComponent('ZStack', data) }),
+  };
+  const imageComponentForm = ImageComponentForm({ context, onSubmit: (data) => handleAddComponent('Image', data) });
+  const textComponentForm = TextComponentForm({ context, onSubmit: (data) => handleAddComponent('Text', data) });
+  const buttonComponentForm = ButtonComponentForm({ context, onSubmit: (data) => handleAddComponent('Button', data) });
+  const paginationButtonForm = PaginationButtonForm({ context, onSubmit: (data) => handleAddComponent('PaginationButton', data) });
 
   console.log('Rendering HomePage'); // Added logging
 
@@ -54,30 +66,30 @@ export const HomePage = ({
     context.ui.showToast('Component added successfully!');
   };
 
-  const handleComponentTypeSelected = (data: { componentType: string }) => {
+  function handleComponentTypeSelected(data: { componentType: string }) {
     const type = data.componentType;
     switch (type) {
       case 'VStack':
       case 'HStack':
       case 'ZStack':
-        context.ui.showForm(StackComponentForm(context, type, (data) => handleAddComponent(type, data)));
+        context.ui.showForm(stackComponentForms[type]);
         break;
       case 'Image':
-        context.ui.showForm(ImageComponentForm(context, (data) => handleAddComponent(type, data)));
+        context.ui.showForm(imageComponentForm);
         break;
       case 'Text':
-        context.ui.showForm(TextComponentForm(context, (data) => handleAddComponent(type, data)));
+        context.ui.showForm(textComponentForm);
         break;
       case 'Button':
-        context.ui.showForm(ButtonComponentForm(context, (data) => handleAddComponent(type, data)));
+        context.ui.showForm(buttonComponentForm);
         break;
       case 'PaginationButton':
-        context.ui.showForm(PaginationButtonForm(context, (data) => handleAddComponent(type, data)));
+        context.ui.showForm(paginationButtonForm);
         break;
       default:
         context.ui.showToast('Unknown component type selected');
     }
-  };
+  }
 
   const renderComponent = (component: ComponentType) => {
     switch (component.type) {
@@ -118,19 +130,19 @@ export const HomePage = ({
       case 'VStack':
       case 'HStack':
       case 'ZStack':
-        context.ui.showForm(StackComponentForm(context, component.type, (data) => handleUpdateComponent(component, data)));
+        context.ui.showForm(StackComponentForm({ context, type: component.type, onSubmit: (data) => handleUpdateComponent(component, data) }));
         break;
       case 'Image':
-        context.ui.showForm(ImageComponentForm(context, (data) => handleUpdateComponent(component, data)));
+        context.ui.showForm(ImageComponentForm({ context, onSubmit: (data) => handleUpdateComponent(component, data) }));
         break;
       case 'Text':
-        context.ui.showForm(TextComponentForm(context, (data) => handleUpdateComponent(component, data)));
+        context.ui.showForm(TextComponentForm({ context, onSubmit: (data) => handleUpdateComponent(component, data) }));
         break;
       case 'Button':
-        context.ui.showForm(ButtonComponentForm(context, (data) => handleUpdateComponent(component, data)));
+        context.ui.showForm(ButtonComponentForm({ context, onSubmit: (data) => handleUpdateComponent(component, data) }));
         break;
       case 'PaginationButton':
-        context.ui.showForm(PaginationButtonForm(context, (data) => handleUpdateComponent(component, data)));
+        context.ui.showForm(PaginationButtonForm({ context, onSubmit: (data) => handleUpdateComponent(component, data) }));
         break;
       default:
         context.ui.showToast('Unknown component type selected');
@@ -157,7 +169,7 @@ export const HomePage = ({
           {pageStructure.children?.map(renderComponent)}
           {isOwner && (
             <vstack gap="small" alignment="center">
-              <button onPress={() => context.ui.showForm(AddComponentForm(context, handleComponentTypeSelected))} appearance="primary" size="small">Add Component</button>
+              <button onPress={() => context.ui.showForm(addComponentForm)} appearance="primary" size="small">Add Component</button>
               {pageStructure.children?.map((component) => (
                 <button
                   key={component.id}

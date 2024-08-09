@@ -1,10 +1,11 @@
 import { Devvit } from '@devvit/public-api';
 
-interface AddComponentFormProps {
-  onComponentTypeSelected: (componentType: string) => void;
+export interface AddComponentFormProps {
+  context: Devvit.Context;
+  onSubmit: (data: { componentType: string }) => void;
 }
 
-export const AddComponentForm = (context: Devvit.Context, onSubmit: (data: { componentType: string }) => void) => {
+export const AddComponentForm = ({ context, onSubmit }: AddComponentFormProps) => {
   return context.useForm(
     {
       fields: [
@@ -13,25 +14,24 @@ export const AddComponentForm = (context: Devvit.Context, onSubmit: (data: { com
           label: 'Select Component Type to Add',
           type: 'select',
           options: [
-            { label: 'VStack', value: 'vstack' },
-            { label: 'HStack', value: 'hstack' },
-            { label: 'ZStack', value: 'zstack' },
-            { label: 'LinkButton', value: 'linkbutton' },
-            { label: 'Image', value: 'image' },
-            { label: 'Text', value: 'text' },
-            { label: 'New Page Button', value: 'paginationbutton' },
-            // TODO: add more components like spacers, etc..
+            { label: 'VStack', value: 'VStack' },
+            { label: 'HStack', value: 'HStack' },
+            { label: 'ZStack', value: 'ZStack' },
+            { label: 'Link Button', value: 'Button' },
+            { label: 'Image', value: 'Image' },
+            { label: 'Text', value: 'Text' },
+            { label: 'New Page Button', value: 'PaginationButton' },
           ],
           required: true,
-          multiple: false
+          multiple: false,
         },
       ],
       title: 'Add New Component',
       acceptLabel: 'Add',
     },
-    (data) => {
+    async (data) => {
       const componentType = Array.isArray(data.componentType) ? data.componentType[0] : data.componentType;
-      onSubmit({ componentType });
+      onSubmit({ componentType: componentType as string});
     }
   );
 };

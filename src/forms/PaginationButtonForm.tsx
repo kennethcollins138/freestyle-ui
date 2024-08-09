@@ -5,7 +5,7 @@ interface PaginationButtonFormData {
   pageId: string;
 }
 
-export const PaginationButtonForm = (context: Devvit.Context, onSubmit: (data: PaginationButtonFormData) => void) => {
+export const PaginationButtonForm = ({ context, onSubmit }: { context: Devvit.Context; onSubmit: (data: PaginationButtonFormData) => void }) => {
   return context.useForm(
     {
       fields: [

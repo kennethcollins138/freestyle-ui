@@ -11,7 +11,7 @@ interface ButtonFormData {
   url: string;
 }
 
-export const ButtonComponentForm = (context: Devvit.Context, onSubmit: (data: ButtonFormData) => void) => {
+export const ButtonComponentForm = ({ context, onSubmit }: { context: Devvit.Context; onSubmit: (data: ButtonFormData) => void }) => {
   return context.useForm(
     {
       fields: [
