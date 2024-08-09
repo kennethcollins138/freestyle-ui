@@ -36,7 +36,6 @@ export const HomePage = ({
   const [pageStructure, setPageStructure] = useState<z.infer<typeof Schema['HomeSchema']>>(appPost.home);
 
   console.log('Rendering HomePage'); // Added logging
-  console.log('HomePage - appPost:', appPost);
 
   const handleAddComponent = async (type: string, data: any) => {
     const newComponent: ComponentType = {

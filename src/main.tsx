@@ -71,7 +71,6 @@ const createPost = Devvit.createForm(
     });
 
     const appController = new AppController(post.id, context);
-    console.log(`INITIALIZED POST ID MAIN.tsx ${post.id}`)
     await appController.createNewPost({
       username, // Username of the creator
       title, // Title of the post

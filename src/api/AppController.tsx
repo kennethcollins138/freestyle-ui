@@ -20,7 +20,6 @@ export class AppController {
                 console.error(`No instance found for postId: ${this.postId}`);
                 return null;
             }
-            console.log('Loaded AppInstance:', instance);
             return instance;
         } catch (error) {
             console.error('Error loading AppInstance:', error);
