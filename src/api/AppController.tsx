@@ -82,7 +82,7 @@ export class AppController {
         }
         return null;
     }
-
+    // Need to clean up
     async editElement(pageId: string, elementId: string, updates: Partial<ElementSchema>): Promise<ElementSchema | null> {
         const appInstance = await this.loadAppInstance();
         if (appInstance && appInstance.pages[pageId]) {
@@ -94,13 +94,28 @@ export class AppController {
                 return page.children[elementIndex];
             }
         }
+        if (appInstance && pageId === 'home'){
+            const page = appInstance.home;
+            const elementIndex = page.children.findIndex((el: ElementSchema) => el.id === elementId);
+            if (elementIndex !== -1) {
+                page.children[elementIndex] = { ...page.children[elementIndex], ...updates };
+                await this.saveAppInstance(appInstance);
+                return page.children[elementIndex];
+            }
+        }
         return null;
     }
 
-    async deleteNode(pageId: string, elementId: string): Promise<PageSchema | null> {
+    async deleteNode(pageId: string, elementId: string): Promise<PageSchema | null | HomeSchema> {
         const appInstance = await this.loadAppInstance();
         if (appInstance && appInstance.pages[pageId]) {
             const page = appInstance.pages[pageId];
+            page.children = page.children.filter((el: ElementSchema) => el.id !== elementId);
+            await this.saveAppInstance(appInstance);
+            return page;
+        }
+        if (appInstance && pageId === 'home') {
+            const page = appInstance.home;
             page.children = page.children.filter((el: ElementSchema) => el.id !== elementId);
             await this.saveAppInstance(appInstance);
             return page;
@@ -141,7 +156,7 @@ export class AppController {
         return null;
     }
 
-    async reorderElements(pageId: string, elementOrder: string[]): Promise<PageSchema | null> {
+    async reorderElements(pageId: string, elementOrder: string[]): Promise<PageSchema | HomeSchema | null> {
         const appInstance = await this.loadAppInstance();
         if (appInstance && appInstance.pages[pageId]) {
             const page = appInstance.pages[pageId];

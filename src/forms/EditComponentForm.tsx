@@ -1,12 +1,10 @@
-import { Devvit } from '@devvit/public-api';
+import { Devvit, FormKey } from '@devvit/public-api';
 import type { ComponentType } from '../types/component.js';
 import { TextComponentForm } from './TextComponentForm.js';
 import { ImageComponentForm } from './ImageComponentForm.js';
 import { StackComponentForm } from './StackComponentForm.js';
 import { ButtonComponentForm } from './ButtonComponentForm.js';
 import { PaginationButtonForm } from './PaginationButtonForm.js';
-
-type FormKey = any; // Placeholder type
 
 interface EditComponentFormProps {
   context: Devvit.Context;
@@ -15,7 +13,12 @@ interface EditComponentFormProps {
   onDelete: () => Promise<void>;
 }
 
-export const EditComponentForm = ({ context, element, onUpdate, onDelete }: EditComponentFormProps): FormKey | undefined => {
+export const EditComponentForm = ({
+  context,
+  element,
+  onUpdate,
+  onDelete,
+}: EditComponentFormProps): FormKey | undefined => {
   let formKey: FormKey | undefined;
 
   switch (element.type) {
@@ -63,7 +66,7 @@ export const EditComponentForm = ({ context, element, onUpdate, onDelete }: Edit
       });
       break;
     default:
-      formKey = undefined;
+      context.ui.showToast('Unknown component type selected');
       break;
   }
 

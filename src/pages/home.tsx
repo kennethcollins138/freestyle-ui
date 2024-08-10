@@ -39,40 +39,7 @@ export const HomePage = ({
   // Prepare forms outside of event handlers
   const addComponentForm = AddComponentForm({ context, onSubmit: handleComponentTypeSelected });
 
-  const handleEditComponent = (component: ComponentType) => {
-    const formKey = EditComponentForm({
-      context,
-      element: component,
-      onUpdate: async (updatedComponent) => {
-        const updatedStructure = deepClone(pageStructure);
-        const index = updatedStructure.children.findIndex(child => child.id === component.id);
-        if (index !== -1) {
-          updatedStructure.children[index] = updatedComponent;
-        }
-        setPageStructure(updatedStructure);
-        await updateAppPost({ home: updatedStructure });
-        context.ui.showToast('Component updated successfully!');
-      },
-      onDelete: async () => {
-        const updatedStructure = deepClone(pageStructure);
-        const index = updatedStructure.children.findIndex(child => child.id === component.id);
-        if (index !== -1) {
-          updatedStructure.children.splice(index, 1);
-        }
-        setPageStructure(updatedStructure);
-        await updateAppPost({ home: updatedStructure });
-        context.ui.showToast('Component deleted successfully!');
-      },
-    });
-
-    if (formKey) {
-      context.ui.showForm(formKey);
-    } else {
-      context.ui.showToast('Could not open the edit form');
-    }
-  };
-
-
+  // Stack component forms initialized at the top
   const stackComponentForms = {
     VStack: StackComponentForm({ context, type: 'VStack', onSubmit: (data) => handleAddComponent('VStack', data) }),
     HStack: StackComponentForm({ context, type: 'HStack', onSubmit: (data) => handleAddComponent('HStack', data) }),
@@ -99,6 +66,40 @@ export const HomePage = ({
     await updateAppPost({ home: updatedStructure });
 
     context.ui.showToast('Component added successfully!');
+  };
+
+  const handleEditComponent = (component: ComponentType) => {
+    const editForm = EditComponentForm({
+      context,
+      element: component,
+      onUpdate: async (updatedComponent) => {
+        const updatedStructure = deepClone(pageStructure);
+        const index = updatedStructure.children.findIndex(child => child.id === component.id);
+        if (index !== -1) {
+          updatedStructure.children[index] = updatedComponent;
+        }
+        setPageStructure(updatedStructure);
+        await updateAppPost({ home: updatedStructure });
+        context.ui.showToast('Component updated successfully!');
+      },
+      onDelete: async () => {
+        await handleDeleteComponent(component);
+      }
+    });
+  
+    if (editForm) {
+      context.ui.showForm(editForm); // Call the returned form, not the function
+    } else {
+      context.ui.showToast('Unable to edit this component');
+    }
+  };  
+
+  const handleDeleteComponent = async (component: ComponentType) => {
+    const updatedStructure = deepClone(pageStructure);
+    updatedStructure.children = updatedStructure.children.filter(child => child.id !== component.id);
+    setPageStructure(updatedStructure);
+    await deleteNode('home', component.id);
+    context.ui.showToast('Component deleted successfully!');
   };
 
   function handleComponentTypeSelected(data: { componentType: string }) {
@@ -181,7 +182,7 @@ export const HomePage = ({
             <hstack gap="small" alignment="center top">
               <button icon="add" onPress={() => context.ui.showForm(addComponentForm)} appearance="primary" size="small"></button>
               <spacer size='medium'></spacer>
-              <button icon="edit" onPress={() => handleEditComponent(pageStructure)} appearance="secondary" size="small"></button>
+              <button icon="edit" onPress={() => context.ui.showForm(EditComponentForm)} appearance="primary" size="small"></button>
             </hstack>
           )}
         </zstack>
