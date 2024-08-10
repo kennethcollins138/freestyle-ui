@@ -2,9 +2,9 @@ import type { Context } from '@devvit/public-api';
 import { Devvit } from '@devvit/public-api';
 import { AppController } from '../api/AppController.js';
 import type { PageProps, Route, RouteParams } from '../types/page.js';
-import { Page  } from '../components/Page.js';
 import { WelcomePage } from './welcome.js';
 import { HomePage } from './home.js';
+import { HomeSchema, PageSchema } from '../api/Schema.js';
 
 const getPageForRoute = (route: Route): ((props: PageProps) => JSX.Element) => {
   switch (route) {
@@ -25,8 +25,6 @@ export const App: Devvit.CustomPostComponent = (context: Context) => {
     throw new Error(`Cannot find post id from context`);
   }
 
-  console.log('Post ID:', postId);
-
   const [currentPost, setCurrentPost] = useState(async () => {
     const svc = new AppController(postId, context);
     return await svc.loadAppInstance();
@@ -45,8 +43,6 @@ export const App: Devvit.CustomPostComponent = (context: Context) => {
     const user = await reddit.getCurrentUser();
     return user?.username;
   });
-
-  console.log('Current route:', route);
 
   const isOwner = currentUserUsername ? (currentPost?.owners.includes(currentUserUsername) ?? false) : false;
 
@@ -76,19 +72,28 @@ export const App: Devvit.CustomPostComponent = (context: Context) => {
     return data;
   };
 
-  const deleteNode: AppController['deleteNode'] = async (...args) => {
+  const deleteNode: AppController['deleteNode'] = async (pageId, elementId) => {
     const svc = new AppController(postId, context);
-    const data = await svc.deleteNode(...args);
+    const data = await svc.deleteNode(pageId, elementId);
+  
     setCurrentPost((prevState) => {
       if (!prevState || !data) return prevState;
-      const updatedPages = { ...prevState.pages };
-      if (data.id in updatedPages) {
-        updatedPages[data.id] = data;
+  
+      if (pageId === 'home') {
+        return { ...prevState, home: data as HomeSchema };
       }
+  
+      const updatedPages = { ...prevState.pages };
+      if (pageId in updatedPages) {
+        updatedPages[pageId] = data as PageSchema;
+      }
+  
       return { ...prevState, pages: updatedPages };
     });
+  
     return data;
   };
+  
 
   const addElement: AppController['addChild'] = async (...args) => {
     const svc = new AppController(postId, context);
