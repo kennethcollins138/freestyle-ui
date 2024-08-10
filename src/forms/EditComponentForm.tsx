@@ -1,62 +1,71 @@
 import { Devvit } from '@devvit/public-api';
-import { StackComponentForm } from '../forms/StackComponentForm.js';
-import { ImageComponentForm } from '../forms/ImageComponentForm.js';
-import { TextComponentForm } from '../forms/TextComponentForm.js';
-import { ButtonComponentForm } from '../forms/ButtonComponentForm.js';
-import { PaginationButtonForm } from '../forms/PaginationButtonForm.js';
+import type { ComponentType } from '../types/component.js';
+import { TextComponentForm } from './TextComponentForm.js';
+import { ImageComponentForm } from './ImageComponentForm.js';
+import { StackComponentForm } from './StackComponentForm.js';
+import { ButtonComponentForm } from './ButtonComponentForm.js';
+import { PaginationButtonForm } from './PaginationButtonForm.js';
+
+type FormKey = any; // Placeholder type
 
 interface EditComponentFormProps {
   context: Devvit.Context;
-  element: any; // This should be typed more specifically based on your schema
-  onUpdate: (updatedData: any) => void;
-  onDelete: () => void;
+  element: ComponentType;
+  onUpdate: (updatedElement: ComponentType) => Promise<void>;
+  onDelete: () => Promise<void>;
 }
 
-export const EditComponentForm = ({ context, element, onUpdate, onDelete }: EditComponentFormProps) => {
-  // Form for editing metadata of the element (e.g., Stack)
-  const metadataForm = StackComponentForm({
-    context,
-    type: element.type,
-    onSubmit: (updatedMetadata) => onUpdate({ ...element, ...updatedMetadata }),
-  });
+export const EditComponentForm = ({ context, element, onUpdate, onDelete }: EditComponentFormProps): FormKey | undefined => {
+  let formKey: FormKey | undefined;
 
-  // Forms for adding children elements to the stack
-  const addChildForms = {
-    Image: ImageComponentForm({
-      context,
-      onSubmit: (data) => onUpdate({ ...element, children: [...(element.children || []), data] }),
-    }),
-    Text: TextComponentForm({
-      context,
-      onSubmit: (data) => onUpdate({ ...element, children: [...(element.children || []), data] }),
-    }),
-    Button: ButtonComponentForm({
-      context,
-      onSubmit: (data) => onUpdate({ ...element, children: [...(element.children || []), data] }),
-    }),
-    PaginationButton: PaginationButtonForm({
-      context,
-      onSubmit: (data) => onUpdate({ ...element, children: [...(element.children || []), data] }),
-    }),
-  };
+  switch (element.type) {
+    case 'Text':
+      formKey = TextComponentForm({
+        context,
+        onSubmit: (data) => {
+          onUpdate({ ...element, ...data });
+        },
+      });
+      break;
+    case 'Image':
+      formKey = ImageComponentForm({
+        context,
+        onSubmit: (data) => {
+          onUpdate({ ...element, ...data });
+        },
+      });
+      break;
+    case 'VStack':
+    case 'HStack':
+    case 'ZStack':
+      formKey = StackComponentForm({
+        context,
+        type: element.type,
+        onSubmit: (data) => {
+          onUpdate({ ...element, ...data });
+        },
+      });
+      break;
+    case 'Button':
+      formKey = ButtonComponentForm({
+        context,
+        onSubmit: (data) => {
+          onUpdate({ ...element, ...data });
+        },
+      });
+      break;
+    case 'PaginationButton':
+      formKey = PaginationButtonForm({
+        context,
+        onSubmit: (data) => {
+          onUpdate({ ...element, ...data });
+        },
+      });
+      break;
+    default:
+      formKey = undefined;
+      break;
+  }
 
-  // Show the edit metadata form
-  context.ui.showForm(metadataForm);
-
-  // Allow adding a new child element
-  const handleAddChild = (childType: keyof typeof addChildForms) => {
-    context.ui.showForm(addChildForms[childType]);
-  };
-
-  // Render buttons for adding different types of child elements
-  return (
-    <vstack>
-      <button onPress={() => handleAddChild('Image')} appearance="primary" size="small">Add Image</button>
-      <button onPress={() => handleAddChild('Text')} appearance="primary" size="small">Add Text</button>
-      <button onPress={() => handleAddChild('Button')} appearance="primary" size="small">Add Button</button>
-      <button onPress={() => handleAddChild('PaginationButton')} appearance="primary" size="small">Add Pagination Button</button>
-
-      <button onPress={onDelete} appearance="destructive" size="small">Delete Element</button>
-    </vstack>
-  );
+  return formKey;
 };
