@@ -51,6 +51,7 @@ export const HomePage = ({
   const buttonComponentForm = ButtonComponentForm({ context, onSubmit: (data) => handleAddComponent('Button', data) });
   const paginationButtonForm = PaginationButtonForm({ context, onSubmit: (data) => handleAddComponent('PaginationButton', data) });
 
+  // Handle adding a new component to the page
   const handleAddComponent = async (type: string, data: any) => {
     const newComponent: ComponentType = {
       id: `component-${randomId()}`,
@@ -68,39 +69,33 @@ export const HomePage = ({
     context.ui.showToast('Component added successfully!');
   };
 
-  const handleEditComponent = (component: ComponentType) => {
-    const editForm = EditComponentForm({
-      context,
-      element: component,
-      onUpdate: async (updatedComponent) => {
-        const updatedStructure = deepClone(pageStructure);
-        const index = updatedStructure.children.findIndex(child => child.id === component.id);
-        if (index !== -1) {
-          updatedStructure.children[index] = updatedComponent;
-        }
-        setPageStructure(updatedStructure);
-        await updateAppPost({ home: updatedStructure });
-        context.ui.showToast('Component updated successfully!');
-      },
-      onDelete: async () => {
-        await handleDeleteComponent(component);
-      }
-    });
-  
-    if (editForm) {
-      context.ui.showForm(editForm); // Call the returned form, not the function
-    } else {
-      context.ui.showToast('Unable to edit this component');
-    }
-  };  
-
-  const handleDeleteComponent = async (component: ComponentType) => {
+  // Handle editing a component on the page
+  const handleEditComponent = async (updatedComponent: ComponentType): Promise<void> => {
     const updatedStructure = deepClone(pageStructure);
-    updatedStructure.children = updatedStructure.children.filter(child => child.id !== component.id);
+    const index = updatedStructure.children.findIndex(child => child.id === updatedComponent.id);
+    if (index !== -1) {
+      updatedStructure.children[index] = updatedComponent;
+    }
     setPageStructure(updatedStructure);
-    await deleteNode('home', component.id);
+    await updateAppPost({ home: updatedStructure });
+    context.ui.showToast('Component updated successfully!');
+  };
+
+  // Handle deleting a component from the page
+  const handleDeleteComponent = async (componentId: string): Promise<void> => {
+    const updatedStructure = deepClone(pageStructure);
+    updatedStructure.children = updatedStructure.children.filter(child => child.id !== componentId);
+    setPageStructure(updatedStructure);
+    await deleteNode('home', componentId);
     context.ui.showToast('Component deleted successfully!');
   };
+
+  // Component to edit elements
+  const editComponentForm = EditComponentForm({
+    context,
+    components: pageStructure.children,
+    onUpdate: handleEditComponent,
+  });
 
   function handleComponentTypeSelected(data: { componentType: string }) {
     const type = data.componentType;
@@ -130,11 +125,23 @@ export const HomePage = ({
   const renderComponent = (component: ComponentType) => {
     switch (component.type) {
       case 'VStack':
-        return <VStackElement key={component.id} {...component}>{component.children?.map(renderComponent)}</VStackElement>;
+        return (
+          <VStackElement key={component.id} {...component}>
+            {component.children?.map(renderComponent)}
+          </VStackElement>
+        );
       case 'HStack':
-        return <HStackElement key={component.id} {...component}>{component.children?.map(renderComponent)}</HStackElement>;
+        return (
+          <HStackElement key={component.id} {...component}>
+            {component.children?.map(renderComponent)}
+          </HStackElement>
+        );
       case 'ZStack':
-        return <ZStackElement key={component.id} {...component}>{component.children?.map(renderComponent)}</ZStackElement>;
+        return (
+          <ZStackElement key={component.id} {...component}>
+            {component.children?.map(renderComponent)}
+          </ZStackElement>
+        );
       case 'Image':
         return <ImageElement key={component.id} {...component} />;
       case 'Text':
@@ -161,19 +168,6 @@ export const HomePage = ({
     }
   };
 
-  const handleUpdateComponent = async (component: ComponentType, data: any) => {
-    const updatedStructure = deepClone(pageStructure);
-    const index = updatedStructure.children.findIndex(child => child.id === component.id);
-    if (index !== -1) {
-      updatedStructure.children[index] = { ...component, ...data };
-    }
-
-    setPageStructure(updatedStructure);
-    await updateAppPost({ home: updatedStructure });
-
-    context.ui.showToast('Component updated successfully!');
-  };
-
   return (
     <Page>
       <Page.Content navigate={navigate} showHomeButton={false}>
@@ -181,8 +175,8 @@ export const HomePage = ({
           {isOwner && (
             <hstack gap="small" alignment="center top">
               <button icon="add" onPress={() => context.ui.showForm(addComponentForm)} appearance="primary" size="small"></button>
-              <spacer size='medium'></spacer>
-              <button icon="edit" onPress={() => context.ui.showForm(EditComponentForm)} appearance="primary" size="small"></button>
+              <spacer size='large'></spacer>
+              <button icon="edit" onPress={() => context.ui.showForm(editComponentForm)} appearance="primary" size="small"></button>
             </hstack>
           )}
         </zstack>
