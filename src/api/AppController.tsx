@@ -179,7 +179,7 @@ export class AppController {
             createdAt: new Date().toISOString(),
             createdBy: username,
             owners: [username],
-            primaryColor: {
+            color: {
                 light: '#FF4500',
                 dark: '#1A1A1B',
             },

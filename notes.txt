@@ -1,33 +1,127 @@
-Error in event handler Error: Hooks can only be declared at the top of a component.  You cannot declare hooks outside of components or inside of event handlers.  It's almost always a mistake to declare hooks inside of loops or conditionals.
-    at registerHook (main.js:11554:11)
-    at Object.useForm (main.js:10655:16)
-    at AddComponentForm (main.js:22655:18)
-    at Object.onPress [as onUIEvent] (main.js:23322:511)
-    at BlocksHandler._BlocksHandler_attemptHook2 (main.js:11727:18)
-    at BlocksHandler._BlocksHandler_handleMainQueue2 (main.js:11742:101)
-    at BlocksHandler.handle (main.js:11629:111)
-    at Devvit.RenderPostContent (main.js:11854:20)
-    at /srv/index.cjs:144575:41
-    at executeWithSourceMap (/srv/index.cjs:144457:18)
-[blocks] unhandled error in handler Error: Hooks can only be declared at the top of a component.  You cannot declare hooks outside of components or inside of event handlers.  It's almost always a mistake to declare hooks inside of loops or conditionals.
-    at registerHook (main.js:11554:11)
-    at Object.useForm (main.js:10655:16)
-    at AddComponentForm (main.js:22655:18)
-    at Object.onPress [as onUIEvent] (main.js:23322:511)
-    at BlocksHandler._BlocksHandler_attemptHook2 (main.js:11727:18)
-    at BlocksHandler._BlocksHandler_handleMainQueue2 (main.js:11742:101)
-    at BlocksHandler.handle (main.js:11629:111)
-    at Devvit.RenderPostContent (main.js:11854:20)
-    at /srv/index.cjs:144575:41
-    at executeWithSourceMap (/srv/index.cjs:144457:18)
-2024-08-09T03:36:20.565Z Error: Hooks can only be declared at the top of a component.  You cannot declare hooks outside of components or inside of event handlers.  It's almost always a mistake to declare hooks inside of loops or conditionals.
-    at registerHook (main.js:11554:11)
-    at Object.useForm (main.js:10655:16)
-    at AddComponentForm (main.js:22655:18)
-    at Object.onPress [as onUIEvent] (main.js:23322:511)
-    at BlocksHandler._BlocksHandler_attemptHook2 (main.js:11727:18)
-    at BlocksHandler._BlocksHandler_handleMainQueue2 (main.js:11742:101)
-    at BlocksHandler.handle (main.js:11629:111)
-    at Devvit.RenderPostContent (main.js:11854:20)
-    at /srv/index.cjs:144575:41
-    at executeWithSourceMap (/srv/index.cjs:144457:18)
+Rendering page for route: admin
+Error in event handler _ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "Light Mode",
+      "Dark Mode"
+    ],
+    "path": [
+      "primaryColor"
+    ],
+    "message": "Unrecognized key(s) in object: 'Light Mode', 'Dark Mode'"
+  }
+]
+    at get error (main.js:18477:23)
+    at _ZodObject.parseAsync (main.js:18604:18)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async _Redis.appInstanceUpdate (main.js:22102:26)
+    at async AppController.saveAppInstance (main.js:22280:5)
+    at async AppController.updateAppInstance (main.js:22323:7)
+    at async updateAppPost (main.js:23624:18)
+    at async main.js:23479:7
+    at async UseFormHook.onUIEvent (main.js:10649:9)
+    at async BlocksHandler._BlocksHandler_attemptHook2 (main.js:11727:7) {
+  issues: [
+    {
+      code: 'unrecognized_keys',
+      keys: [Array],
+      path: [Array],
+      message: "Unrecognized key(s) in object: 'Light Mode', 'Dark Mode'"
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'unrecognized_keys',
+      keys: [Array],
+      path: [Array],
+      message: "Unrecognized key(s) in object: 'Light Mode', 'Dark Mode'"
+    }
+  ]
+}
+[blocks] unhandled error in handler _ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "Light Mode",
+      "Dark Mode"
+    ],
+    "path": [
+      "primaryColor"
+    ],
+    "message": "Unrecognized key(s) in object: 'Light Mode', 'Dark Mode'"
+  }
+]
+    at get error (main.js:18477:23)
+    at _ZodObject.parseAsync (main.js:18604:18)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async _Redis.appInstanceUpdate (main.js:22102:26)
+    at async AppController.saveAppInstance (main.js:22280:5)
+    at async AppController.updateAppInstance (main.js:22323:7)
+    at async updateAppPost (main.js:23624:18)
+    at async main.js:23479:7
+    at async UseFormHook.onUIEvent (main.js:10649:9)
+    at async BlocksHandler._BlocksHandler_attemptHook2 (main.js:11727:7) {
+  issues: [
+    {
+      code: 'unrecognized_keys',
+      keys: [Array],
+      path: [Array],
+      message: "Unrecognized key(s) in object: 'Light Mode', 'Dark Mode'"
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'unrecognized_keys',
+      keys: [Array],
+      path: [Array],
+      message: "Unrecognized key(s) in object: 'Light Mode', 'Dark Mode'"
+    }
+  ]
+}
+2024-08-11T07:29:06.760Z _ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "Light Mode",
+      "Dark Mode"
+    ],
+    "path": [
+      "primaryColor"
+    ],
+    "message": "Unrecognized key(s) in object: 'Light Mode', 'Dark Mode'"
+  }
+]
+    at get error (main.js:18477:23)
+    at _ZodObject.parseAsync (main.js:18604:18)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async _Redis.appInstanceUpdate (main.js:22102:26)
+    at async AppController.saveAppInstance (main.js:22280:5)
+    at async AppController.updateAppInstance (main.js:22323:7)
+    at async updateAppPost (main.js:23624:18)
+    at async main.js:23479:7
+    at async UseFormHook.onUIEvent (main.js:10649:9)
+    at async BlocksHandler._BlocksHandler_attemptHook2 (main.js:11727:7) {
+  issues: [
+    {
+      code: 'unrecognized_keys',
+      keys: [Array],
+      path: [Array],
+      message: "Unrecognized key(s) in object: 'Light Mode', 'Dark Mode'"
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'unrecognized_keys',
+      keys: [Array],
+      path: [Array],
+      message: "Unrecognized key(s) in object: 'Light Mode', 'Dark Mode'"
+    }
+  ]
+}

@@ -180,7 +180,10 @@ export class Schema {
       createdAt: z.string().datetime(),
       createdBy: z.string().min(1),
       owners: z.array(z.string()).min(1),
-      primaryColor: Schema.color,
+      color: z.object({
+        light: z.string(),
+        dark: z.string()
+      }),
       title: z.string().min(1),
       header: z.string().min(1),
       subheader: z.string(),

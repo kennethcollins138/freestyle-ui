@@ -40,7 +40,7 @@ export const Page: {
 Page.Content = ({ children, navigate, showHomeButton = true }) => {
   return (
     <zstack width={100} height={100} padding="small">
-      <vstack width={100} lightBackgroundColor="#FFFFFF" darkBackgroundColor="#1A1A1B">
+      <vstack width={100}>
         {children}
       </vstack>
 

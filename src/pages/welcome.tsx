@@ -44,14 +44,14 @@ const Step2 = ({
           name: 'light',
           label: 'Light Color',
           type: 'string',
-          defaultValue: appPost.primaryColor.light,
+          defaultValue: appPost.color.light,
           required: true,
         },
         {
           name: 'dark',
           label: 'Dark Color',
           type: 'string',
-          defaultValue: appPost.primaryColor.dark,
+          defaultValue: appPost.color.dark,
           required: true,
         },
       ],
@@ -60,12 +60,11 @@ const Step2 = ({
     },
     async (data) => {
       await updateAppPost({
-        primaryColor: {
-          ...appPost.primaryColor,
-          ...data,
+        color: {
+          light: data['light'],
+          dark: data['dark']
         },
       });
-      context.ui.showToast(`${data.light} is your current theme`);
     }
   );
 

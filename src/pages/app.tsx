@@ -4,6 +4,7 @@ import { AppController } from '../api/AppController.js';
 import type { PageProps, Route, RouteParams } from '../types/page.js';
 import { WelcomePage } from './welcome.js';
 import { HomePage } from './home.js';
+import { AdminPage } from './admin.js';
 import { HomeSchema, PageSchema } from '../api/Schema.js';
 
 const getPageForRoute = (route: Route): ((props: PageProps) => JSX.Element) => {
@@ -12,6 +13,8 @@ const getPageForRoute = (route: Route): ((props: PageProps) => JSX.Element) => {
       return HomePage;
     case 'welcome':
       return WelcomePage;
+    case 'admin':
+      return AdminPage;
     default:
       throw new Error(`Unhandled route: ${route}`);
   }
@@ -145,7 +148,7 @@ export const App: Devvit.CustomPostComponent = (context: Context) => {
   
 
   return (
-    <vstack>
+    <vstack lightBackgroundColor={currentPost.color.light} darkBackgroundColor={currentPost.color.dark}>
       <PageComponent
         navigate={navigate}
         route={route}

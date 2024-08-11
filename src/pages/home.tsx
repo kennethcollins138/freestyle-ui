@@ -260,7 +260,7 @@ export const HomePage = ({
             )}
           </hstack>
         </zstack>
-        <vstack alignment="center" lightBackgroundColor={pageStructure.light} darkBackgroundColor={pageStructure.dark || pageStructure.light}>
+        <vstack alignment="center">
           {pageStructure.children?.map(renderComponent)}
         </vstack>
       </Page.Content>
