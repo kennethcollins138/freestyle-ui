@@ -1,6 +1,8 @@
 import { Devvit } from '@devvit/public-api';
 
 export interface StackFormData {
+  id?: string;  // Optional, since it might not be present in 'add' mode
+  mode: 'edit' | 'add';
   type: string;
   gap?: Devvit.Blocks.ContainerGap;
   alignment?: Devvit.Blocks.Alignment;
@@ -14,12 +16,14 @@ interface StackComponentFormProps {
   context: Devvit.Context;
   type: 'HStack' | 'VStack' | 'ZStack';
   onSubmit: (data: StackFormData) => void;
+  componentId?: string;
 }
 
 export const StackComponentForm = ({
   context, 
   type, 
-  onSubmit
+  onSubmit,
+  componentId
 }: StackComponentFormProps) => {
   const typeElement = type;
   return context.useForm(
@@ -92,6 +96,8 @@ export const StackComponentForm = ({
     },
     (values) => {
       const formData: StackFormData = {
+        id: componentId,
+        mode: componentId ? 'edit' : 'add',
         type: type,
         gap: values.gap ? values.gap[0] as Devvit.Blocks.ContainerGap : undefined,
         alignment: values.alignment ? values.alignment[0] as Devvit.Blocks.Alignment : undefined,

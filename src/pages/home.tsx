@@ -41,11 +41,12 @@ export const HomePage = ({
   ) => {
     console.log("Form submission data:", formData, "Mode:", mode, "Component Type:", componentType);
 
-    if (mode === 'edit' && componentType && componentId) {
+    if (mode === 'edit' && formData.type && formData.id) {
       const editedComponent: ComponentType = {
         ...formData,
-        id: componentId,
+        id: formData.id,
       };
+      delete editedComponent.mode;
 
       const updatedStructure = await updateAppElement('home', editedComponent.id, editedComponent);
       setPageStructure(updatedStructure);
@@ -55,7 +56,7 @@ export const HomePage = ({
         id: `component-${randomId()}`,
         ...formData,
       };
-
+      delete newComponent.mode;
       const updatedStructure = deepClone(pageStructure);
       updatedStructure.children.push(newComponent);
       setPageStructure(updatedStructure);
@@ -64,27 +65,40 @@ export const HomePage = ({
     }
   };
 
-  const stackComponentForms = {
+  const addStackComponentForms = {
     VStack: StackComponentForm({ context, type: 'VStack', onSubmit: (data) => handleFormSubmit(data, 'add') }),
     HStack: StackComponentForm({ context, type: 'HStack', onSubmit: (data) => handleFormSubmit(data, 'add') }),
     ZStack: StackComponentForm({ context, type: 'ZStack', onSubmit: (data) => handleFormSubmit(data, 'add') }),
   };
 
-  const componentForms = {
+  const addComponentForms = {
     Image: ImageComponentForm({ context, onSubmit: (data) => handleFormSubmit(data, 'add') }),
     Text: TextComponentForm({ context, onSubmit: (data) => handleFormSubmit(data, 'add') }),
     Button: ButtonComponentForm({ context, onSubmit: (data) => handleFormSubmit(data, 'add') }),
     PaginationButton: PaginationButtonForm({ context, onSubmit: (data) => handleFormSubmit(data, 'add') }),
   };
 
+  const editStackComponentForms = {
+    VStack: StackComponentForm({ context, type: 'VStack', onSubmit: (data) => handleFormSubmit(data, 'edit') }),
+    HStack: StackComponentForm({ context, type: 'HStack', onSubmit: (data) => handleFormSubmit(data, 'edit') }),
+    ZStack: StackComponentForm({ context, type: 'ZStack', onSubmit: (data) => handleFormSubmit(data, 'edit') }),
+  };
+
+  const editComponentForms = {
+    Image: ImageComponentForm({ context, onSubmit: (data) => handleFormSubmit(data, 'edit') }),
+    Text: TextComponentForm({ context, onSubmit: (data) => handleFormSubmit(data, 'edit') }),
+    Button: ButtonComponentForm({ context, onSubmit: (data) => handleFormSubmit(data, 'edit') }),
+    PaginationButton: PaginationButtonForm({ context, onSubmit: (data) => handleFormSubmit(data, 'edit') }),
+  };
+
   const addComponentForm = AddComponentForm({ 
     context, 
     onSubmit: (data) => {
-      const selectedForm = componentForms[data.componentType as keyof typeof componentForms];
+      const selectedForm = addComponentForms[data.componentType as keyof typeof addComponentForms];
       if (selectedForm) {
         context.ui.showForm(selectedForm);
-      } else if (data.componentType in stackComponentForms) {
-        context.ui.showForm(stackComponentForms[data.componentType as keyof typeof stackComponentForms]);
+      } else if (data.componentType in addStackComponentForms) {
+        context.ui.showForm(addStackComponentForms[data.componentType as keyof typeof addStackComponentForms]);
       } else {
         context.ui.showToast('Unknown component type selected');
       }
@@ -95,11 +109,11 @@ export const HomePage = ({
     context,
     components: pageStructure.children,
     onSubmit: (data) => {
-      const selectedForm = componentForms[data.componentType as keyof typeof componentForms];
+      const selectedForm = editComponentForms[data.componentType as keyof typeof editComponentForms];
       if (selectedForm) {
-        context.ui.showForm(selectedForm, data); // passing data to be used in the form
-      } else if (data.componentType in stackComponentForms) {
-        context.ui.showForm(stackComponentForms[data.componentType as keyof typeof stackComponentForms], data);
+        context.ui.showForm(selectedForm, data);  
+      } else if (data.componentType in editStackComponentForms) {
+        context.ui.showForm(editStackComponentForms[data.componentType as keyof typeof editStackComponentForms], data);
       } else {
         context.ui.showToast('Unknown component type selected');
       }
