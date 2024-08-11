@@ -1,6 +1,6 @@
 import { Devvit, IconName } from '@devvit/public-api';
 
-interface ButtonFormData {
+export interface ButtonFormData {
   icon?: string;
   size: Devvit.Blocks.ButtonSize;
   appearance: Devvit.Blocks.ButtonAppearance;

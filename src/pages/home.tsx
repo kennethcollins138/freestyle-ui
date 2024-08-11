@@ -77,25 +77,59 @@ export const HomePage = ({
 
   // Handle editing a component on the page
   // TODO: Editing this to work properly. I like my implementation. Since updateAppElemnet returns the page
-  const handleEditComponent = async (updatedComponent: ComponentType): Promise<void> => {
-    console.log("Editing component:", updatedComponent);
+  const handleEditComponent = async ({ componentType, componentId }: { componentType: string; componentId: string }): Promise<void> => {
+    console.log("Editing component:", { componentType, componentId });
 
-    // Ensure the component is correctly formed before updating
-    const editedComponent: ComponentType = {
-        ...updatedComponent,
-        type: updatedComponent.type,
-        ...(updatedComponent.type === 'VStack' || updatedComponent.type === 'HStack' || updatedComponent.type === 'ZStack' ? { children: updatedComponent.children || [] } : {}),
+    // Function to handle the form submission and capture the updated component data
+    const handleFormSubmit = async (formData: any) => {
+        console.log("Form data submitted:", formData);
+
+        // Ensure the component is correctly formed before updating
+        const editedComponent: ComponentType = {
+            ...formData,
+            id: componentId, // Ensure the correct id is set
+            type: componentType,
+            ...(componentType === 'VStack' || componentType === 'HStack' || componentType === 'ZStack'
+                ? { children: formData.children || [] }
+                : {}),
+        };
+
+        // Update the structure and refresh the state
+        const updatedStructure = await updateAppElement('home', editedComponent.id, editedComponent);
+
+        console.log("Updated structure after editing component:", updatedStructure);
+
+        setPageStructure(updatedStructure);
+
+        context.ui.showToast('Component updated successfully!');
     };
 
-    // Update the structure and refresh the state
-    const updatedStructure = await updateAppElement('home', updatedComponent.id, editedComponent);
-
-    console.log("Updated structure after editing component:", updatedStructure);
-
-    setPageStructure(updatedStructure);
-
-    context.ui.showToast('Component updated successfully!');
+    // Display the appropriate form based on the selected component type
+    switch (componentType) {
+        case 'VStack':
+        case 'HStack':
+        case 'ZStack':
+            context.ui.showForm(StackComponentForm({ context, type: componentType, onSubmit: handleFormSubmit }));
+            break;
+        case 'Image':
+            context.ui.showForm(ImageComponentForm({ context, onSubmit: handleFormSubmit }));
+            break;
+        case 'Text':
+            context.ui.showForm(TextComponentForm({ context, onSubmit: handleFormSubmit }));
+            break;
+        case 'Button':
+            context.ui.showForm(ButtonComponentForm({ context, onSubmit: handleFormSubmit }));
+            break;
+        case 'PaginationButton':
+            context.ui.showForm(PaginationButtonForm({ context, onSubmit: handleFormSubmit }));
+            break;
+        default:
+            context.ui.showToast('Unknown component type selected');
+            console.error("Unknown component type:", componentType);
+            return;
+    }
 };
+
 
 
   // Handle deleting a component from the page
