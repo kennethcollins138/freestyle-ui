@@ -1,6 +1,7 @@
 import { Devvit } from '@devvit/public-api';
 
-interface StackFormData {
+export interface StackFormData {
+  type: string;
   gap?: Devvit.Blocks.ContainerGap;
   alignment?: Devvit.Blocks.Alignment;
   width?: Devvit.Blocks.SizeString;
@@ -20,6 +21,7 @@ export const StackComponentForm = ({
   type, 
   onSubmit
 }: StackComponentFormProps) => {
+  const typeElement = type;
   return context.useForm(
     {
       fields: [
@@ -90,6 +92,7 @@ export const StackComponentForm = ({
     },
     (values) => {
       const formData: StackFormData = {
+        type: type,
         gap: values.gap ? values.gap[0] as Devvit.Blocks.ContainerGap : undefined,
         alignment: values.alignment ? values.alignment[0] as Devvit.Blocks.Alignment : undefined,
         width: values.width as Devvit.Blocks.SizeString,

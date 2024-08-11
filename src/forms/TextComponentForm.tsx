@@ -1,6 +1,7 @@
 import { Devvit } from '@devvit/public-api';
 
-interface TextFormData {
+export interface TextFormData {
+  type: string;
   text: string;
   style?: Devvit.Blocks.TextStyle;
   size?: Devvit.Blocks.TextSize;
@@ -136,6 +137,7 @@ export const TextComponentForm = ({ context, onSubmit }: { context: Devvit.Conte
     },
     (values) => {
       const formData: TextFormData = {
+        type: 'Text',
         text: values.text as string,
         style: values.style ? (values.style[0] as Devvit.Blocks.TextStyle) : undefined,
         size: values.size ? (values.size[0] as Devvit.Blocks.TextSize) : undefined,

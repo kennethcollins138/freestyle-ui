@@ -36,44 +36,15 @@ export const HomePage = ({
   const { useState } = context;
   const [pageStructure, setPageStructure] = useState(appPost.home);
 
-  // Logging for debugging purposes
-  console.log("Initial page structure:", pageStructure);
-
-  // Define forms outside of event handlers to avoid re-defining them on every render
-  const addComponentForm = AddComponentForm({ context, onSubmit: handleComponentTypeSelected });
-
-  const stackComponentForms = {
-    VStack: StackComponentForm({ context, type: 'VStack', onSubmit: (data) => handleAddComponent('VStack', data) }),
-    HStack: StackComponentForm({ context, type: 'HStack', onSubmit: (data) => handleAddComponent('HStack', data) }),
-    ZStack: StackComponentForm({ context, type: 'ZStack', onSubmit: (data) => handleAddComponent('ZStack', data) }),
-  };
-
-  const componentForms = {
-    Image: ImageComponentForm({ context, onSubmit: (data) => handleAddComponent('Image', data) }),
-    Text: TextComponentForm({ context, onSubmit: (data) => handleAddComponent('Text', data) }),
-    Button: ButtonComponentForm({ context, onSubmit: (data) => handleAddComponent('Button', data) }),
-    PaginationButton: PaginationButtonForm({ context, onSubmit: (data) => handleAddComponent('PaginationButton', data) }),
-  };
-
-  const handleAddComponent = async (type: string, data: any) => {
-    const newComponent: ComponentType = {
-      id: `component-${randomId()}`,
-      type,
-      ...(type === 'VStack' || type === 'HStack' || type === 'ZStack' ? { children: [] } : {}),
-      ...data,
-    };
-
-    const updatedStructure = deepClone(pageStructure);
-    updatedStructure.children.push(newComponent);
-
-    setPageStructure(updatedStructure);
-    await updateAppPost({ home: updatedStructure });
-
-    context.ui.showToast('Component added successfully!');
-  };
-
-  const handleEditComponent = async ({ componentType, componentId }: { componentType: string; componentId: string }): Promise<void> => {
-    const handleFormSubmit = async (formData: any) => {
+  const handleFormSubmit = async (
+    formData: any, 
+    mode: 'edit' | 'add', 
+    componentType?: string, 
+    componentId?: string
+  ) => {
+    console.log("Form submission data:", formData, "Mode:", mode, "Component Type:", componentType);
+  
+    if (mode === 'edit' && componentType && componentId) {
       const editedComponent: ComponentType = {
         ...formData,
         id: componentId,
@@ -82,22 +53,69 @@ export const HomePage = ({
           ? { children: formData.children || [] }
           : {}),
       };
-
       const updatedStructure = await updateAppElement('home', editedComponent.id, editedComponent);
-
       setPageStructure(updatedStructure);
       context.ui.showToast('Component updated successfully!');
-    };
-
-    if (componentType in stackComponentForms) {
-      context.ui.showForm(stackComponentForms[componentType as keyof typeof stackComponentForms]);
-    } else if (componentType in componentForms) {
-      context.ui.showForm(componentForms[componentType as keyof typeof componentForms]);
-    } else {
-      context.ui.showToast('Unknown component type selected');
-      console.error("Unknown component type:", componentType);
+    } else if (mode === 'add') {
+      const newComponent: ComponentType = {
+        id: `component-${randomId()}`,
+        type: formData.componentType,
+        ...(formData.componentType === 'VStack' || formData.componentType === 'HStack' || formData.componentType === 'ZStack'
+          ? { children: [] }
+          : {}),
+        ...formData,
+      };
+      const updatedStructure = deepClone(pageStructure);
+      updatedStructure.children.push(newComponent);
+      setPageStructure(updatedStructure);
+      await updateAppPost({ home: updatedStructure });
+      context.ui.showToast('Component added successfully!');
     }
   };
+  
+  // Define all forms at the top level to avoid issues with hooks
+  const stackComponentForms = {
+    VStack: StackComponentForm({ context, type: 'VStack', onSubmit: (data) => handleFormSubmit(data, 'add') }),
+    HStack: StackComponentForm({ context, type: 'HStack', onSubmit: (data) => handleFormSubmit(data, 'add') }),
+    ZStack: StackComponentForm({ context, type: 'ZStack', onSubmit: (data) => handleFormSubmit(data, 'add') }),
+  };
+
+  const componentForms = {
+    Image: ImageComponentForm({ context, onSubmit: (data) => handleFormSubmit(data, 'add') }),
+    Text: TextComponentForm({ context, onSubmit: (data) => handleFormSubmit(data, 'add') }),
+    Button: ButtonComponentForm({ context, onSubmit: (data) => handleFormSubmit(data, 'add') }),
+    PaginationButton: PaginationButtonForm({ context, onSubmit: (data) => handleFormSubmit(data, 'add') }),
+  };
+
+  const addComponentForm = AddComponentForm({ 
+    context, 
+    onSubmit: (data) => {
+      // Trigger the correct form based on the selected component type
+      const selectedForm = componentForms[data.componentType as keyof typeof componentForms];
+      if (selectedForm) {
+        context.ui.showForm(selectedForm);
+      } else if (data.componentType in stackComponentForms) {
+        context.ui.showForm(stackComponentForms[data.componentType as keyof typeof stackComponentForms]);
+      } else {
+        context.ui.showToast('Unknown component type selected');
+      }
+    }
+  });
+
+  const editComponentForm = EditComponentForm({
+    context,
+    components: pageStructure.children,
+    onSubmit: (data) => {
+      const selectedForm = componentForms[data.componentType as keyof typeof componentForms];
+      if (selectedForm) {
+        context.ui.showForm(selectedForm);
+      } else if (data.componentType in stackComponentForms) {
+        context.ui.showForm(stackComponentForms[data.componentType as keyof typeof stackComponentForms]);
+      } else {
+        context.ui.showToast('Unknown component type selected');
+      }
+    },
+  });
 
   const handleDeleteComponent = async (componentId: string): Promise<void> => {
     const updatedStructure = deepClone(pageStructure);
@@ -105,30 +123,15 @@ export const HomePage = ({
 
     setPageStructure(updatedStructure);
     await deleteNode('home', componentId);
-
     context.ui.showToast('Component deleted successfully!');
   };
 
-  const editComponentForm = EditComponentForm({
-    context,
-    components: pageStructure.children,
-    onSubmit: handleEditComponent,
-  });
-
-  function handleComponentTypeSelected(data: { componentType: string }) {
-    const type = data.componentType;
-
-    if (type in stackComponentForms) {
-      context.ui.showForm(stackComponentForms[type as keyof typeof stackComponentForms]);
-    } else if (type in componentForms) {
-      context.ui.showForm(componentForms[type as keyof typeof componentForms]);
-    } else {
-      context.ui.showToast('Unknown component type selected');
-      console.error("Unknown component type selected:", type);
-    }
-  }
-
   const renderComponent = (component: ComponentType) => {
+    console.log("Rendering component:", component); // Add this log
+    if (!component.type) {
+      console.error("Component type is undefined for component:", component);
+      return null;
+    }
     switch (component.type) {
       case 'VStack':
         return (
@@ -174,8 +177,14 @@ export const HomePage = ({
   };
 
   const settingsPage: Devvit.Blocks.OnPressEventHandler = () => navigate('admin');
-  const addNewElement: Devvit.Blocks.OnPressEventHandler = () => context.ui.showForm(addComponentForm);
-  const editPage: Devvit.Blocks.OnPressEventHandler = () => context.ui.showForm(editComponentForm);
+
+  const addNewElement: Devvit.Blocks.OnPressEventHandler = () => {
+    context.ui.showForm(addComponentForm);
+  };
+
+  const editPage: Devvit.Blocks.OnPressEventHandler = () => {
+    context.ui.showForm(editComponentForm);
+  };
 
   return (
     <Page>

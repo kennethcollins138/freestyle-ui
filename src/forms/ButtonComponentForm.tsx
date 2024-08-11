@@ -1,6 +1,7 @@
 import { Devvit, IconName } from '@devvit/public-api';
 
 export interface ButtonFormData {
+  type: string;
   icon?: string;
   size: Devvit.Blocks.ButtonSize;
   appearance: Devvit.Blocks.ButtonAppearance;
@@ -86,6 +87,7 @@ export const ButtonComponentForm = ({ context, onSubmit }: { context: Devvit.Con
     },
     (values) => {
       const formData: ButtonFormData = {
+        type: 'Button',
         text: values.text as string,
         url: values.url as string,
         icon: values.icon ? values.icon[0] as string : undefined,

@@ -1,6 +1,6 @@
 import { Devvit } from '@devvit/public-api';
 
-interface PaginationButtonFormData {
+export interface PaginationButtonFormData {
   text: string;
   pageId: string;
 }
