@@ -1,6 +1,7 @@
 import { Devvit } from '@devvit/public-api';
 
 export interface PaginationButtonFormData {
+  type: string;
   text: string;
   pageId: string;
 }
@@ -15,6 +16,13 @@ export const PaginationButtonForm = ({ context, onSubmit }: { context: Devvit.Co
       title: 'Add New Page Button',
       acceptLabel: 'Add',
     },
-    onSubmit
+    (values) => {
+      const formData = {
+        type: 'PaginationButton',
+        text: values.text as string,
+        pageId: values.pageId as string
+      };
+      onSubmit(formData);
+    }
   );
 };

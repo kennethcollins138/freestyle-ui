@@ -1,25 +1,22 @@
 import { Devvit } from '@devvit/public-api';
-import type { z } from 'zod';
-import { Schema } from '../api/Schema.js';
 import { Page } from '../components/Page.js';
 import type { PageProps } from '../types/page.js';
 import { deepClone, randomId } from '../util.js';
 import { AddComponentForm } from '../forms/AddComponentForm.js';
 import { EditComponentForm } from '../forms/EditComponentForm.js';
-import { ImageComponentForm } from '../forms/ImageComponentForm.js';
-import { TextComponentForm } from '../forms/TextComponentForm.js';
-import { StackComponentForm } from '../forms/StackComponentForm.js';
-import { ButtonComponentForm } from '../forms/ButtonComponentForm.js';
-import { PaginationButtonForm } from '../forms/PaginationButtonForm.js';
+import { ImageComponentForm, ImageFormData } from '../forms/ImageComponentForm.js';
+import { TextComponentForm, TextFormData } from '../forms/TextComponentForm.js';
+import { StackComponentForm, StackFormData } from '../forms/StackComponentForm.js';
+import { ButtonComponentForm, ButtonFormData } from '../forms/ButtonComponentForm.js';
+import { PaginationButtonForm, PaginationButtonFormData } from '../forms/PaginationButtonForm.js';
 import { VStackElement } from '../components/VStackElement.js';
 import { HStackElement } from '../components/HStackElement.js';
 import { ZStackElement } from '../components/ZStackElement.js';
 import { TextElement } from '../components/TextElement.js';
 import { ImageElement } from '../components/ImageElement.js';
+import { ComponentType, FormComponentData } from '../types/component.js';
 
 export default Devvit;
-
-type ComponentType = z.infer<typeof Schema.ElementSchema>;
 
 export const HomePage = ({
   navigate,
@@ -37,34 +34,28 @@ export const HomePage = ({
   const [pageStructure, setPageStructure] = useState(appPost.home);
 
   const handleFormSubmit = async (
-    formData: any, 
+    formData: FormComponentData, 
     mode: 'edit' | 'add', 
     componentType?: string, 
     componentId?: string
   ) => {
     console.log("Form submission data:", formData, "Mode:", mode, "Component Type:", componentType);
-  
+
     if (mode === 'edit' && componentType && componentId) {
       const editedComponent: ComponentType = {
         ...formData,
         id: componentId,
-        type: componentType,
-        ...(componentType === 'VStack' || componentType === 'HStack' || componentType === 'ZStack'
-          ? { children: formData.children || [] }
-          : {}),
       };
+
       const updatedStructure = await updateAppElement('home', editedComponent.id, editedComponent);
       setPageStructure(updatedStructure);
       context.ui.showToast('Component updated successfully!');
     } else if (mode === 'add') {
       const newComponent: ComponentType = {
         id: `component-${randomId()}`,
-        type: formData.componentType,
-        ...(formData.componentType === 'VStack' || formData.componentType === 'HStack' || formData.componentType === 'ZStack'
-          ? { children: [] }
-          : {}),
         ...formData,
       };
+
       const updatedStructure = deepClone(pageStructure);
       updatedStructure.children.push(newComponent);
       setPageStructure(updatedStructure);
@@ -72,8 +63,7 @@ export const HomePage = ({
       context.ui.showToast('Component added successfully!');
     }
   };
-  
-  // Define all forms at the top level to avoid issues with hooks
+
   const stackComponentForms = {
     VStack: StackComponentForm({ context, type: 'VStack', onSubmit: (data) => handleFormSubmit(data, 'add') }),
     HStack: StackComponentForm({ context, type: 'HStack', onSubmit: (data) => handleFormSubmit(data, 'add') }),
@@ -90,7 +80,6 @@ export const HomePage = ({
   const addComponentForm = AddComponentForm({ 
     context, 
     onSubmit: (data) => {
-      // Trigger the correct form based on the selected component type
       const selectedForm = componentForms[data.componentType as keyof typeof componentForms];
       if (selectedForm) {
         context.ui.showForm(selectedForm);
@@ -108,9 +97,9 @@ export const HomePage = ({
     onSubmit: (data) => {
       const selectedForm = componentForms[data.componentType as keyof typeof componentForms];
       if (selectedForm) {
-        context.ui.showForm(selectedForm);
+        context.ui.showForm(selectedForm, data); // passing data to be used in the form
       } else if (data.componentType in stackComponentForms) {
-        context.ui.showForm(stackComponentForms[data.componentType as keyof typeof stackComponentForms]);
+        context.ui.showForm(stackComponentForms[data.componentType as keyof typeof stackComponentForms], data);
       } else {
         context.ui.showToast('Unknown component type selected');
       }
@@ -127,7 +116,7 @@ export const HomePage = ({
   };
 
   const renderComponent = (component: ComponentType) => {
-    console.log("Rendering component:", component); // Add this log
+    console.log("Rendering component:", component);
     if (!component.type) {
       console.error("Component type is undefined for component:", component);
       return null;

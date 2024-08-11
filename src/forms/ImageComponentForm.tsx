@@ -6,6 +6,7 @@ export interface ImageComponentFormProps {
 }
 
 export interface ImageFormData {
+  type: string;
   url: string;
   width: Devvit.Blocks.SizeString;
   height: Devvit.Blocks.SizeString;
@@ -65,6 +66,7 @@ export const ImageComponentForm = ({ context, onSubmit }: ImageComponentFormProp
     },
     (values) => {
       const formData: ImageFormData = {
+        type: 'Image',
         url: values.url as string,
         width: values.width as Devvit.Blocks.SizeString,
         height: values.height as Devvit.Blocks.SizeString,

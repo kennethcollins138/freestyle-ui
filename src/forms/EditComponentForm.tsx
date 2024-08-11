@@ -11,7 +11,9 @@ export const EditComponentForm = ({ context, components, onSubmit }: EditCompone
     label: `${component.type} (${component.id})`,
     value: `${component.type}:${component.id}`,
   }));
+  
   console.log("About to set up the form...");
+
   return context.useForm(
     {
       fields: [
@@ -28,22 +30,16 @@ export const EditComponentForm = ({ context, components, onSubmit }: EditCompone
       acceptLabel: 'Next',
     },
     (data) => {
-      console.log(`EDIT FORM DATA: ${data}`)
+      console.log(`EDIT FORM DATA: ${data}`);
       const selectedComponent = data.selectedComponent as string | string[];
       console.log(selectedComponent);
+
       // Check if selectedComponent is an array and handle accordingly
       const [componentType, componentId] = Array.isArray(selectedComponent) 
         ? selectedComponent[0].split(':') 
         : selectedComponent.split(':');
-
-      if (componentType && componentId) {
-        console.log(`Component Type: ${componentType}`);
-        console.log(`Component Id: ${componentId}`);
-        onSubmit({ componentType, componentId });
-      } else {
-        console.error("Component type or ID is undefined:", { componentType, componentId });
-        context.ui.showToast('Failed to select a component. Please try again.');
-      }
+      
+      onSubmit({ componentType, componentId });
     }
   );
 };
