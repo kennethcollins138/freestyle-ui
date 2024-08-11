@@ -34,26 +34,27 @@ export const HomePage = ({
   },
 }: PageProps): JSX.Element => {
   const { useState } = context;
-  const [pageStructure, setPageStructure] = useState<z.infer<typeof Schema['HomeSchema']>>(appPost.home);
+  const [pageStructure, setPageStructure] = useState(appPost.home);
 
+  // Logging for debugging purposes
   console.log("Initial page structure:", pageStructure);
 
-  // Prepare forms outside of event handlers
+  // Define forms outside of event handlers to avoid re-defining them on every render
   const addComponentForm = AddComponentForm({ context, onSubmit: handleComponentTypeSelected });
 
-  // Stack component forms initialized at the top
   const stackComponentForms = {
     VStack: StackComponentForm({ context, type: 'VStack', onSubmit: (data) => handleAddComponent('VStack', data) }),
     HStack: StackComponentForm({ context, type: 'HStack', onSubmit: (data) => handleAddComponent('HStack', data) }),
     ZStack: StackComponentForm({ context, type: 'ZStack', onSubmit: (data) => handleAddComponent('ZStack', data) }),
   };
 
-  const imageComponentForm = ImageComponentForm({ context, onSubmit: (data) => handleAddComponent('Image', data) });
-  const textComponentForm = TextComponentForm({ context, onSubmit: (data) => handleAddComponent('Text', data) });
-  const buttonComponentForm = ButtonComponentForm({ context, onSubmit: (data) => handleAddComponent('Button', data) });
-  const paginationButtonForm = PaginationButtonForm({ context, onSubmit: (data) => handleAddComponent('PaginationButton', data) });
+  const componentForms = {
+    Image: ImageComponentForm({ context, onSubmit: (data) => handleAddComponent('Image', data) }),
+    Text: TextComponentForm({ context, onSubmit: (data) => handleAddComponent('Text', data) }),
+    Button: ButtonComponentForm({ context, onSubmit: (data) => handleAddComponent('Button', data) }),
+    PaginationButton: PaginationButtonForm({ context, onSubmit: (data) => handleAddComponent('PaginationButton', data) }),
+  };
 
-  // Handle adding a new component to the page
   const handleAddComponent = async (type: string, data: any) => {
     const newComponent: ComponentType = {
       id: `component-${randomId()}`,
@@ -62,12 +63,8 @@ export const HomePage = ({
       ...data,
     };
 
-    console.log("Adding new component:", newComponent);
-
     const updatedStructure = deepClone(pageStructure);
     updatedStructure.children.push(newComponent);
-
-    console.log("Updated structure after adding component:", updatedStructure);
 
     setPageStructure(updatedStructure);
     await updateAppPost({ home: updatedStructure });
@@ -75,71 +72,36 @@ export const HomePage = ({
     context.ui.showToast('Component added successfully!');
   };
 
-  // Handle editing a component on the page
-  // TODO: Editing this to work properly. I like my implementation. Since updateAppElemnet returns the page
   const handleEditComponent = async ({ componentType, componentId }: { componentType: string; componentId: string }): Promise<void> => {
-    console.log("Editing component:", { componentType, componentId });
-
-    // Function to handle the form submission and capture the updated component data
     const handleFormSubmit = async (formData: any) => {
-        console.log("Form data submitted:", formData);
+      const editedComponent: ComponentType = {
+        ...formData,
+        id: componentId,
+        type: componentType,
+        ...(componentType === 'VStack' || componentType === 'HStack' || componentType === 'ZStack'
+          ? { children: formData.children || [] }
+          : {}),
+      };
 
-        // Ensure the component is correctly formed before updating
-        const editedComponent: ComponentType = {
-            ...formData,
-            id: componentId, // Ensure the correct id is set
-            type: componentType,
-            ...(componentType === 'VStack' || componentType === 'HStack' || componentType === 'ZStack'
-                ? { children: formData.children || [] }
-                : {}),
-        };
+      const updatedStructure = await updateAppElement('home', editedComponent.id, editedComponent);
 
-        // Update the structure and refresh the state
-        const updatedStructure = await updateAppElement('home', editedComponent.id, editedComponent);
-
-        console.log("Updated structure after editing component:", updatedStructure);
-
-        setPageStructure(updatedStructure);
-
-        context.ui.showToast('Component updated successfully!');
+      setPageStructure(updatedStructure);
+      context.ui.showToast('Component updated successfully!');
     };
 
-    // Display the appropriate form based on the selected component type
-    switch (componentType) {
-        case 'VStack':
-        case 'HStack':
-        case 'ZStack':
-            context.ui.showForm(StackComponentForm({ context, type: componentType, onSubmit: handleFormSubmit }));
-            break;
-        case 'Image':
-            context.ui.showForm(ImageComponentForm({ context, onSubmit: handleFormSubmit }));
-            break;
-        case 'Text':
-            context.ui.showForm(TextComponentForm({ context, onSubmit: handleFormSubmit }));
-            break;
-        case 'Button':
-            context.ui.showForm(ButtonComponentForm({ context, onSubmit: handleFormSubmit }));
-            break;
-        case 'PaginationButton':
-            context.ui.showForm(PaginationButtonForm({ context, onSubmit: handleFormSubmit }));
-            break;
-        default:
-            context.ui.showToast('Unknown component type selected');
-            console.error("Unknown component type:", componentType);
-            return;
+    if (componentType in stackComponentForms) {
+      context.ui.showForm(stackComponentForms[componentType as keyof typeof stackComponentForms]);
+    } else if (componentType in componentForms) {
+      context.ui.showForm(componentForms[componentType as keyof typeof componentForms]);
+    } else {
+      context.ui.showToast('Unknown component type selected');
+      console.error("Unknown component type:", componentType);
     }
-};
+  };
 
-
-
-  // Handle deleting a component from the page
   const handleDeleteComponent = async (componentId: string): Promise<void> => {
-    console.log("Deleting component with ID:", componentId);
-
     const updatedStructure = deepClone(pageStructure);
     updatedStructure.children = updatedStructure.children.filter(child => child.id !== componentId);
-
-    console.log("Updated structure after deleting component:", updatedStructure);
 
     setPageStructure(updatedStructure);
     await deleteNode('home', componentId);
@@ -147,7 +109,6 @@ export const HomePage = ({
     context.ui.showToast('Component deleted successfully!');
   };
 
-  // Component to edit elements
   const editComponentForm = EditComponentForm({
     context,
     components: pageStructure.children,
@@ -156,35 +117,18 @@ export const HomePage = ({
 
   function handleComponentTypeSelected(data: { componentType: string }) {
     const type = data.componentType;
-    console.log("Component type selected:", type);
 
-    switch (type) {
-      case 'VStack':
-      case 'HStack':
-      case 'ZStack':
-        context.ui.showForm(stackComponentForms[type]);
-        break;
-      case 'Image':
-        context.ui.showForm(imageComponentForm);
-        break;
-      case 'Text':
-        context.ui.showForm(textComponentForm);
-        break;
-      case 'Button':
-        context.ui.showForm(buttonComponentForm);
-        break;
-      case 'PaginationButton':
-        context.ui.showForm(paginationButtonForm);
-        break;
-      default:
-        console.error("Unknown component type selected:", type);
-        context.ui.showToast('Unknown component type selected');
+    if (type in stackComponentForms) {
+      context.ui.showForm(stackComponentForms[type as keyof typeof stackComponentForms]);
+    } else if (type in componentForms) {
+      context.ui.showForm(componentForms[type as keyof typeof componentForms]);
+    } else {
+      context.ui.showToast('Unknown component type selected');
+      console.error("Unknown component type selected:", type);
     }
   }
 
   const renderComponent = (component: ComponentType) => {
-    console.log("Rendering component:", component);
-    
     switch (component.type) {
       case 'VStack':
         return (
@@ -215,9 +159,7 @@ export const HomePage = ({
             icon={component.icon}
             size={component.size}
             appearance={component.appearance}
-            onPress={async () => {
-              context.ui.navigateTo(component.url);
-            }}
+            onPress={async () => context.ui.navigateTo(component.url)}
             {...(component.width ? { width: component.width } : {})}
             {...(component.height ? { height: component.height } : {})}
             {...(component.isGrow ? { grow: true } : {})}
@@ -230,16 +172,11 @@ export const HomePage = ({
         return null;
     }
   };
-  const settingsPage: Devvit.Blocks.OnPressEventHandler = async () => {
-    navigate('admin');
-  };
 
-  const addNewElement: Devvit.Blocks.OnPressEventHandler = async () => {
-    context.ui.showForm(addComponentForm);
-  }
-  const editPage: Devvit.Blocks.OnPressEventHandler = async () => {
-    context.ui.showForm(editComponentForm);
-  }
+  const settingsPage: Devvit.Blocks.OnPressEventHandler = () => navigate('admin');
+  const addNewElement: Devvit.Blocks.OnPressEventHandler = () => context.ui.showForm(addComponentForm);
+  const editPage: Devvit.Blocks.OnPressEventHandler = () => context.ui.showForm(editComponentForm);
+
   return (
     <Page>
       <Page.Content navigate={navigate} showHomeButton={false}>
@@ -247,15 +184,9 @@ export const HomePage = ({
           <hstack width={100} alignment="center middle">
             {isOwner && (
               <hstack gap="small" alignment="start">
-                <hstack >
                 <button onPress={settingsPage} icon="settings" size="small" textColor="green" appearance="primary"></button>
-                </hstack>
-                <hstack>
-                  <button icon="add" onPress={addNewElement} appearance="primary" size="small"></button>
-                </hstack>
-                <hstack>
-                  <button icon="edit" onPress={editPage} appearance="primary" size="small"></button>
-                </hstack>
+                <button icon="add" onPress={addNewElement} appearance="primary" size="small"></button>
+                <button icon="edit" onPress={editPage} appearance="primary" size="small"></button>
               </hstack>
             )}
           </hstack>

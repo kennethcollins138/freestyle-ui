@@ -11,7 +11,7 @@ export const EditComponentForm = ({ context, components, onSubmit }: EditCompone
     label: `${component.type} (${component.id})`,
     value: `${component.type}:${component.id}`,
   }));
-
+  console.log("About to set up the form...");
   return context.useForm(
     {
       fields: [
@@ -19,9 +19,7 @@ export const EditComponentForm = ({ context, components, onSubmit }: EditCompone
           name: 'selectedComponent',
           label: 'Select Component to Edit',
           type: 'select',
-          options: [
-            {label: 'Button', value: 'Button:component-1145025518663'}
-          ],
+          options: componentOptions,
           required: true,
           multiple: false,
         },
@@ -29,7 +27,8 @@ export const EditComponentForm = ({ context, components, onSubmit }: EditCompone
       title: 'Edit Component',
       acceptLabel: 'Next',
     },
-    async (data) => {
+    (data) => {
+      console.log(`EDIT FORM DATA: ${data}`)
       const selectedComponent = data.selectedComponent as string | string[];
       console.log(selectedComponent);
       // Check if selectedComponent is an array and handle accordingly
