@@ -83,27 +83,22 @@ export class AppController {
         return null;
     }
     // Need to clean up
-    async editElement(pageId: string, elementId: string, updates: Partial<ElementSchema>): Promise<ElementSchema | null> {
+    async editElement(pageId: string, elementId: string, updates: Partial<ElementSchema>): Promise<PageSchema | HomeSchema> {
         const appInstance = await this.loadAppInstance();
-        if (appInstance && appInstance.pages[pageId]) {
-            const page = appInstance.pages[pageId];
-            const elementIndex = page.children.findIndex((el: ElementSchema) => el.id === elementId);
-            if (elementIndex !== -1) {
-                page.children[elementIndex] = { ...page.children[elementIndex], ...updates };
-                await this.saveAppInstance(appInstance);
-                return page.children[elementIndex];
+        
+        if (appInstance) {
+            if (pageId === 'home' || appInstance.pages[pageId]) {
+                const page = pageId === 'home' ? appInstance.home : appInstance.pages[pageId];
+                const elementIndex = page.children.findIndex((el: ElementSchema) => el.id === elementId);
+                if (elementIndex !== -1) {
+                    page.children[elementIndex] = { ...page.children[elementIndex], ...updates };
+                    await this.saveAppInstance(appInstance);
+                    return page;
+                }
             }
         }
-        if (appInstance && pageId === 'home'){
-            const page = appInstance.home;
-            const elementIndex = page.children.findIndex((el: ElementSchema) => el.id === elementId);
-            if (elementIndex !== -1) {
-                page.children[elementIndex] = { ...page.children[elementIndex], ...updates };
-                await this.saveAppInstance(appInstance);
-                return page.children[elementIndex];
-            }
-        }
-        return null;
+        
+        throw new Error("Failed to update the component.");
     }
 
     async deleteNode(pageId: string, elementId: string): Promise<PageSchema | null | HomeSchema> {

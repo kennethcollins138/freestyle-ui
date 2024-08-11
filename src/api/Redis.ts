@@ -93,10 +93,12 @@ export class Redis {
 
   async editElement(appInstanceId: string, updatedElement: ElementSchema): Promise<void> {
     const appInstance = await this.appInstanceGet(appInstanceId);
-
+  
     const editElementRecursive = (elements: ElementSchema[]): ElementSchema[] => {
       return elements.map(element => {
+        console.log(`Checking element with ID: ${element.id}`); // Log element being checked
         if (element.id === updatedElement.id) {
+          console.log(`Found matching element with ID: ${element.id}. Updating...`); // Log match
           return { ...element, ...updatedElement };
         }
         if (element.children) {
@@ -105,14 +107,16 @@ export class Redis {
         return element;
       });
     };
-
+  
     appInstance.home.children = editElementRecursive(appInstance.home.children);
     for (const pageKey in appInstance.pages) {
       appInstance.pages[pageKey].children = editElementRecursive(appInstance.pages[pageKey].children);
     }
-
+  
+    console.log(`Saving updated appInstance with ID: ${appInstanceId}`);
     await this.#redis.set(Redis.keys.appInstance(appInstanceId), JSON.stringify(appInstance));
   }
+  
 
   async addChild(appInstanceId: string, parentElementId: string, newChild: ElementSchema): Promise<void> {
     const appInstance = await this.appInstanceGet(appInstanceId);

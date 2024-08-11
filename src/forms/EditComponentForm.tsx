@@ -9,10 +9,10 @@ import { PaginationButtonForm } from './PaginationButtonForm.js';
 interface EditComponentFormProps {
   context: Devvit.Context;
   components: ComponentType[];
-  onUpdate: (updatedElement: ComponentType) => Promise<void>;
+  onSubmit: (updatedElement: ComponentType) => Promise<void>;
 }
 
-export const EditComponentForm = ({ context, components, onUpdate }: EditComponentFormProps) => {
+export const EditComponentForm = ({ context, components, onSubmit }: EditComponentFormProps) => {
   const { useState } = context;
   const [selectedComponentId, setSelectedComponentId] = useState<string | null>(null);
 
@@ -21,7 +21,11 @@ export const EditComponentForm = ({ context, components, onUpdate }: EditCompone
     value: component.id,
   }));
 
+  console.log("Component options:", componentOptions);
+
   const selectedComponent = components.find(component => component.id === selectedComponentId);
+
+  console.log("Selected component:", selectedComponent);
 
   const mainForm = context.useForm(
     {
@@ -39,27 +43,39 @@ export const EditComponentForm = ({ context, components, onUpdate }: EditCompone
       acceptLabel: 'Next',
     },
     async (values) => {
+      console.log("Form values on submission:", values);
       const selectedId = Array.isArray(values.selectedComponentId)
         ? values.selectedComponentId[0]
-        : values.selectedComponentId; // Safely extract if it's an array
+        : values.selectedComponentId;
+
+      console.log("Selected ID after form submission:", selectedId);
       setSelectedComponentId(selectedId);
     }
   );
 
-  if (selectedComponent) {
+  if (selectedComponent && selectedComponentId) {
     let form = null;
+
+    console.log("Creating form for component type:", selectedComponent.type);
+
+    const handleSubmit = async (data: any) => {
+      console.log("Submitting data for component:", data);
+      await onSubmit({ ...selectedComponent, ...data });
+      setSelectedComponentId(null); // Reset after submission
+      context.ui.showToast('Component updated successfully!');
+    };
 
     switch (selectedComponent.type) {
       case 'Text':
         form = TextComponentForm({
           context,
-          onSubmit: (data) => onUpdate({ ...selectedComponent, ...data }),
+          onSubmit: handleSubmit,
         });
         break;
       case 'Image':
         form = ImageComponentForm({
           context,
-          onSubmit: (data) => onUpdate({ ...selectedComponent, ...data }),
+          onSubmit: handleSubmit,
         });
         break;
       case 'VStack':
@@ -68,28 +84,32 @@ export const EditComponentForm = ({ context, components, onUpdate }: EditCompone
         form = StackComponentForm({
           context,
           type: selectedComponent.type,
-          onSubmit: (data) => onUpdate({ ...selectedComponent, ...data }),
+          onSubmit: handleSubmit,
         });
         break;
       case 'Button':
         form = ButtonComponentForm({
           context,
-          onSubmit: (data) => onUpdate({ ...selectedComponent, ...data }),
+          onSubmit: handleSubmit,
         });
         break;
       case 'PaginationButton':
         form = PaginationButtonForm({
           context,
-          onSubmit: (data) => onUpdate({ ...selectedComponent, ...data }),
+          onSubmit: handleSubmit,
         });
         break;
       default:
+        console.error("Unknown component type selected:", selectedComponent.type);
         context.ui.showToast('Unknown component type selected');
-        return mainForm; // Return the main form if no valid component is selected
+        return mainForm;
     }
 
-    // Render the form for the selected component
-    context.ui.showForm(form);
+    if (form && selectedComponentId) {
+      console.log("Displaying form for component:", selectedComponent.type);
+      context.ui.showForm(form);
+      setSelectedComponentId(null);
+    }
   }
 
   return mainForm;

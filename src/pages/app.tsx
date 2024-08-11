@@ -63,12 +63,18 @@ export const App: Devvit.CustomPostComponent = (context: Context) => {
   const updateAppElement: AppController['editElement'] = async (...args) => {
     const svc = new AppController(postId, context);
     const data = await svc.editElement(...args);
+  
     setCurrentPost((prevState) => {
-      if (!prevState) return prevState;
-      const updatedPages = { ...prevState.pages };
-      updatedPages[data.id] = data;
-      return { ...prevState, pages: updatedPages };
+      if (!prevState || !data) return prevState;
+      if ('id' in data) {
+        const updatedPages = { ...prevState.pages };
+        updatedPages[data.id] = data;
+        return { ...prevState, pages: updatedPages };
+      } else {
+        return { ...prevState, home: data };
+      }
     });
+  
     return data;
   };
 

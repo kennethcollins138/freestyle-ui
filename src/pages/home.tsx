@@ -36,6 +36,8 @@ export const HomePage = ({
   const { useState } = context;
   const [pageStructure, setPageStructure] = useState<z.infer<typeof Schema['HomeSchema']>>(appPost.home);
 
+  console.log("Initial page structure:", pageStructure);
+
   // Prepare forms outside of event handlers
   const addComponentForm = AddComponentForm({ context, onSubmit: handleComponentTypeSelected });
 
@@ -60,8 +62,12 @@ export const HomePage = ({
       ...data,
     };
 
+    console.log("Adding new component:", newComponent);
+
     const updatedStructure = deepClone(pageStructure);
     updatedStructure.children.push(newComponent);
+
+    console.log("Updated structure after adding component:", updatedStructure);
 
     setPageStructure(updatedStructure);
     await updateAppPost({ home: updatedStructure });
@@ -70,23 +76,40 @@ export const HomePage = ({
   };
 
   // Handle editing a component on the page
+  // TODO: Editing this to work properly. I like my implementation. Since updateAppElemnet returns the page
   const handleEditComponent = async (updatedComponent: ComponentType): Promise<void> => {
-    const updatedStructure = deepClone(pageStructure);
-    const index = updatedStructure.children.findIndex(child => child.id === updatedComponent.id);
-    if (index !== -1) {
-      updatedStructure.children[index] = updatedComponent;
-    }
+    console.log("Editing component:", updatedComponent);
+
+    // Ensure the component is correctly formed before updating
+    const editedComponent: ComponentType = {
+        ...updatedComponent,
+        type: updatedComponent.type,
+        ...(updatedComponent.type === 'VStack' || updatedComponent.type === 'HStack' || updatedComponent.type === 'ZStack' ? { children: updatedComponent.children || [] } : {}),
+    };
+
+    // Update the structure and refresh the state
+    const updatedStructure = await updateAppElement('home', updatedComponent.id, editedComponent);
+
+    console.log("Updated structure after editing component:", updatedStructure);
+
     setPageStructure(updatedStructure);
-    await updateAppPost({ home: updatedStructure });
+
     context.ui.showToast('Component updated successfully!');
-  };
+};
+
 
   // Handle deleting a component from the page
   const handleDeleteComponent = async (componentId: string): Promise<void> => {
+    console.log("Deleting component with ID:", componentId);
+
     const updatedStructure = deepClone(pageStructure);
     updatedStructure.children = updatedStructure.children.filter(child => child.id !== componentId);
+
+    console.log("Updated structure after deleting component:", updatedStructure);
+
     setPageStructure(updatedStructure);
     await deleteNode('home', componentId);
+
     context.ui.showToast('Component deleted successfully!');
   };
 
@@ -94,11 +117,13 @@ export const HomePage = ({
   const editComponentForm = EditComponentForm({
     context,
     components: pageStructure.children,
-    onUpdate: handleEditComponent,
+    onSubmit: handleEditComponent,
   });
 
   function handleComponentTypeSelected(data: { componentType: string }) {
     const type = data.componentType;
+    console.log("Component type selected:", type);
+
     switch (type) {
       case 'VStack':
       case 'HStack':
@@ -118,11 +143,14 @@ export const HomePage = ({
         context.ui.showForm(paginationButtonForm);
         break;
       default:
+        console.error("Unknown component type selected:", type);
         context.ui.showToast('Unknown component type selected');
     }
   }
 
   const renderComponent = (component: ComponentType) => {
+    console.log("Rendering component:", component);
+    
     switch (component.type) {
       case 'VStack':
         return (
@@ -164,6 +192,7 @@ export const HomePage = ({
           </button>
         );
       default:
+        console.error("Unknown component type encountered during rendering:", component.type);
         return null;
     }
   };
