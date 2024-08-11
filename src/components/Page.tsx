@@ -31,7 +31,7 @@ export const Page: {
   }) => JSX.Element;
 } = ({ children }) => {
   return (
-    <vstack width={100} height={100} lightBackgroundColor="#FFFFFF" darkBackgroundColor="#1A1A1B">
+    <vstack width={100} height={100}>
       {children}
     </vstack>
   );
@@ -114,8 +114,6 @@ Page.Nav = ({ buttonStart, buttonMiddle, buttonEnd, bottomBorderColor }) => {
       <hstack
         padding="xsmall"
         gap="small"
-        lightBackgroundColor="#FFFFFF"
-        darkBackgroundColor="#1A1A1B"
       >
         {sButton}
         {mButton}
