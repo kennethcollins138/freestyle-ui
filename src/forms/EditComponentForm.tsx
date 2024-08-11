@@ -19,7 +19,9 @@ export const EditComponentForm = ({ context, components, onSubmit }: EditCompone
           name: 'selectedComponent',
           label: 'Select Component to Edit',
           type: 'select',
-          options: componentOptions,
+          options: [
+            {label: 'Button', value: 'Button:component-1145025518663'}
+          ],
           required: true,
           multiple: false,
         },
@@ -28,13 +30,21 @@ export const EditComponentForm = ({ context, components, onSubmit }: EditCompone
       acceptLabel: 'Next',
     },
     async (data) => {
-      // Fix: Shouldn't be unknown but ill elave it for now
-      const selectedComponent = data.selectedComponent as unknown as string;
+      const selectedComponent = data.selectedComponent as string | string[];
+      console.log(selectedComponent);
+      // Check if selectedComponent is an array and handle accordingly
       const [componentType, componentId] = Array.isArray(selectedComponent) 
         ? selectedComponent[0].split(':') 
         : selectedComponent.split(':');
 
-      onSubmit({ componentType, componentId });
+      if (componentType && componentId) {
+        console.log(`Component Type: ${componentType}`);
+        console.log(`Component Id: ${componentId}`);
+        onSubmit({ componentType, componentId });
+      } else {
+        console.error("Component type or ID is undefined:", { componentType, componentId });
+        context.ui.showToast('Failed to select a component. Please try again.');
+      }
     }
   );
 };

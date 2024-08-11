@@ -230,18 +230,35 @@ export const HomePage = ({
         return null;
     }
   };
+  const settingsPage: Devvit.Blocks.OnPressEventHandler = async () => {
+    navigate('admin');
+  };
 
+  const addNewElement: Devvit.Blocks.OnPressEventHandler = async () => {
+    context.ui.showForm(addComponentForm);
+  }
+  const editPage: Devvit.Blocks.OnPressEventHandler = async () => {
+    context.ui.showForm(editComponentForm);
+  }
   return (
     <Page>
       <Page.Content navigate={navigate} showHomeButton={false}>
-        <zstack alignment="center top">
-          {isOwner && (
-            <hstack gap="small" alignment="center top">
-              <button icon="add" onPress={() => context.ui.showForm(addComponentForm)} appearance="primary" size="small"></button>
-              <spacer size='large'></spacer>
-              <button icon="edit" onPress={() => context.ui.showForm(editComponentForm)} appearance="primary" size="small"></button>
-            </hstack>
-          )}
+        <zstack width={100} alignment="middle">
+          <hstack width={100} alignment="center middle">
+            {isOwner && (
+              <hstack gap="small" alignment="start">
+                <hstack >
+                <button onPress={settingsPage} icon="settings" size="small" textColor="green" appearance="primary"></button>
+                </hstack>
+                <hstack>
+                  <button icon="add" onPress={addNewElement} appearance="primary" size="small"></button>
+                </hstack>
+                <hstack>
+                  <button icon="edit" onPress={editPage} appearance="primary" size="small"></button>
+                </hstack>
+              </hstack>
+            )}
+          </hstack>
         </zstack>
         <vstack alignment="center" lightBackgroundColor={pageStructure.light} darkBackgroundColor={pageStructure.dark || pageStructure.light}>
           {pageStructure.children?.map(renderComponent)}
