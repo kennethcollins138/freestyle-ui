@@ -1,8 +1,7 @@
+
 import { Devvit } from '@devvit/public-api';
 
 export interface TextFormData {
-  id?: string;  // Optional, since it might not be present in 'add' mode
-  mode: 'edit' | 'add';
   type: string;
   text: string;
   style?: Devvit.Blocks.TextStyle;
@@ -18,15 +17,7 @@ export interface TextFormData {
   height?: Devvit.Blocks.SizeString;
 }
 
-export const TextComponentForm = ({
-  context,
-  onSubmit,
-  componentId, // Accept componentId as a prop
-}: {
-  context: Devvit.Context;
-  onSubmit: (data: TextFormData) => void;
-  componentId?: string; // Optional, only present in 'edit' mode
-}) => {
+export const TextComponentForm = ({ context, onSubmit }: { context: Devvit.Context, onSubmit: (data: TextFormData) => void }) => {
   const form = context.useForm(
     {
       fields: [
@@ -110,6 +101,7 @@ export const TextComponentForm = ({
           label: 'Selectable',
           type: 'boolean',
           defaultValue: false,
+          required: false,
         },
         {
           name: 'wrap',
@@ -141,13 +133,11 @@ export const TextComponentForm = ({
           required: false,
         },
       ],
-      title: componentId ? 'Edit Text Element' : 'Add Text Element',
-      acceptLabel: componentId ? 'Update' : 'Add',
+      title: 'Add Text Element',
+      acceptLabel: 'Add',
     },
     (values) => {
       const formData: TextFormData = {
-        id: componentId,
-        mode: componentId ? 'edit' : 'add',
         type: 'Text',
         text: values.text as string,
         style: values.style ? (values.style[0] as Devvit.Blocks.TextStyle) : undefined,

@@ -1,8 +1,6 @@
 import { Devvit, IconName } from '@devvit/public-api';
 
 export interface ButtonFormData {
-  id?: string;  // Optional, for edit mode
-  mode: 'edit' | 'add';
   type: string;
   icon?: string;
   size: Devvit.Blocks.ButtonSize;
@@ -14,15 +12,7 @@ export interface ButtonFormData {
   url: string;
 }
 
-export const ButtonComponentForm = ({
-  context,
-  onSubmit,
-  componentId,  // Optional, passed in for edit mode
-}: {
-  context: Devvit.Context;
-  onSubmit: (data: ButtonFormData) => void;
-  componentId?: string;  // Optional, for edit mode
-}) => {
+export const ButtonComponentForm = ({ context, onSubmit }: { context: Devvit.Context; onSubmit: (data: ButtonFormData) => void }) => {
   return context.useForm(
     {
       fields: [
@@ -30,19 +20,19 @@ export const ButtonComponentForm = ({
           name: 'text',
           label: 'Button Text',
           type: 'string',
-          required: true,
+          required: true
         },
         {
           name: 'url',
           label: 'Button URL',
           type: 'string',
-          required: true,
+          required: true
         },
         {
           name: 'icon',
           label: 'Icon',
           type: 'string',
-          required: false,
+          required: false
         },
         {
           name: 'size',
@@ -51,9 +41,9 @@ export const ButtonComponentForm = ({
           options: [
             { label: 'Small', value: 'small' },
             { label: 'Medium', value: 'medium' },
-            { label: 'Large', value: 'large' },
+            { label: 'Large', value: 'large' }
           ],
-          required: true,
+          required: true
         },
         {
           name: 'appearance',
@@ -67,9 +57,9 @@ export const ButtonComponentForm = ({
             { label: 'Media', value: 'media' },
             { label: 'Destructive', value: 'destructive' },
             { label: 'Caution', value: 'caution' },
-            { label: 'Success', value: 'success' },
+            { label: 'Success', value: 'success' }
           ],
-          required: true,
+          required: true
         },
         {
           name: 'isGrow',
@@ -82,27 +72,25 @@ export const ButtonComponentForm = ({
           label: 'Width',
           type: 'string',
           defaultValue: '50',
-          required: false,
+          required: false
         },
         {
           name: 'height',
           label: 'Height',
           type: 'string',
           defaultValue: '50',
-          required: false,
-        },
+          required: false
+        }
       ],
-      title: componentId ? 'Edit Link Button' : 'Add Link Button',  // Update title based on mode
-      acceptLabel: componentId ? 'Update' : 'Add',  // Update label based on mode
+      title: 'Add Link Button',
+      acceptLabel: 'Add',
     },
     (values) => {
       const formData: ButtonFormData = {
-        id: componentId,  // Include componentId if available
-        mode: componentId ? 'edit' : 'add',  // Determine mode based on componentId
         type: 'Button',
         text: values.text as string,
         url: values.url as string,
-        icon: values.icon ? (values.icon[0] as string) : undefined,
+        icon: values.icon ? values.icon[0] as string : undefined,
         size: values.size[0] as Devvit.Blocks.ButtonSize,
         appearance: values.appearance[0] as Devvit.Blocks.ButtonAppearance,
         isGrow: values.isGrow as boolean,
