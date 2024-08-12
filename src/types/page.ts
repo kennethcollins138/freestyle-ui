@@ -6,6 +6,7 @@ import type { AppController } from '../api/AppController.js';
 export type Route = 
   | 'home'
   | 'admin'
+  | 'pagination'
   | 'admin:configure'
   | 'welcome';
 
@@ -26,6 +27,7 @@ export type PageProps = {
     clonePost: AppController['clonePost'];
     deleteNode: AppController['deleteNode'];
     readWholePage: AppController['readWholePage'];
+    createNewPage: AppController['createNewPage'];
     // readImmediateChildren: AppController['readImmediateChildren'];
     // updateChildrenOrder: AppController['updateChildrenOrder'];
   };

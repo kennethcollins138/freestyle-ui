@@ -5,6 +5,7 @@ import type { PageProps, Route, RouteParams } from '../types/page.js';
 import { WelcomePage } from './welcome.js';
 import { HomePage } from './home.js';
 import { AdminPage } from './admin.js';
+import { NewPage } from './Pagination.js';
 import { HomeSchema, PageSchema } from '../api/Schema.js';
 
 const getPageForRoute = (route: Route): ((props: PageProps) => JSX.Element) => {
@@ -15,6 +16,8 @@ const getPageForRoute = (route: Route): ((props: PageProps) => JSX.Element) => {
       return WelcomePage;
     case 'admin':
       return AdminPage;
+    case 'pagination':
+      return NewPage
     default:
       throw new Error(`Unhandled route: ${route}`);
   }
@@ -134,7 +137,12 @@ export const App: Devvit.CustomPostComponent = (context: Context) => {
     });
     return data;
   };
-
+  
+  const createNewPage: AppController['createNewPage'] = async (...args) => {
+    const svc = new AppController(postId, context);
+    const data = await svc.createNewPage(...args);
+    return data;
+  }
   const PageComponent = getPageForRoute(route);
   console.log('Rendering page for route:', route);
 
@@ -164,6 +172,7 @@ export const App: Devvit.CustomPostComponent = (context: Context) => {
           clonePost,
           deleteNode,
           readWholePage,
+          createNewPage
         }}
       />
     </vstack>

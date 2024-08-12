@@ -48,8 +48,8 @@ export class AppController {
         }
     }
 
-    async createNewPage(): Promise<string> {
-        const newPageId = randomId();
+    async createNewPage(inputId: string): Promise<string> {
+        const newPageId = inputId;
         const newPage: PageSchema = {
             id: newPageId,
             light: '#FFFFFF',

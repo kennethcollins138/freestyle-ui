@@ -19,7 +19,9 @@ import { ComponentType, FormComponentData } from '../types/component.js';
 
 export default Devvit;
 
-export const HomePage = ({
+export const NewPage = ({
+  //TODO: reconfigure for new page and not home
+  //TODO: Remove PaginationButton
   navigate,
   context,
   appPost,

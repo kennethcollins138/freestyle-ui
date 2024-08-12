@@ -1,5 +1,5 @@
 import { Devvit } from '@devvit/public-api';
-
+import { randomId } from '../util.js';
 export interface PaginationButtonFormData {
   type: string;
   text: string;
@@ -21,7 +21,7 @@ export const PaginationButtonForm = ({
     {
       fields: [
         { name: 'text', label: 'Button Text', type: 'string', required: true },
-        { name: 'pageId', label: 'Page ID to Link', type: 'string', required: true }
+        { name: 'pageId', label: 'Page ID to Link', type: 'string', defaultValue: randomId(), required: true, disabled: true }
       ],
       title: componentId ? 'Edit Page Button' : 'Add New Page Button', // Differentiating between add and edit
       acceptLabel: componentId ? 'Update' : 'Add',
