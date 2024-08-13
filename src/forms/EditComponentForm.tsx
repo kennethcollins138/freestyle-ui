@@ -3,7 +3,7 @@ import { Devvit } from '@devvit/public-api';
 export interface EditComponentFormProps {
   context: Devvit.Context;
   components: Array<{ id: string; type: string }>;
-  onSubmit: (data: { componentType: string; componentId: string }) => void;
+  onSubmit: (data: { selectedComponent: string | string[] }) => void;
 }
 
 export const EditComponentForm = ({ context, components, onSubmit }: EditComponentFormProps) => {
@@ -11,8 +11,7 @@ export const EditComponentForm = ({ context, components, onSubmit }: EditCompone
     label: `${component.type} (${component.id})`,
     value: `${component.type}:${component.id}`,
   }));
-  
-  console.log("About to set up the form...");
+  console.log("Edit Form Render");
 
   return context.useForm(
     {
@@ -39,7 +38,7 @@ export const EditComponentForm = ({ context, components, onSubmit }: EditCompone
         ? selectedComponent[0].split(':') 
         : selectedComponent.split(':');
       
-      onSubmit({ componentType, componentId });
+      onSubmit({ selectedComponent });
     }
   );
 };

@@ -32,30 +32,25 @@ export const HomePage = ({
 }: PageProps): JSX.Element => {
   const { useState } = context;
   const [pageStructure, setPageStructure] = useState(appPost.home);
+  const [selectedComponentId, setComponentId] = useState<string | null>(null);
+  const [selectedComponentType, setComponentType] = useState<string | null>(null);
+  const [mode, setMode] = useState<'add' | 'edit' | null>(null);
 
-  const handleFormSubmit = async (
-    formData: FormComponentData, 
-    mode: 'edit' | 'add', 
-    componentType?: string, 
-    componentId?: string
-  ) => {
-    console.log("Form submission data:", formData, "Mode:", mode, "Component Type:", componentType);
-
-    if (mode === 'edit' && componentType && componentId) {
+  const handleFormSubmit = async (formData: FormComponentData) => {
+    if (mode === 'edit' && selectedComponentId) {
       const editedComponent: ComponentType = {
         ...formData,
-        id: componentId,
+        id: selectedComponentId, // Using state value
       };
 
       const updatedStructure = await updateAppElement('home', editedComponent.id, editedComponent);
       setPageStructure(updatedStructure);
       context.ui.showToast('Component updated successfully!');
     } else if (mode === 'add') {
-
       if ((formData as PaginationButtonFormData).type === 'PaginationButton') {
         const newPageId = (formData as PaginationButtonFormData).pageId;
         await createNewPage(newPageId);
-      };
+      }
 
       const newComponent: ComponentType = {
         id: `component-${randomId()}`,
@@ -80,22 +75,23 @@ export const HomePage = ({
   };
 
   const stackComponentForms = {
-    VStack: StackComponentForm({ context, type: 'VStack', onSubmit: (data) => handleFormSubmit(data, 'add') }),
-    HStack: StackComponentForm({ context, type: 'HStack', onSubmit: (data) => handleFormSubmit(data, 'add') }),
-    ZStack: StackComponentForm({ context, type: 'ZStack', onSubmit: (data) => handleFormSubmit(data, 'add') }),
+    VStack: StackComponentForm({ context, type: 'VStack', onSubmit: (data) => handleFormSubmit(data) }),
+    HStack: StackComponentForm({ context, type: 'HStack', onSubmit: (data) => handleFormSubmit(data) }),
+    ZStack: StackComponentForm({ context, type: 'ZStack', onSubmit: (data) => handleFormSubmit(data) }),
   };
 
   const componentForms = {
-    Image: ImageComponentForm({ context, onSubmit: (data) => handleFormSubmit(data, 'add') }),
-    Text: TextComponentForm({ context, onSubmit: (data) => handleFormSubmit(data, 'add') }),
-    Button: ButtonComponentForm({ context, onSubmit: (data) => handleFormSubmit(data, 'add') }),
-    PaginationButton: PaginationButtonForm({ context, onSubmit: (data) => handleFormSubmit(data, 'add') }),
+    Image: ImageComponentForm({ context, onSubmit: (data) => handleFormSubmit(data) }),
+    Text: TextComponentForm({ context, onSubmit: (data) => handleFormSubmit(data) }),
+    Button: ButtonComponentForm({ context, onSubmit: (data) => handleFormSubmit(data) }),
+    PaginationButton: PaginationButtonForm({ context, onSubmit: (data) => handleFormSubmit(data) }),
   };
 
   const addComponentForm = AddComponentForm({ 
     context, 
     onSubmit: (data) => {
       const selectedForm = componentForms[data.componentType as keyof typeof componentForms];
+      setMode('add');
       if (selectedForm) {
         context.ui.showForm(selectedForm);
       } else if (data.componentType in stackComponentForms) {
@@ -109,12 +105,24 @@ export const HomePage = ({
   const editComponentForm = EditComponentForm({
     context,
     components: pageStructure.children,
-    onSubmit: (data: {componentType: string, componentId: string}) => {
-      const selectedForm = componentForms[data.componentType as keyof typeof componentForms];
+    onSubmit: (data: { selectedComponent: string | string[]}) => {
+      const selectedComponent = data.selectedComponent as string | string[];
+      console.log(selectedComponent);
+
+      // Check if selectedComponent is an array and handle accordingly
+      const [componentType, componentId] = Array.isArray(selectedComponent) 
+        ? selectedComponent[0].split(':') 
+        : selectedComponent.split(':');
+      setMode('edit');
+      setComponentType(componentType);
+      setComponentId(componentId);
+
+      console.log(`SELECTED COMPONENTID: ${selectedComponentId}`)
+      const selectedForm = componentForms[componentType as keyof typeof componentForms];
       if (selectedForm) {
-        context.ui.showForm(selectedForm, data); // passing data to be used in the form
-      } else if (data.componentType in stackComponentForms) {
-        context.ui.showForm(stackComponentForms[data.componentType as keyof typeof stackComponentForms], data);
+        context.ui.showForm(selectedForm);  // No need to pass componentId and type here
+      } else if (componentType in stackComponentForms) {
+        context.ui.showForm(stackComponentForms[componentType as keyof typeof stackComponentForms]);
       } else {
         context.ui.showToast('Unknown component type selected');
       }
@@ -124,7 +132,6 @@ export const HomePage = ({
   const deleteComponentForm = DeleteComponentForm({ context, components: pageStructure.children, onSubmit: (data) => handleDeleteComponent(data.componentId)});
 
   const renderComponent = (component: ComponentType) => {
-    console.log("Rendering component:", component);
     if (!component.type) {
       console.error("Component type is undefined for component:", component);
       return null;
