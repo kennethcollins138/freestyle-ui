@@ -17,6 +17,7 @@ import { TextElement } from '../components/TextElement.js';
 import { ImageElement } from '../components/ImageElement.js';
 import { EditStackComponentForm, EditStackFormData } from '../forms/EditStackComponentForm.js';
 import { ComponentType, FormComponentData } from '../types/component.js';
+// import { PaginationButton, PaginationButtonElement } from '../components/PaginationButton.js';
 
 export default Devvit;
 
@@ -312,6 +313,22 @@ export const HomePage = ({
         return <ImageElement key={component.id} {...component} />;
       case 'Text':
         return <TextElement key={component.id} {...component} />;
+      case 'PaginationButton':
+        return (
+          <button
+            key={component.id}
+            icon={component.icon}
+            size={component.size}
+            appearance={component.appearance}
+            onPress={async () => navigate('pagination', { pageId: component.pageId })}
+            {...(component.width ? { width: component.width } : {})}
+            {...(component.height ? { height: component.height } : {})}
+            {...(component.isGrow ? { grow: true } : {})}
+          >
+            {component.text}
+          </button>
+        );
+        
       case 'Button':
         return (
           <button

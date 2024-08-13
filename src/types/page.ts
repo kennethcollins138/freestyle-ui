@@ -28,6 +28,7 @@ export type PageProps = {
     deleteNode: AppController['deleteNode'];
     readWholePage: AppController['readWholePage'];
     createNewPage: AppController['createNewPage'];
+    savePage: AppController['savePage'];
     // readImmediateChildren: AppController['readImmediateChildren'];
     // updateChildrenOrder: AppController['updateChildrenOrder'];
   };

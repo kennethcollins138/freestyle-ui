@@ -14,7 +14,7 @@ export type PaginationButtonProps = {
   context: Devvit.Context;
 };
 
-export const PaginationButton = ({ 
+export const PaginationButtonElement = ({ 
   pageId,
   icon, 
   size='medium', 

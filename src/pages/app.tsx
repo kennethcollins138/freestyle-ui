@@ -138,6 +138,19 @@ export const App: Devvit.CustomPostComponent = (context: Context) => {
     return data;
   };
   
+//   async savePage(pageId: string, page: PageSchema) {
+//     const appInstance = await this.loadAppInstance();
+//     if (appInstance) {
+//         appInstance.pages[pageId] = page;
+//         await this.saveAppInstance(appInstance);
+//     }
+// }
+
+  const savePage: AppController['savePage'] = async (...args) => {
+    const svc = new AppController(postId, context);
+    const data = await svc.savePage(...args);
+    return data; 
+  }
   const createNewPage: AppController['createNewPage'] = async (...args) => {
     const svc = new AppController(postId, context);
     const data = await svc.createNewPage(...args);
@@ -172,7 +185,8 @@ export const App: Devvit.CustomPostComponent = (context: Context) => {
           clonePost,
           deleteNode,
           readWholePage,
-          createNewPage
+          createNewPage,
+          savePage
         }}
       />
     </vstack>
