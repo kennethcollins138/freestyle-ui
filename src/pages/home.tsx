@@ -24,9 +24,8 @@ export const HomePage = ({
   context,
   appPost,
   isOwner,
-  currentUserUsername,
   postMethods: {
-    updateAppPost, updateAppElement,
+    updateAppPost,
     deleteNode, createNewPage
   },
 }: PageProps): JSX.Element => {
@@ -37,14 +36,24 @@ export const HomePage = ({
   const [mode, setMode] = useState<'add' | 'edit' | null>(null);
 
   const handleFormSubmit = async (formData: FormComponentData) => {
+    const updatedStructure = deepClone(pageStructure);
+
     if (mode === 'edit' && selectedComponentId) {
       const editedComponent: ComponentType = {
-        ...formData,
-        id: selectedComponentId, // Using state value
+          ...formData,
+          id: selectedComponentId,
       };
+      const componentIndex = updatedStructure.children.findIndex(child => child.id === selectedComponentId);
+      
+      if (componentIndex !== -1) {
+          updatedStructure.children[componentIndex] = editedComponent;
+      } else {
+          context.ui.showToast('Component not found.');
+          return;
+      }
 
-      const updatedStructure = await updateAppElement('home', editedComponent.id, editedComponent);
-      setPageStructure(updatedStructure);
+      setPageStructure(updatedStructure); // Update the state with the edited structure
+      await updateAppPost({ home: updatedStructure });
       context.ui.showToast('Component updated successfully!');
     } else if (mode === 'add') {
       if ((formData as PaginationButtonFormData).type === 'PaginationButton') {
