@@ -135,9 +135,9 @@ export const HomePage = ({
   
     const updatedStructure = deepClone(pageStructure);
     updatedStructure.children = updateStackPropertiesRecursive(updatedStructure.children);
+    setStackStructure(updatedStructure);
   
     if (addChild) {
-      setStackStructure(updatedStructure);
       const selectedForm = addStackChildrenForms[addChild as keyof typeof addStackChildrenForms];
       if (selectedForm) {
         context.ui.showForm(selectedForm);
@@ -147,9 +147,9 @@ export const HomePage = ({
     } else {
       setPageStructure(updatedStructure);
       await updateAppPost({ home: updatedStructure });
+      context.ui.showToast('Stack properties updated successfully!');
     }
   
-    context.ui.showToast('Stack properties updated successfully!');
   };
 
   const handleAddChildStackForm = async (formData: FormComponentData) => {
