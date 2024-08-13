@@ -37,23 +37,38 @@ export const HomePage = ({
   const [mode, setMode] = useState<'add' | 'edit' | null>(null);
   const [stackStructure, setStackStructure] = useState(appPost.home);
 
+  const updateComponentRecursive = (elements: ComponentType[], editedComponent: ComponentType): ComponentType[] => {
+    return elements.map((el) => {
+        if (el.id === editedComponent.id) {
+            return {
+                ...el,
+                ...editedComponent, // Update the found component
+            };
+        }
+        if (el.children) {
+            return {
+                ...el,
+                children: updateComponentRecursive(el.children, editedComponent), // Recursively update children if needed
+            };
+        }
+        return el;
+    });
+  };
+
   const handleFormSubmit = async (formData: FormComponentData) => {
     if (mode === 'edit' && selectedComponentId) {
       const editedComponent: ComponentType = {
-        ...formData,
-        id: selectedComponentId,
+          ...formData,
+          id: selectedComponentId,
       };
       const updatedStructure = deepClone(pageStructure);
-      const componentIndex = updatedStructure.children.findIndex(child => child.id === selectedComponentId);
 
-      if (componentIndex !== -1) {
-        updatedStructure.children[componentIndex] = editedComponent;
-        setPageStructure(updatedStructure); // Update the state with the edited structure
-        await updateAppPost({ home: updatedStructure });
-        context.ui.showToast('Component updated successfully!');
-      } else {
-        context.ui.showToast('Component not found.');
-      }
+      // Use the recursive function to update the component in the structure
+      updatedStructure.children = updateComponentRecursive(updatedStructure.children, editedComponent);
+
+      setPageStructure(updatedStructure); // Update the state with the edited structure
+      await updateAppPost({ home: updatedStructure });
+      context.ui.showToast('Component updated successfully!');
     } else if (mode === 'add') {
       if ((formData as PaginationButtonFormData).type === 'PaginationButton') {
         const newPageId = (formData as PaginationButtonFormData).pageId;
@@ -74,54 +89,53 @@ export const HomePage = ({
   };
 
   const handleDeleteComponent = async (componentId: string): Promise<void> => {
+    const deleteComponentRecursive = (elements: ComponentType[]): ComponentType[] => {
+        return elements.filter((el) => {
+            if (el.id === componentId) {
+                return false; // Remove the component with the matching ID
+            }
+            if (el.children) {
+                el.children = deleteComponentRecursive(el.children); // Recursively filter children
+            }
+            return true; // Keep other components
+        });
+    };
+
     const updatedStructure = deepClone(pageStructure);
-    updatedStructure.children = updatedStructure.children.filter(child => child.id !== componentId);
+    updatedStructure.children = deleteComponentRecursive(updatedStructure.children);
 
     setPageStructure(updatedStructure);
     await deleteNode('home', componentId);
     context.ui.showToast('Component deleted successfully!');
-  };
+};
+
 
   const handleEditStackFormSubmit = async (formData: EditStackFormData) => {
     const { addChild, ...restFormData } = formData;
     const selectedStackId = selectedComponentId;
   
-    console.log("Handling Edit Stack Form Submit");
-    console.log("Form Data:", formData);
-    console.log("addChild value:", addChild);
-  
-    // Define a recursive function to find and update the stack by ID
     const updateStackPropertiesRecursive = (elements: ComponentType[]): ComponentType[] => {
       return elements.map((el) => {
         if (el.id === selectedStackId) {
           return {
-            ...el, // Retain all existing properties
-            ...restFormData, // Override only the properties that are in restFormData
+            ...el,
+            ...Object.fromEntries(Object.entries(restFormData).filter(([key, value]) => value !== undefined)),
             children: el.children, // Ensure children remain unchanged
           };
         }
         if (el.children) {
           return {
             ...el,
-            children: updateStackPropertiesRecursive(el.children), // Recursively update children if they exist
+            children: updateStackPropertiesRecursive(el.children),
           };
         }
         return el;
       });
     };
   
-    // Clone the page structure to avoid directly mutating state
     const updatedStructure = deepClone(pageStructure);
-  
-    // Update the stack properties within the structure
     updatedStructure.children = updateStackPropertiesRecursive(updatedStructure.children);
   
-    // Update the page structure state and persist the changes
-    // setPageStructure(updatedStructure);
-    // await updateAppPost({ home: updatedStructure });
-    
-    console.log(`CHECKING ADD CHILD AFTER SETPAGESTRUCTURE: ${addChild}`);
-    // If addChild is defined, show the form for adding a child component
     if (addChild) {
       setStackStructure(updatedStructure);
       const selectedForm = addStackChildrenForms[addChild as keyof typeof addStackChildrenForms];
@@ -137,8 +151,6 @@ export const HomePage = ({
   
     context.ui.showToast('Stack properties updated successfully!');
   };
-  
-  
 
   const handleAddChildStackForm = async (formData: FormComponentData) => {
     if ((formData as PaginationButtonFormData).type === 'PaginationButton') {
@@ -184,6 +196,21 @@ export const HomePage = ({
     context.ui.showToast('Child component added to stack successfully!');
   };
   
+  const flattenStructure = (elements: ComponentType[]): ComponentType[] => {
+    let flattened: ComponentType[] = [];
+
+    const traverse = (items: ComponentType[]) => {
+        items.forEach((el) => {
+            flattened.push(el);
+            if (el.children) {
+                traverse(el.children); // Recursively add children
+            }
+        });
+    };
+
+    traverse(elements);
+    return flattened;
+  };
 
   const stackComponentForms = {
     VStack: StackComponentForm({ context, type: 'VStack', onSubmit: (data) => handleFormSubmit(data) }),
@@ -231,7 +258,7 @@ export const HomePage = ({
 
   const editComponentForm = EditComponentForm({
     context,
-    components: pageStructure.children,
+    components: flattenStructure(pageStructure.children),
     onSubmit: (data: { selectedComponent: string | string[] }) => {
       const selectedComponent = data.selectedComponent as string | string[];
       const [componentType, componentId] = Array.isArray(selectedComponent)
@@ -253,7 +280,7 @@ export const HomePage = ({
 
   const deleteComponentForm = DeleteComponentForm({
     context,
-    components: pageStructure.children,
+    components: flattenStructure(pageStructure.children),
     onSubmit: (data) => handleDeleteComponent(data.componentId),
   });
 
@@ -341,7 +368,7 @@ export const HomePage = ({
             )}
           </hstack>
         </zstack>
-        <vstack alignment="center">
+        <vstack alignment="center" width={100} height={100}>
           {pageStructure.children?.map(renderComponent)}
         </vstack>
       </Page.Content>
