@@ -5,6 +5,7 @@ import { App } from './pages/app.js';
 Devvit.configure({
   redditAPI: true,
   redis: true,
+  media: true,
 });
 
 Devvit.addMenuItem({

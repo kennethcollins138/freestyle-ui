@@ -20,7 +20,7 @@ export const ImageComponentForm = ({ context, onSubmit }: ImageComponentFormProp
     {
       fields: [
         {
-          name: 'url',
+          name: 'uploadUrl',
           label: 'Image URL',
           type: 'string',
           required: true
@@ -64,17 +64,34 @@ export const ImageComponentForm = ({ context, onSubmit }: ImageComponentFormProp
       title: 'Add Image Element',
       acceptLabel: 'Add',
     },
-    (values) => {
-      const formData: ImageFormData = {
-        type: 'Image',
-        url: values.url as string,
-        width: values.width as Devvit.Blocks.SizeString,
-        height: values.height as Devvit.Blocks.SizeString,
-        resizeMode: values.resizeMode as Devvit.Blocks.ImageResizeMode,
-        imageWidth: values.imageWidth as number,
-        imageHeight: values.imageHeight as number,
-      };
-      onSubmit(formData);
+    async (values) => {
+      const uploadUrl = values.uploadUrl;
+      const imageRegex = /\.(gif|jpg|jpeg|png)$/i;
+      let mediaType: "image" | "gif" | "video";
+    
+      
+    
+      try {
+        const response = await context.media.upload({
+          url: uploadUrl,
+          type: "image",
+        });
+        
+        console.log(`Response Url: ${response.mediaUrl}`);
+        console.log(`Response Id: ${response.mediaId}`);
+        const formData: ImageFormData = {
+          type: 'Image',
+          url: response.mediaUrl, // Use the uploaded media ID
+          width: values.width as Devvit.Blocks.SizeString,
+          height: values.height as Devvit.Blocks.SizeString,
+          resizeMode: values.resizeMode as Devvit.Blocks.ImageResizeMode,
+          imageWidth: values.imageWidth as number,
+          imageHeight: values.imageHeight as number,
+        };
+        onSubmit(formData);
+      } catch (err) {
+        console.error("Error uploading media:", err);
+      }
     }
   );
 };
