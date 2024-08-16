@@ -58,36 +58,52 @@ export const HomePage = ({
 
   const handleFormSubmit = async (formData: FormComponentData) => {
     if (mode === 'edit' && selectedComponentId) {
-      const editedComponent: ComponentType = {
-          ...formData,
-          id: selectedComponentId,
-      };
-      const updatedStructure = deepClone(pageStructure);
+        const editedComponent: ComponentType = {
+            ...formData,
+            id: selectedComponentId,
+        };
+        const updatedStructure = deepClone(pageStructure);
 
-      // Use the recursive function to update the component in the structure
-      updatedStructure.children = updateComponentRecursive(updatedStructure.children, editedComponent);
+        // Use the recursive function to update the component in the structure
+        updatedStructure.children = updateComponentRecursive(updatedStructure.children, editedComponent);
 
-      setPageStructure(updatedStructure); // Update the state with the edited structure
-      await updateAppPost({ home: updatedStructure });
-      context.ui.showToast('Component updated successfully!');
+        setPageStructure(updatedStructure); // Update the state with the edited structure
+        await updateAppPost({ home: updatedStructure });
+        context.ui.showToast('Component updated successfully!');
     } else if (mode === 'add') {
-      if ((formData as PaginationButtonFormData).type === 'PaginationButton') {
-        const newPageId = (formData as PaginationButtonFormData).pageId;
-        await createNewPage(newPageId);
-      }
+        const newComponent: ComponentType = {
+            id: `component-${randomId()}`,
+            ...formData,
+        };
 
-      const newComponent: ComponentType = {
-        id: `component-${randomId()}`,
-        ...formData,
-      };
+        if ((formData as PaginationButtonFormData).type === 'PaginationButton') {
+          const newPageId = (formData as PaginationButtonFormData).pageId;
+          // Create a basePage for the new page
+          const basePage = {
+              id: newPageId,
+              light: '#FFFFFF',
+              dark: '#1A1A1B',
+              children: [],
+          };
 
-      const updatedStructure = deepClone(pageStructure);
-      updatedStructure.children.push(newComponent);
-      setPageStructure(updatedStructure);
-      await updateAppPost({ home: updatedStructure });
-      context.ui.showToast('Component added successfully!');
+          // Clone the entire appPost to modify both home and pages
+          const updatedAppInstance = deepClone(appPost);
+          updatedAppInstance.home.children.push(newComponent);
+          updatedAppInstance.pages[newPageId] = basePage;
+
+          setPageStructure(updatedAppInstance.home); // Update the state with the edited home structure
+          await updateAppPost(updatedAppInstance);
+          context.ui.showToast('Component added successfully!');
+          return; 
+        }
+        const updatedStructure = deepClone(pageStructure);
+        updatedStructure.children.push(newComponent);
+        setPageStructure(updatedStructure);
+        await updateAppPost({ home: updatedStructure });
+        context.ui.showToast('Component added successfully!');
     }
-  };
+};
+
 
   const handleDeleteComponent = async (componentId: string): Promise<void> => {
     const deleteComponentRecursive = (elements: ComponentType[]): ComponentType[] => {

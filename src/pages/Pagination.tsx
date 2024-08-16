@@ -30,7 +30,6 @@ export const NewPage = ({
     updateAppPost,
     deleteNode,
     createNewPage,
-    savePage
   },
 }: PageProps): JSX.Element => {
   const { pageId }  = params;
@@ -70,7 +69,9 @@ export const NewPage = ({
       updatedStructure.children = updateComponentRecursive(updatedStructure.children, editedComponent);
 
       setPageStructure(updatedStructure); // Update the state with the edited structure
-      await savePage(pageId, updatedStructure);
+      
+      // Use updateAppInstance instead of savePage
+      await updateAppPost({ pages: { [pageId]: updatedStructure } });
       context.ui.showToast('Component updated successfully!');
     } else if (mode === 'add') {
       if ((formData as PaginationButtonFormData).type === 'PaginationButton') {
@@ -86,7 +87,9 @@ export const NewPage = ({
       const updatedStructure = deepClone(pageStructure);
       updatedStructure.children.push(newComponent);
       setPageStructure(updatedStructure);
-      await savePage(pageId, updatedStructure);
+
+      // Use updateAppPost instead of savePage
+      await updateAppPost({ pages: { [pageId]: updatedStructure } });
       context.ui.showToast('Component added successfully!');
     }
   };
@@ -108,9 +111,11 @@ export const NewPage = ({
     updatedStructure.children = deleteComponentRecursive(updatedStructure.children);
 
     setPageStructure(updatedStructure);
-    await deleteNode(pageId, componentId);
+
+    // Use updateAppPost instead of savePage
+    await updateAppPost({ pages: { [pageId]: updatedStructure } });
     context.ui.showToast('Component deleted successfully!');
-};
+  };
 
 
   const handleEditStackFormSubmit = async (formData: EditStackFormData) => {
@@ -149,10 +154,11 @@ export const NewPage = ({
       }
     } else {
       setPageStructure(updatedStructure);
-      await savePage(pageId, updatedStructure);
+
+      // Use updateAppPost instead of savePage
+      await updateAppPost({ pages: { [pageId]: updatedStructure } });
       context.ui.showToast('Stack properties updated successfully!');
     }
-  
   };
 
   const handleAddChildStackForm = async (formData: FormComponentData) => {
@@ -194,7 +200,9 @@ export const NewPage = ({
     console.log("Updated Structure after adding child:", updatedStructure);
   
     setPageStructure(updatedStructure);
-    await savePage(pageId, updatedStructure);
+
+    // Use updateAppPost instead of savePage
+    await updateAppPost({ pages: { [pageId]: updatedStructure } });
   
     context.ui.showToast('Child component added to stack successfully!');
   };
