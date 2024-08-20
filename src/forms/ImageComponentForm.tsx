@@ -37,7 +37,7 @@ export const ImageComponentForm = ({ context, onSubmit }: ImageComponentFormProp
           label: 'Height',
           type: 'string',
           required: true,
-          defaultValue: 'auto'
+          defaultValue: '100%'
         },
         {
           name: 'resizeMode',
@@ -79,9 +79,11 @@ export const ImageComponentForm = ({ context, onSubmit }: ImageComponentFormProp
         
         console.log(`Response Url: ${response.mediaUrl}`);
         console.log(`Response Id: ${response.mediaId}`);
+
+        const newUrl = `https://www.reddit.com/media?url${response.mediaUrl}`;
         const formData: ImageFormData = {
           type: 'Image',
-          url: response.mediaUrl, // Use the uploaded media ID
+          url: newUrl, // Use the uploaded media ID
           width: values.width as Devvit.Blocks.SizeString,
           height: values.height as Devvit.Blocks.SizeString,
           resizeMode: values.resizeMode as Devvit.Blocks.ImageResizeMode,

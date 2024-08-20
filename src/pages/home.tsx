@@ -75,7 +75,7 @@ export const HomePage = ({
             id: `component-${randomId()}`,
             ...formData,
         };
-
+        console.log(`New Component: ${newComponent}`);
         if ((formData as PaginationButtonFormData).type === 'PaginationButton') {
           const newPageId = (formData as PaginationButtonFormData).pageId;
           // Create a basePage for the new page
@@ -326,9 +326,18 @@ export const HomePage = ({
           </ZStackElement>
         );
       case 'Image':
-        return <ImageElement key={component.id} {...component} />;
+        console.log("Rendering Image Component:", {
+          id: component.id,
+          url: component.url,
+          width: component.width,
+          height: component.height,
+          resizeMode: component.resizeMode,
+          imageWidth: component.imageWidth,
+          imageHeight: component.imageHeight
+      });
+        return (<ImageElement key={component.id} {...component} />);
       case 'Text':
-        return <TextElement key={component.id} {...component} />;
+        return (<TextElement key={component.id} {...component} />);
       case 'PaginationButton':
         return (
           <button
