@@ -27,7 +27,7 @@ export const DeleteComponentForm = ({ context, components, onSubmit }: DeleteCom
         },
       ],
       title: 'Delete Component',
-      acceptLabel: 'Next',
+      acceptLabel: 'Delete',
     },
     (data) => {
       console.log(`Delete FORM DATA: ${data}`);

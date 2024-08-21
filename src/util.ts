@@ -11,3 +11,14 @@ export const randomId = (): string => {
   };
 
   export const deepClone = <T>(object: T): T => JSON.parse(JSON.stringify(object));
+
+  export function sleep(ms: number) : Promise<void>{
+    return new Promise (resolve => {
+        var startTime = Date.now()
+        while ((Date.now() - startTime) < ms)
+        {
+            // do nothing
+        }
+        resolve()
+    })
+}

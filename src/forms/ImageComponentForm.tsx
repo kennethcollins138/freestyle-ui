@@ -1,5 +1,5 @@
 import { Devvit } from '@devvit/public-api';
-
+import { sleep } from '../util.js';
 export interface ImageComponentFormProps {
   context: Devvit.Context;
   onSubmit: (data: ImageFormData) => void;
@@ -75,7 +75,7 @@ export const ImageComponentForm = ({ context, onSubmit }: ImageComponentFormProp
         
         console.log(`Response Url: ${response.mediaUrl}`);
         console.log(`Response Id: ${response.mediaId}`);
-
+        await sleep(2500);
         const formData: ImageFormData = {
           type: 'Image',
           url: response.mediaUrl,
