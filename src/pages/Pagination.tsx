@@ -20,7 +20,7 @@ import { ComponentType, FormComponentData } from '../types/component.js';
 
 export default Devvit;
 
-export const NewPage = ({
+export const PaginationPage = ({
   params,
   navigate,
   context,
@@ -29,11 +29,11 @@ export const NewPage = ({
   postMethods: {
     updateAppPost,
     deleteNode,
-    createNewPage,
+    createNewPage
   },
 }: PageProps): JSX.Element => {
-  const { pageId }  = params;
   const { useState } = context;
+  const { pageId } = params;
   const [pageStructure, setPageStructure] = useState(appPost.pages[pageId]);
   const [selectedComponentId, setComponentId] = useState<string | null>(null);
   const [mode, setMode] = useState<'add' | 'edit' | null>(null);
@@ -44,13 +44,13 @@ export const NewPage = ({
         if (el.id === editedComponent.id) {
             return {
                 ...el,
-                ...editedComponent, // Update the found component
+                ...editedComponent,
             };
         }
         if (el.children) {
             return {
                 ...el,
-                children: updateComponentRecursive(el.children, editedComponent), // Recursively update children if needed
+                children: updateComponentRecursive(el.children, editedComponent),
             };
         }
         return el;
@@ -59,38 +59,47 @@ export const NewPage = ({
 
   const handleFormSubmit = async (formData: FormComponentData) => {
     if (mode === 'edit' && selectedComponentId) {
-      const editedComponent: ComponentType = {
-          ...formData,
-          id: selectedComponentId,
-      };
-      const updatedStructure = deepClone(pageStructure);
+        const editedComponent: ComponentType = {
+            ...formData,
+            id: selectedComponentId,
+        };
+        const updatedStructure = deepClone(pageStructure);
 
-      // Use the recursive function to update the component in the structure
-      updatedStructure.children = updateComponentRecursive(updatedStructure.children, editedComponent);
+        updatedStructure.children = updateComponentRecursive(updatedStructure.children, editedComponent);
 
-      setPageStructure(updatedStructure); // Update the state with the edited structure
-      
-      // Use updateAppInstance instead of savePage
-      await updateAppPost({ pages: { [pageId]: updatedStructure } });
-      context.ui.showToast('Component updated successfully!');
+        setPageStructure(updatedStructure);
+        await updateAppPost({ pages: { [pageId]: updatedStructure } });
+        context.ui.showToast('Component updated successfully!');
     } else if (mode === 'add') {
-      if ((formData as PaginationButtonFormData).type === 'PaginationButton') {
-        const newPageId = (formData as PaginationButtonFormData).pageId;
-        await createNewPage(newPageId);
-      }
+        const newComponent: ComponentType = {
+            id: `component-${randomId()}`,
+            ...formData,
+        };
 
-      const newComponent: ComponentType = {
-        id: `component-${randomId()}`,
-        ...formData,
-      };
+        if ((formData as PaginationButtonFormData).type === 'PaginationButton') {
+            const newPageId = (formData as PaginationButtonFormData).pageId;
+            const basePage = {
+                id: newPageId,
+                light: '#FFFFFF',
+                dark: '#1A1A1B',
+                children: [],
+            };
 
-      const updatedStructure = deepClone(pageStructure);
-      updatedStructure.children.push(newComponent);
-      setPageStructure(updatedStructure);
+            const updatedAppInstance = deepClone(appPost);
+            updatedAppInstance.pages[pageId].children.push(newComponent);
+            updatedAppInstance.pages[newPageId] = basePage;
 
-      // Use updateAppPost instead of savePage
-      await updateAppPost({ pages: { [pageId]: updatedStructure } });
-      context.ui.showToast('Component added successfully!');
+            setPageStructure(updatedAppInstance.pages[pageId]);
+            await updateAppPost(updatedAppInstance);
+            context.ui.showToast('Pagination button and new page created successfully!');
+            return;
+        }
+
+        const updatedStructure = deepClone(pageStructure);
+        updatedStructure.children.push(newComponent);
+        setPageStructure(updatedStructure);
+        await updateAppPost({ pages: { [pageId]: updatedStructure } });
+        context.ui.showToast('Component added successfully!');
     }
   };
 
@@ -98,12 +107,12 @@ export const NewPage = ({
     const deleteComponentRecursive = (elements: ComponentType[]): ComponentType[] => {
         return elements.filter((el) => {
             if (el.id === componentId) {
-                return false; // Remove the component with the matching ID
+                return false;
             }
             if (el.children) {
-                el.children = deleteComponentRecursive(el.children); // Recursively filter children
+                el.children = deleteComponentRecursive(el.children);
             }
-            return true; // Keep other components
+            return true;
         });
     };
 
@@ -111,24 +120,21 @@ export const NewPage = ({
     updatedStructure.children = deleteComponentRecursive(updatedStructure.children);
 
     setPageStructure(updatedStructure);
-
-    // Use updateAppPost instead of savePage
-    await updateAppPost({ pages: { [pageId]: updatedStructure } });
+    await deleteNode(pageId, componentId);
     context.ui.showToast('Component deleted successfully!');
   };
-
 
   const handleEditStackFormSubmit = async (formData: EditStackFormData) => {
     const { addChild, ...restFormData } = formData;
     const selectedStackId = selectedComponentId;
-  
+
     const updateStackPropertiesRecursive = (elements: ComponentType[]): ComponentType[] => {
       return elements.map((el) => {
         if (el.id === selectedStackId) {
           return {
             ...el,
             ...Object.fromEntries(Object.entries(restFormData).filter(([key, value]) => value !== undefined)),
-            children: el.children, // Ensure children remain unchanged
+            children: el.children,
           };
         }
         if (el.children) {
@@ -140,24 +146,23 @@ export const NewPage = ({
         return el;
       });
     };
-  
+
     const updatedStructure = deepClone(pageStructure);
     updatedStructure.children = updateStackPropertiesRecursive(updatedStructure.children);
     setStackStructure(updatedStructure);
-  
-    if (addChild) {
-      const selectedForm = addStackChildrenForms[addChild as keyof typeof addStackChildrenForms];
-      if (selectedForm) {
-        context.ui.showForm(selectedForm);
-      } else {
-        context.ui.showToast('Unknown component type selected');
-      }
-    } else {
-      setPageStructure(updatedStructure);
 
-      // Use updateAppPost instead of savePage
+    if (!addChild) {
+      setPageStructure(updatedStructure);
       await updateAppPost({ pages: { [pageId]: updatedStructure } });
       context.ui.showToast('Stack properties updated successfully!');
+      return;
+    }
+
+    const selectedForm = addStackChildrenForms[addChild as keyof typeof addStackChildrenForms];
+    if (selectedForm) {
+      context.ui.showForm(selectedForm);
+    } else {
+      context.ui.showToast('Unknown component type selected');
     }
   };
 
@@ -166,19 +171,15 @@ export const NewPage = ({
       const newPageId = (formData as PaginationButtonFormData).pageId;
       await createNewPage(newPageId);
     }
-  
+
     const newComponent: ComponentType = {
       id: `component-${randomId()}`,
       ...formData,
     };
-  
-    console.log("Selected Stack ID:", selectedComponentId);
-    console.log("New Component to Add:", newComponent);
-  
+
     const addComponentToStackRecursive = (elements: ComponentType[]): ComponentType[] => {
       return elements.map((el) => {
         if (el.id === selectedComponentId) {
-          console.log("Found matching stack:", el);
           return {
             ...el,
             children: [...(el.children || []), newComponent],
@@ -193,32 +194,26 @@ export const NewPage = ({
         return el;
       });
     };
-  
+
     const updatedStructure = deepClone(stackStructure);
     updatedStructure.children = addComponentToStackRecursive(updatedStructure.children);
-  
-    console.log("Updated Structure after adding child:", updatedStructure);
-  
-    setPageStructure(updatedStructure);
 
-    // Use updateAppPost instead of savePage
+    setPageStructure(updatedStructure);
     await updateAppPost({ pages: { [pageId]: updatedStructure } });
-  
+
     context.ui.showToast('Child component added to stack successfully!');
   };
-  
+
   const flattenStructure = (elements: ComponentType[]): ComponentType[] => {
     let flattened: ComponentType[] = [];
-
     const traverse = (items: ComponentType[]) => {
         items.forEach((el) => {
             flattened.push(el);
             if (el.children) {
-                traverse(el.children); // Recursively add children
+                traverse(el.children);
             }
         });
     };
-
     traverse(elements);
     return flattened;
   };
@@ -320,9 +315,18 @@ export const NewPage = ({
           </ZStackElement>
         );
       case 'Image':
-        return <ImageElement key={component.id} {...component} />;
+        console.log("Rendering Image Component:", {
+          id: component.id,
+          url: component.url,
+          width: component.width,
+          height: component.height,
+          resizeMode: component.resizeMode,
+          imageWidth: component.imageWidth,
+          imageHeight: component.imageHeight
+      });
+        return (<ImageElement key={component.id} {...component} />);
       case 'Text':
-        return <TextElement key={component.id} {...component} />;
+        return (<TextElement key={component.id} {...component} />);
       case 'PaginationButton':
         return (
           <button
@@ -338,7 +342,6 @@ export const NewPage = ({
             {component.text}
           </button>
         );
-        
       case 'Button':
         return (
           <button
@@ -374,6 +377,7 @@ export const NewPage = ({
     context.ui.showForm(deleteComponentForm);
   };
 
+  
   return (
     <Page>
       <Page.Content navigate={navigate} showHomeButton={true}>
@@ -396,7 +400,11 @@ export const NewPage = ({
           </hstack>
         </zstack>
         <vstack alignment="center" width={100} height={100}>
-          {pageStructure.children?.map(renderComponent)}
+          {pageStructure && pageStructure.children?.length > 0 ? (
+              pageStructure.children?.map(renderComponent)
+            ) : (
+              <text>Page not found or has no content.</text>
+            )}
         </vstack>
       </Page.Content>
     </Page>

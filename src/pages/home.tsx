@@ -70,32 +70,40 @@ export const HomePage = ({
         setPageStructure(updatedStructure); // Update the state with the edited structure
         await updateAppPost({ home: updatedStructure });
         context.ui.showToast('Component updated successfully!');
-    } else if (mode === 'add') {
+      } else if (mode === 'add') {
         const newComponent: ComponentType = {
             id: `component-${randomId()}`,
             ...formData,
         };
-        console.log(`New Component: ${newComponent}`);
+
         if ((formData as PaginationButtonFormData).type === 'PaginationButton') {
           const newPageId = (formData as PaginationButtonFormData).pageId;
-          // Create a basePage for the new page
           const basePage = {
               id: newPageId,
               light: '#FFFFFF',
               dark: '#1A1A1B',
-              children: [],
+              children: [],  // Ensure this is always initialized
           };
-
-          // Clone the entire appPost to modify both home and pages
+      
           const updatedAppInstance = deepClone(appPost);
           updatedAppInstance.home.children.push(newComponent);
-          updatedAppInstance.pages[newPageId] = basePage;
-
-          setPageStructure(updatedAppInstance.home); // Update the state with the edited home structure
+      
+          // Check if the page ID already exists (which it shouldn’t)
+          if (!updatedAppInstance.pages[newPageId]) {
+              updatedAppInstance.pages[newPageId] = basePage;
+          } else {
+              console.error('Page ID already exists:', newPageId);
+          }
+      
+          console.log('Updated Pages:', updatedAppInstance.pages);
+          setPageStructure(updatedAppInstance.home);
           await updateAppPost(updatedAppInstance);
-          context.ui.showToast('Component added successfully!');
-          return; 
-        }
+          context.ui.showToast('Pagination button and new page created successfully!');
+          return;
+      }
+      
+
+        // If not a PaginationButton, just update the home page
         const updatedStructure = deepClone(pageStructure);
         updatedStructure.children.push(newComponent);
         setPageStructure(updatedStructure);
@@ -103,6 +111,7 @@ export const HomePage = ({
         context.ui.showToast('Component added successfully!');
     }
 };
+
 
 
   const handleDeleteComponent = async (componentId: string): Promise<void> => {

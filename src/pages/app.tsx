@@ -5,7 +5,7 @@ import type { PageProps, Route, RouteParams } from '../types/page.js';
 import { WelcomePage } from './welcome.js';
 import { HomePage } from './home.js';
 import { AdminPage } from './admin.js';
-import { NewPage } from './Pagination.js';
+import { PaginationPage } from './pagination.js';
 import { HomeSchema, PageSchema } from '../api/Schema.js';
 
 const getPageForRoute = (route: Route): ((props: PageProps) => JSX.Element) => {
@@ -17,7 +17,7 @@ const getPageForRoute = (route: Route): ((props: PageProps) => JSX.Element) => {
     case 'admin':
       return AdminPage;
     case 'pagination':
-      return NewPage
+      return PaginationPage
     default:
       throw new Error(`Unhandled route: ${route}`);
   }

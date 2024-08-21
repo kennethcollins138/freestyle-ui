@@ -66,10 +66,6 @@ export const ImageComponentForm = ({ context, onSubmit }: ImageComponentFormProp
     },
     async (values) => {
       const uploadUrl = values.uploadUrl;
-      const imageRegex = /\.(gif|jpg|jpeg|png)$/i;
-      let mediaType: "image" | "gif" | "video";
-    
-      
     
       try {
         const response = await context.media.upload({
@@ -80,10 +76,9 @@ export const ImageComponentForm = ({ context, onSubmit }: ImageComponentFormProp
         console.log(`Response Url: ${response.mediaUrl}`);
         console.log(`Response Id: ${response.mediaId}`);
 
-        const newUrl = `https://www.reddit.com/media?url${response.mediaUrl}`;
         const formData: ImageFormData = {
           type: 'Image',
-          url: newUrl, // Use the uploaded media ID
+          url: response.mediaUrl,
           width: values.width as Devvit.Blocks.SizeString,
           height: values.height as Devvit.Blocks.SizeString,
           resizeMode: values.resizeMode as Devvit.Blocks.ImageResizeMode,

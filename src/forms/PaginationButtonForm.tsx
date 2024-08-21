@@ -1,12 +1,10 @@
-import { Devvit, IconName } from '@devvit/public-api';
+import { Devvit } from '@devvit/public-api';
 import { randomId } from '../util.js';
 
 export interface PaginationButtonFormData {
   type: string;
   text: string;
   pageId: string;
-  id?: string; // Optional, since it might not be present in 'edit' mode
-  mode: 'edit' | 'add';
   icon?: string;
   size: Devvit.Blocks.ButtonSize;
   appearance: Devvit.Blocks.ButtonAppearance;
@@ -15,20 +13,16 @@ export interface PaginationButtonFormData {
   height?: Devvit.Blocks.SizeString;
 }
 
-export const PaginationButtonForm = ({
-  context,
-  onSubmit,
-  componentId, // Optional, only present in 'edit' mode
-}: {
-  context: Devvit.Context;
-  onSubmit: (data: PaginationButtonFormData) => void;
-  componentId?: string;
-}) => {
+export const PaginationButtonForm = ({ context, onSubmit }: { context: Devvit.Context; onSubmit: (data: PaginationButtonFormData) => void }) => {
   return context.useForm(
     {
       fields: [
-        { name: 'text', label: 'Button Text', type: 'string', required: true },
-        { name: 'pageId', label: 'Page ID to Link', type: 'string', defaultValue: randomId(), required: true, disabled: true },
+        {
+          name: 'text',
+          label: 'Button Text',
+          type: 'string',
+          required: true,
+        },
         {
           name: 'icon',
           label: 'Icon',
@@ -83,17 +77,15 @@ export const PaginationButtonForm = ({
           required: false,
         },
       ],
-      title: componentId ? 'Edit Page Button' : 'Add New Page Button', // Differentiating between add and edit
-      acceptLabel: componentId ? 'Update' : 'Add',
+      title: 'Add Pagination Button',
+      acceptLabel: 'Add',
     },
     (values) => {
       const formData: PaginationButtonFormData = {
-        id: componentId,
-        mode: componentId ? 'edit' : 'add',
         type: 'PaginationButton',
         text: values.text as string,
-        pageId: values.pageId as string,
-        icon: values.icon ? values.icon[0] as string : undefined,
+        pageId: `page-${randomId()}`, // Generate a new page ID
+        icon: values.icon ? values.icon as string : undefined,
         size: values.size[0] as Devvit.Blocks.ButtonSize,
         appearance: values.appearance[0] as Devvit.Blocks.ButtonAppearance,
         isGrow: values.isGrow as boolean,
