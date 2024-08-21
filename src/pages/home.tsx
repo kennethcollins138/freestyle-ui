@@ -127,47 +127,53 @@ export const HomePage = ({
 };
 
 
-  const handleEditStackFormSubmit = async (formData: EditStackFormData) => {
-    const { addChild, ...restFormData } = formData;
-    const selectedStackId = selectedComponentId;
-  
-    const updateStackPropertiesRecursive = (elements: ComponentType[]): ComponentType[] => {
-      return elements.map((el) => {
-        if (el.id === selectedStackId) {
-          return {
-            ...el,
-            ...Object.fromEntries(Object.entries(restFormData).filter(([key, value]) => value !== undefined)),
-            children: el.children, // Ensure children remain unchanged
-          };
-        }
-        if (el.children) {
-          return {
-            ...el,
-            children: updateStackPropertiesRecursive(el.children),
-          };
-        }
-        return el;
-      });
-    };
-  
-    const updatedStructure = deepClone(pageStructure);
-    updatedStructure.children = updateStackPropertiesRecursive(updatedStructure.children);
-    setStackStructure(updatedStructure);
-  
-    if (addChild) {
-      const selectedForm = addStackChildrenForms[addChild as keyof typeof addStackChildrenForms];
-      if (selectedForm) {
-        context.ui.showForm(selectedForm);
-      } else {
-        context.ui.showToast('Unknown component type selected');
+const handleEditStackFormSubmit = async (formData: EditStackFormData) => {
+  const { addChild, ...restFormData } = formData;
+  const selectedStackId = selectedComponentId;
+
+  // Function to update stack properties recursively
+  const updateStackPropertiesRecursive = (elements: ComponentType[]): ComponentType[] => {
+    return elements.map((el) => {
+      if (el.id === selectedStackId) {
+        return {
+          ...el,
+          ...Object.fromEntries(Object.entries(restFormData).filter(([key, value]) => value !== undefined)),
+          children: el.children, // Ensure children remain unchanged
+        };
       }
-    } else {
-      setPageStructure(updatedStructure);
-      await updateAppPost({ home: updatedStructure });
-      context.ui.showToast('Stack properties updated successfully!');
-    }
-  
+      if (el.children) {
+        return {
+          ...el,
+          children: updateStackPropertiesRecursive(el.children),
+        };
+      }
+      return el;
+    });
   };
+
+  // Update the stack properties in memory
+  const updatedStructure = deepClone(pageStructure);
+  updatedStructure.children = updateStackPropertiesRecursive(updatedStructure.children);
+
+  setStackStructure(updatedStructure);
+
+  // If addChild is selected, show the corresponding form
+  if (!addChild) {
+    setPageStructure(updatedStructure);
+    await updateAppPost({ home: updatedStructure });
+    context.ui.showToast('Stack properties updated successfully!');
+    return; // Exit the function to prevent further execution
+  }
+
+  // If addChild is selected, show the corresponding form
+  const selectedForm = addStackChildrenForms[addChild as keyof typeof addStackChildrenForms];
+  if (selectedForm) {
+    context.ui.showForm(selectedForm);
+  } else {
+    context.ui.showToast('Unknown component type selected');
+  }
+};
+
 
   const handleAddChildStackForm = async (formData: FormComponentData) => {
     if ((formData as PaginationButtonFormData).type === 'PaginationButton') {

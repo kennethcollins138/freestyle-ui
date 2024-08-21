@@ -101,12 +101,14 @@ export const EditStackComponentForm = ({
             { label: 'New Page Button', value: 'PaginationButton' },
           ],
           multiple: false,
+          required: false
         }
       ],
-      title: `Add ${type.toUpperCase()}`,
-      acceptLabel: 'Add',
+      title: `Edit ${type.toUpperCase()}`,
+      acceptLabel: 'Edit',
     },
     (values) => {
+      console.log(`addCHILD VALUE: ${values.componentType}`)
       const formData: EditStackFormData = {
         type: type,
         gap: values.gap ? values.gap[0] as Devvit.Blocks.ContainerGap : undefined,
@@ -115,7 +117,7 @@ export const EditStackComponentForm = ({
         height: values.height as Devvit.Blocks.SizeString,
         padding: values.padding ? values.padding[0] as Devvit.Blocks.ContainerPadding : undefined,
         backgroundColor: values.backgroundColor as string,
-        addChild: values.componentType[0]
+        addChild: values.componentType ? values.componentType[0] : undefined,
       };
       onSubmit(formData);
     }
