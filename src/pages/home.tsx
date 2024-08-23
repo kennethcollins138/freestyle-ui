@@ -114,26 +114,26 @@ export const HomePage = ({
 
 
 
-  const handleDeleteComponent = async (componentId: string): Promise<void> => {
-    const deleteComponentRecursive = (elements: ComponentType[]): ComponentType[] => {
-        return elements.filter((el) => {
-            if (el.id === componentId) {
-                return false; // Remove the component with the matching ID
-            }
-            if (el.children) {
-                el.children = deleteComponentRecursive(el.children); // Recursively filter children
-            }
-            return true; // Keep other components
-        });
-    };
+const handleDeleteComponent = async (componentId: string): Promise<void> => {
+  const deleteComponentRecursive = (elements: ComponentType[]): ComponentType[] => {
+    return elements
+      .map((el) => {
+        if (el.children) {
+          el.children = deleteComponentRecursive(el.children); // Recursively filter children
+        }
+        return el;
+      })
+      .filter((el) => el.id !== componentId); // Remove the component with the matching ID
+  };
 
-    const updatedStructure = deepClone(pageStructure);
-    updatedStructure.children = deleteComponentRecursive(updatedStructure.children);
+  const updatedStructure = deepClone(pageStructure);
+  updatedStructure.children = deleteComponentRecursive(updatedStructure.children);
 
-    setPageStructure(updatedStructure);
-    await deleteNode('home', componentId);
-    context.ui.showToast('Component deleted successfully!');
+  setPageStructure(updatedStructure);
+  await updateAppPost({ home: updatedStructure });
+  context.ui.showToast('Component deleted successfully!');
 };
+
 
 
 const handleEditStackFormSubmit = async (formData: EditStackFormData) => {
