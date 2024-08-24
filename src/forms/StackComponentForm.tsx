@@ -42,6 +42,7 @@ export const StackComponentForm = ({
           label: 'Alignment',
           type: 'select',
           options: [
+            { label: 'Center', value: 'center'},
             { label: 'Top Start', value: 'top start' },
             { label: 'Top Center', value: 'top center' },
             { label: 'Top End', value: 'top end' },

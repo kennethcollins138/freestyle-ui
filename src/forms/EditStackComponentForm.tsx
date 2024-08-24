@@ -43,6 +43,7 @@ export const EditStackComponentForm = ({
           label: 'Alignment',
           type: 'select',
           options: [
+            { label: 'Center', value: 'center'},
             { label: 'Top Start', value: 'top start' },
             { label: 'Top Center', value: 'top center' },
             { label: 'Top End', value: 'top end' },
@@ -98,7 +99,7 @@ export const EditStackComponentForm = ({
             { label: 'Link Button', value: 'Button' },
             { label: 'Image', value: 'Image' },
             { label: 'Text', value: 'Text' },
-            { label: 'New Page Button', value: 'PaginationButton' },
+            // { label: 'New Page Button', value: 'PaginationButton' },
           ],
           multiple: false,
           required: false

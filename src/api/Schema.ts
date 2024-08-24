@@ -61,6 +61,10 @@ export class Schema {
     resizeMode: z.enum(['fit', 'fill', 'cover']),
     imageWidth: z.number(),
     imageHeight: z.number(),
+    minWidth: z.string().optional(),
+    minHeight: z.string().optional(),
+    maxWidth: z.string().optional(),
+    maxHeight: z.string().optional(),
     order: z.number().optional(),
   });
 

@@ -1,6 +1,6 @@
 import { Devvit, IconName } from '@devvit/public-api';
 
-//TODO: need to fix
+//TODO: need to fix for next update
 export type PaginationButtonProps = {
   pageId: string;
   icon?: IconName;

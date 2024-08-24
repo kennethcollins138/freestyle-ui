@@ -17,7 +17,6 @@ import { TextElement } from '../components/TextElement.js';
 import { ImageElement } from '../components/ImageElement.js';
 import { EditStackComponentForm, EditStackFormData } from '../forms/EditStackComponentForm.js';
 import { ComponentType, FormComponentData } from '../types/component.js';
-// import { PaginationButton, PaginationButtonElement } from '../components/PaginationButton.js';
 
 export default Devvit;
 
@@ -28,8 +27,6 @@ export const HomePage = ({
   isOwner,
   postMethods: {
     updateAppPost,
-    deleteNode,
-    createNewPage,
     addOrUpdateImageData,
     getImageDatabyComponentId,
   },
@@ -123,30 +120,6 @@ export const HomePage = ({
           await addOrUpdateImageData(newComponent.id, newComponent);
         }
 
-        if ((formData as PaginationButtonFormData).type === 'PaginationButton') {
-          const newPageId = (formData as PaginationButtonFormData).pageId;
-          const basePage = {
-            id: newPageId,
-            light: '#FFFFFF',
-            dark: '#1A1A1B',
-            children: [],
-          };
-
-          const updatedAppInstance = deepClone(appPost);
-          updatedAppInstance.home.children.push(newComponent);
-
-          if (!updatedAppInstance.pages[newPageId]) {
-            updatedAppInstance.pages[newPageId] = basePage;
-          } else {
-            console.error('Page ID already exists:', newPageId);
-          }
-
-          setPageStructure(updatedAppInstance.home);
-          await updateAppPost(updatedAppInstance);
-          context.ui.showToast('Pagination button and new page created successfully!');
-          return;
-        }
-
         const updatedStructure = deepClone(pageStructure);
         updatedStructure.children.push(newComponent);
         setPageStructure(updatedStructure);
@@ -233,10 +206,6 @@ const handleEditStackFormSubmit = async (formData: EditStackFormData) => {
 
 
   const handleAddChildStackForm = async (formData: FormComponentData) => {
-    if ((formData as PaginationButtonFormData).type === 'PaginationButton') {
-      const newPageId = (formData as PaginationButtonFormData).pageId;
-      await createNewPage(newPageId);
-    }
   
     const newComponent: ComponentType = {
       id: `component-${randomId()}`,
@@ -307,7 +276,6 @@ const handleEditStackFormSubmit = async (formData: EditStackFormData) => {
     Image: ImageComponentForm({ context, onSubmit: (data) => handleFormSubmit(data) }),
     Text: TextComponentForm({ context, onSubmit: (data) => handleFormSubmit(data) }),
     Button: ButtonComponentForm({ context, onSubmit: (data) => handleFormSubmit(data) }),
-    PaginationButton: PaginationButtonForm({ context, onSubmit: (data) => handleFormSubmit(data) }),
   };
 
   const editStackComponentForms = {
@@ -320,7 +288,6 @@ const handleEditStackFormSubmit = async (formData: EditStackFormData) => {
     Image: ImageComponentForm({ context, onSubmit: (data) => handleAddChildStackForm(data) }),
     Text: TextComponentForm({ context, onSubmit: (data) => handleAddChildStackForm(data) }),
     Button: ButtonComponentForm({ context, onSubmit: (data) => handleAddChildStackForm(data) }),
-    PaginationButton: PaginationButtonForm({ context, onSubmit: (data) => handleAddChildStackForm(data) }),
     VStack: StackComponentForm({ context, type: 'VStack', onSubmit: (data) => handleAddChildStackForm(data) }),
     HStack: StackComponentForm({ context, type: 'HStack', onSubmit: (data) => handleAddChildStackForm(data) }),
     ZStack: StackComponentForm({ context, type: 'ZStack', onSubmit: (data) => handleAddChildStackForm(data) }),
@@ -394,34 +361,9 @@ const handleEditStackFormSubmit = async (formData: EditStackFormData) => {
           </ZStackElement>
         );
       case 'Image':
-        console.log("Rendering Image Component:", {
-          id: component.id,
-          url: component.url,
-          width: component.width,
-          height: component.height,
-          resizeMode: component.resizeMode,
-          imageWidth: component.imageWidth,
-          imageHeight: component.imageHeight
-      });
         return (<ImageElement key={component.id} {...component} />);
       case 'Text':
         return (<TextElement key={component.id} {...component} />);
-      case 'PaginationButton':
-        return (
-          <button
-            key={component.id}
-            icon={component.icon}
-            size={component.size}
-            appearance={component.appearance}
-            onPress={async () => navigate('pagination', { pageId: component.pageId })}
-            {...(component.width ? { width: component.width } : {})}
-            {...(component.height ? { height: component.height } : {})}
-            {...(component.isGrow ? { grow: true } : {})}
-          >
-            {component.text}
-          </button>
-        );
-        
       case 'Button':
         return (
           <button
