@@ -172,6 +172,7 @@ const Step3 = ({
         </text>
         <text color="black white" size="medium" wrap>
           Important note for Images: Image uploads work for jpeg as of now.
+          When uploading images, wait a couple of seconds and refresh your page for it to appear.
           With that, Image uploads will only appear inside of vstacks and ztacks.
           Hstack implementation does not work as expected and will be fixed in future!
         </text>

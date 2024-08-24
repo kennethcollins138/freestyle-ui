@@ -9,9 +9,7 @@ export const AdminPage = ({
   isOwner,
   currentUserUsername,
   postMethods: {
-    updateAppPost, updateAppElement,
-    addElement, clonePost,
-    deleteNode, readWholePage
+    updateAppPost,
   },
 }: PageProps): JSX.Element => { 
   const { useForm } = context;
@@ -166,6 +164,9 @@ export const AdminPage = ({
             <vstack grow gap="small">
               <button onPress={addOwner} size="small" icon="mod" appearance="secondary">
                 Owners
+              </button>
+              <button onPress={async () => {context.ui.navigateTo('https://www.reddit.com/message/compose/?to=TheRepDeveloper')}} size="small" icon="message" appearance="secondary">
+                Help
               </button>
             </vstack>
             <vstack grow gap="small">

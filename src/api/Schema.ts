@@ -21,6 +21,7 @@ export type PostSchema = z.infer<typeof Schema.PostSchema>;
 export type ElementSchema = z.infer<typeof Schema.ElementSchema>;
 export type HomeSchema = z.infer<typeof Schema.HomeSchema>;
 export type ImageElementSchema = z.infer<typeof Schema.ImageElementSchema>;
+
 export class Schema {
   static configSchema = z.object({});
 
