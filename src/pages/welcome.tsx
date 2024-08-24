@@ -171,6 +171,14 @@ const Step3 = ({
           You are limited on the amount of storage this bot has!
         </text>
         <text color="black white" size="medium" wrap>
+          Important note for Images: Image uploads work for jpeg as of now.
+          With that, Image uploads will only appear inside of vstacks and ztacks.
+          Hstack implementation does not work as expected and will be fixed in future!
+        </text>
+        <text color="black white" size="medium" wrap>
+          Upcoming Feature: Get ready for seamless navigation with our new pagination support, allowing multiple pages within a single post!
+        </text>
+        <text color="black white" size="medium" wrap>
           For any questions, feel free to message u/TheRepDeveloper!
           This app was fully inspired by Community Hub. Check out their app as well!
         </text>
