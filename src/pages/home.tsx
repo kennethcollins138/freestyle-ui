@@ -44,14 +44,39 @@ export const HomePage = ({
   const processAddedImage = async (imageId: string) => {
     const imageComponent = await getImageDatabyComponentId(imageId);
     if (imageComponent) {
-      const updatedStructureWithImage = deepClone(pageStructure);
-      updatedStructureWithImage.children.push(imageComponent);
-      setPageStructure(updatedStructureWithImage);
-      await updateAppPost({ home: updatedStructureWithImage });
+      let updatedStructure = deepClone(pageStructure);
+
+      if (selectedComponentId) {
+        const addComponentToStackRecursive = (elements: ComponentType[]): ComponentType[] => {
+          return elements.map((el) => {
+            if (el.id === selectedComponentId) {
+              return {
+                ...el,
+                children: [...(el.children || []), imageComponent],
+              };
+            }
+            if (el.children) {
+              return {
+                ...el,
+                children: addComponentToStackRecursive(el.children),
+              };
+            }
+            return el;
+          });
+        };
+
+        updatedStructure.children = addComponentToStackRecursive(updatedStructure.children);
+      } else {
+        updatedStructure.children.push(imageComponent);
+      }
+
+      setPageStructure(updatedStructure);
+      await updateAppPost({ home: updatedStructure });
     }
     setAddedImageId(null); // Reset the state after processing
   };
 
+  // Handle image processing if an image is added
   if (addedImageId) {
     processAddedImage(addedImageId);
   }
@@ -217,7 +242,12 @@ const handleEditStackFormSubmit = async (formData: EditStackFormData) => {
       id: `component-${randomId()}`,
       ...formData,
     };
-  
+    
+    if ((formData as ImageFormData).type === 'Image') {
+      setAddedImageId(newComponent.id);
+      await addOrUpdateImageData(newComponent.id, newComponent);
+    }
+
     console.log("Selected Stack ID:", selectedComponentId);
     console.log("New Component to Add:", newComponent);
   
