@@ -51,14 +51,14 @@ export const ImageComponentForm = ({ context, onSubmit }: ImageComponentFormProp
           label: 'Image Width',
           type: 'number',
           required: true,
-          defaultValue: 1024
+          defaultValue: 200
         },
         {
           name: 'imageHeight',
           label: 'Image Height',
           type: 'number',
           required: true,
-          defaultValue: 150
+          defaultValue: 200
         }
       ],
       title: 'Add Image Element',
@@ -75,7 +75,9 @@ export const ImageComponentForm = ({ context, onSubmit }: ImageComponentFormProp
         
         console.log(`Response Url: ${response.mediaUrl}`);
         console.log(`Response Id: ${response.mediaId}`);
-        await sleep(2500);
+        
+        await sleep(3000);
+
         const formData: ImageFormData = {
           type: 'Image',
           url: response.mediaUrl,
@@ -88,7 +90,7 @@ export const ImageComponentForm = ({ context, onSubmit }: ImageComponentFormProp
         onSubmit(formData);
       } catch (err) {
         console.error("Error uploading media:", err);
-      }
+      };
     }
   );
 };

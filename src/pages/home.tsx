@@ -5,7 +5,7 @@ import { deepClone, randomId } from '../util.js';
 import { AddComponentForm } from '../forms/AddComponentForm.js';
 import { EditComponentForm } from '../forms/EditComponentForm.js';
 import { DeleteComponentForm } from '../forms/DeleteComponentForm.js';
-import { ImageComponentForm } from '../forms/ImageComponentForm.js';
+import { ImageComponentForm, ImageFormData } from '../forms/ImageComponentForm.js';
 import { TextComponentForm } from '../forms/TextComponentForm.js';
 import { StackComponentForm } from '../forms/StackComponentForm.js';
 import { ButtonComponentForm } from '../forms/ButtonComponentForm.js';
@@ -29,7 +29,9 @@ export const HomePage = ({
   postMethods: {
     updateAppPost,
     deleteNode,
-    createNewPage
+    createNewPage,
+    addOrUpdateImageData,
+    getImageDatabyComponentId,
   },
 }: PageProps): JSX.Element => {
   const { useState } = context;
@@ -37,80 +39,101 @@ export const HomePage = ({
   const [selectedComponentId, setComponentId] = useState<string | null>(null);
   const [mode, setMode] = useState<'add' | 'edit' | null>(null);
   const [stackStructure, setStackStructure] = useState(appPost.home);
+  const [addedImageId, setAddedImageId] = useState<string | null>(null);
+
+  const processAddedImage = async (imageId: string) => {
+    const imageComponent = await getImageDatabyComponentId(imageId);
+    if (imageComponent) {
+      const updatedStructureWithImage = deepClone(pageStructure);
+      updatedStructureWithImage.children.push(imageComponent);
+      setPageStructure(updatedStructureWithImage);
+      await updateAppPost({ home: updatedStructureWithImage });
+    }
+    setAddedImageId(null); // Reset the state after processing
+  };
+
+  if (addedImageId) {
+    processAddedImage(addedImageId);
+  }
 
   const updateComponentRecursive = (elements: ComponentType[], editedComponent: ComponentType): ComponentType[] => {
     return elements.map((el) => {
-        if (el.id === editedComponent.id) {
-            return {
-                ...el,
-                ...editedComponent, // Update the found component
-            };
-        }
-        if (el.children) {
-            return {
-                ...el,
-                children: updateComponentRecursive(el.children, editedComponent), // Recursively update children if needed
-            };
-        }
-        return el;
+      if (el.id === editedComponent.id) {
+        return {
+          ...el,
+          ...editedComponent, // Update the found component
+        };
+      }
+      if (el.children) {
+        return {
+          ...el,
+          children: updateComponentRecursive(el.children, editedComponent), // Recursively update children if needed
+        };
+      }
+      return el;
     });
   };
 
   const handleFormSubmit = async (formData: FormComponentData) => {
-    if (mode === 'edit' && selectedComponentId) {
+    try {
+      if (mode === 'edit' && selectedComponentId) {
         const editedComponent: ComponentType = {
-            ...formData,
-            id: selectedComponentId,
+          ...formData,
+          id: selectedComponentId,
         };
         const updatedStructure = deepClone(pageStructure);
-
-        // Use the recursive function to update the component in the structure
         updatedStructure.children = updateComponentRecursive(updatedStructure.children, editedComponent);
 
-        setPageStructure(updatedStructure); // Update the state with the edited structure
+        setPageStructure(updatedStructure);
         await updateAppPost({ home: updatedStructure });
         context.ui.showToast('Component updated successfully!');
       } else if (mode === 'add') {
         const newComponent: ComponentType = {
-            id: `component-${randomId()}`,
-            ...formData,
+          id: `component-${randomId()}`,
+          ...formData,
         };
+
+        if ((formData as ImageFormData).type === 'Image') {
+          setAddedImageId(newComponent.id);
+          await addOrUpdateImageData(newComponent.id, newComponent);
+        }
 
         if ((formData as PaginationButtonFormData).type === 'PaginationButton') {
           const newPageId = (formData as PaginationButtonFormData).pageId;
           const basePage = {
-              id: newPageId,
-              light: '#FFFFFF',
-              dark: '#1A1A1B',
-              children: [],  // Ensure this is always initialized
+            id: newPageId,
+            light: '#FFFFFF',
+            dark: '#1A1A1B',
+            children: [],
           };
-      
+
           const updatedAppInstance = deepClone(appPost);
           updatedAppInstance.home.children.push(newComponent);
-      
-          // Check if the page ID already exists (which it shouldn’t)
+
           if (!updatedAppInstance.pages[newPageId]) {
-              updatedAppInstance.pages[newPageId] = basePage;
+            updatedAppInstance.pages[newPageId] = basePage;
           } else {
-              console.error('Page ID already exists:', newPageId);
+            console.error('Page ID already exists:', newPageId);
           }
-      
-          console.log('Updated Pages:', updatedAppInstance.pages);
+
           setPageStructure(updatedAppInstance.home);
           await updateAppPost(updatedAppInstance);
           context.ui.showToast('Pagination button and new page created successfully!');
           return;
-      }
-      
+        }
 
-        // If not a PaginationButton, just update the home page
         const updatedStructure = deepClone(pageStructure);
         updatedStructure.children.push(newComponent);
         setPageStructure(updatedStructure);
         await updateAppPost({ home: updatedStructure });
         context.ui.showToast('Component added successfully!');
+      }
+    } catch (error) {
+      console.error('Error in handleFormSubmit:', error);
+      context.ui.showToast('An error occurred while submitting the form.');
     }
-};
+  };
+  
 
 
 

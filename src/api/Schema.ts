@@ -59,8 +59,8 @@ export class Schema {
     width: z.string(),
     height: z.string(),
     resizeMode: z.enum(['fit', 'fill', 'cover']),
-    imageWidth: z.string(),
-    imageHeight: z.string(),
+    imageWidth: z.number(),
+    imageHeight: z.number(),
     order: z.number().optional(),
   });
 
