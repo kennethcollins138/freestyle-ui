@@ -29,6 +29,8 @@ export type PageProps = {
     readWholePage: AppController['readWholePage'];
     createNewPage: AppController['createNewPage'];
     savePage: AppController['savePage'];
+    addOrUpdateImageData: AppController['addOrUpdateImageData'];
+    getImageDatabyComponentId: AppController['getImageDataByComponentId'];
     // readImmediateChildren: AppController['readImmediateChildren'];
     // updateChildrenOrder: AppController['updateChildrenOrder'];
   };

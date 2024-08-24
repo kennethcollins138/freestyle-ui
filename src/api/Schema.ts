@@ -20,7 +20,7 @@ export type PageSchema = z.infer<typeof Schema.PageSchema>;
 export type PostSchema = z.infer<typeof Schema.PostSchema>;
 export type ElementSchema = z.infer<typeof Schema.ElementSchema>;
 export type HomeSchema = z.infer<typeof Schema.HomeSchema>;
-
+export type ImageElementSchema = z.infer<typeof Schema.ImageElementSchema>;
 export class Schema {
   static configSchema = z.object({});
 
@@ -172,6 +172,7 @@ export class Schema {
     dark: z.string().nullable(),
     children: z.array(Schema.ElementSchema),
   });
+
   // appInstance defines the base post instance
   static appInstance = z
     .object({
@@ -187,6 +188,7 @@ export class Schema {
       title: z.string().min(1),
       header: z.string().min(1),
       subheader: z.string(),
+      imageData: z.record(Schema.ImageElementSchema),
       home: Schema.HomeSchema,
       pages: z.record(Schema.PageSchema), // Techinically Same as Home page, but setup for pagination
     })

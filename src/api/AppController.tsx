@@ -1,6 +1,5 @@
 import { Redis } from './Redis.js';
-import { Schema, AppInstance, PageSchema, ElementSchema, HomeSchema } from './Schema.js';
-import { randomId } from '../util.js';
+import { Schema, AppInstance, PageSchema, ElementSchema, HomeSchema, ImageElementSchema } from './Schema.js';
 import { Devvit } from '@devvit/public-api';
 
 export class AppController {
@@ -129,6 +128,25 @@ export class AppController {
         return null;
     }
 
+    async addOrUpdateImageData(componentId: string, imageData: ImageElementSchema): Promise<void> {
+        const appInstance = await this.loadAppInstance();
+        if (appInstance) {
+          // Add or update the image data for the given componentId
+          appInstance.imageData[componentId] = imageData;
+          await this.saveAppInstance(appInstance); // Save the updated instance
+        } else {
+          throw new Error('App instance not found');
+        }
+      }
+    
+    async getImageDataByComponentId(componentId: string): Promise<ImageElementSchema | null> {
+        const appInstance = await this.loadAppInstance();
+        if (appInstance && appInstance.imageData[componentId]) {
+          return appInstance.imageData[componentId];
+        }
+        return null;
+      }
+    
     async clonePost(newPostId: string): Promise<AppInstance | null> {
         const appInstance = await this.loadAppInstance();
         if (appInstance) {
@@ -186,6 +204,7 @@ export class AppController {
             title,
             header,
             subheader: '',
+            imageData: {},
             home: {
                 light: '#FF4500',
                 dark: '#1A1A1B',

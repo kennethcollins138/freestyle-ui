@@ -145,6 +145,17 @@ export const App: Devvit.CustomPostComponent = (context: Context) => {
 //         await this.saveAppInstance(appInstance);
 //     }
 // }
+  const addOrUpdateImageData: AppController['addOrUpdateImageData'] = async (...args) => {
+    const svc = new AppController(postId, context);
+    const data= await svc.addOrUpdateImageData(...args);
+    return data;
+  }
+
+  const getImageDatabyComponentId: AppController['getImageDataByComponentId'] = async(...args) => {
+    const svc = new AppController(postId, context);
+    const data = await svc.getImageDataByComponentId(...args);
+    return data;
+  }
 
   const savePage: AppController['savePage'] = async (...args) => {
     const svc = new AppController(postId, context);
@@ -186,7 +197,9 @@ export const App: Devvit.CustomPostComponent = (context: Context) => {
           deleteNode,
           readWholePage,
           createNewPage,
-          savePage
+          savePage,
+          addOrUpdateImageData,
+          getImageDatabyComponentId
         }}
       />
     </vstack>
