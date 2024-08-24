@@ -19,7 +19,9 @@ import { EditStackComponentForm, EditStackFormData } from '../forms/EditStackCom
 import { ComponentType, FormComponentData } from '../types/component.js';
 
 export default Devvit;
-
+/**
+ * Currently not implemented. Will be adding this feature with my next update. 
+ */
 export const PaginationPage = ({
   params,
   navigate,
