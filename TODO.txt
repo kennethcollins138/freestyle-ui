@@ -1,3 +1,0 @@
-Fix wrapper and document! almost there champ
-Add max width and heights to image and done woot woot
-Remove pagination button logic temporarily
