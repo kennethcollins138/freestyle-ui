@@ -29,8 +29,3 @@ Freestyle UI empowers moderators and post owners to design their own custom expe
 6. In upcoming updates, you’ll be able to add buttons that link to other pages within the same experience.
 7. Feel free to message any requests or suggestions to /u/TheRepDeveloper. Hope you enjoy!
 
-## Notes for Reddit team (Hopefully not included in final publish)
-
-- I'm assuming there are some super avoidable mistakes, but this is my first time attacking app development and typescript with that.
-- I thought it would be cool for moderators to be able to edit their own posts and multiple experiences.
-- I loved the popups for external links as I thought that was a great safety feature.

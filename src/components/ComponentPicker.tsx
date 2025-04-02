@@ -1,5 +1,5 @@
 import { Devvit, useForm } from '@devvit/public-api';
-import { ComponentType } from '../types/component.js';
+import { ComponentType } from '../api/Schema.js';
 
 export interface ComponentPickerProps {
     context: Devvit.Context;

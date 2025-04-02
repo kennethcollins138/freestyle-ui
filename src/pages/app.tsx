@@ -6,7 +6,6 @@ import { WelcomePage } from './welcome.js';
 import { HomePage } from './home.js';
 import { AdminPage } from './admin.js';
 import { HomeSchema, PageSchema } from '../api/Schema.js';
-import {string} from "zod";
 
 const getPageForRoute = (route: Route): ((props: PageProps) => JSX.Element) => {
   switch (route) {

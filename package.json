@@ -16,7 +16,11 @@
   },
   "dependencies": {
     "@devvit/public-api": "0.11.11",
+    "@typescript-eslint/eslint-plugin": "^8.29.0",
+    "@typescript-eslint/parser": "^8.29.0",
     "dset": "3.1.3",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-prettier": "^5.2.6",
     "zod": "^3.23.8"
   },
   "devDependencies": {
