@@ -1,7 +1,7 @@
 import { Devvit } from '@devvit/public-api';
 
-type HStackProps = {
-  children: JSX.Element | JSX.Element[];
+type VStackProps = {
+  children?: JSX.Element | JSX.Element[];
   gap?: Devvit.Blocks.ContainerGap;
   alignment?: Devvit.Blocks.Alignment;
   width?: Devvit.Blocks.SizeString;
@@ -10,7 +10,7 @@ type HStackProps = {
   backgroundColor?: string;
 };
 
-export const HStackElement = ({
+export const VStackElement = ({
   children,
   gap = "medium",
   alignment = "center",
@@ -18,9 +18,9 @@ export const HStackElement = ({
   height,
   padding,
   backgroundColor
-}: HStackProps): JSX.Element => {
+}: VStackProps): JSX.Element => {
   return (
-    <hstack
+    <vstack
       gap={gap}
       alignment={alignment}
       width={width}
@@ -29,6 +29,6 @@ export const HStackElement = ({
       backgroundColor={backgroundColor}
     >
       {children}
-    </hstack>
+    </vstack>
   );
 };

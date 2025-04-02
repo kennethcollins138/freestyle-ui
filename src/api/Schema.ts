@@ -21,6 +21,18 @@ export type PostSchema = z.infer<typeof Schema.PostSchema>;
 export type ElementSchema = z.infer<typeof Schema.ElementSchema>;
 export type HomeSchema = z.infer<typeof Schema.HomeSchema>;
 export type ImageElementSchema = z.infer<typeof Schema.ImageElementSchema>;
+export type TextElementSchema = z.infer<typeof Schema.TextElementSchema>;
+export type ButtonElementSchema = z.infer<typeof Schema.ButtonElementSchema>;
+export type VStackSchema = z.infer<typeof Schema.VStackSchema>;
+export type HStackSchema = z.infer<typeof Schema.HStackSchema>;
+export type ZStackSchema = z.infer<typeof Schema.ZStackSchema>;
+export type ComponentType =
+    | ImageElementSchema
+    | TextElementSchema
+    | ButtonElementSchema
+    | VStackSchema
+    | HStackSchema
+    | ZStackSchema;
 
 export class Schema {
   static configSchema = z.object({});
@@ -154,7 +166,7 @@ export class Schema {
   });
 
   // Define ElementSchema with recursive reference
-  static ElementSchema: z.ZodType<any> = z.union([
+  static ElementSchema: z.ZodType = z.union([
     Schema.ImageElementSchema,
     Schema.TextElementSchema,
     Schema.ButtonElementSchema,
@@ -173,6 +185,7 @@ export class Schema {
   });
 
   static HomeSchema = z.object({
+    id: z.string().optional(),
     light: z.string(),
     dark: z.string().nullable(),
     children: z.array(Schema.ElementSchema),

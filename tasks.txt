@@ -1,0 +1,2 @@
+1) Rewrite Forms to factory
+2) Remove duplicate code

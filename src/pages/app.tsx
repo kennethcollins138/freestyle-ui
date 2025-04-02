@@ -1,11 +1,12 @@
 import type { Context } from '@devvit/public-api';
-import { Devvit } from '@devvit/public-api';
+import { Devvit, useState } from '@devvit/public-api';
 import { AppController } from '../api/AppController.js';
 import type { PageProps, Route, RouteParams } from '../types/page.js';
 import { WelcomePage } from './welcome.js';
 import { HomePage } from './home.js';
 import { AdminPage } from './admin.js';
 import { HomeSchema, PageSchema } from '../api/Schema.js';
+import {string} from "zod";
 
 const getPageForRoute = (route: Route): ((props: PageProps) => JSX.Element) => {
   switch (route) {
@@ -21,7 +22,7 @@ const getPageForRoute = (route: Route): ((props: PageProps) => JSX.Element) => {
 };
 
 export const App: Devvit.CustomPostComponent = (context: Context) => {
-  const { useState, postId, reddit } = context;
+  const {  postId, reddit } = context;
 
   if (!postId) {
     console.error('No postId found in context');
@@ -156,6 +157,7 @@ export const App: Devvit.CustomPostComponent = (context: Context) => {
 
   const savePage: AppController['savePage'] = async (...args) => {
     const svc = new AppController(postId, context);
+    // Local variable data is redundant
     const data = await svc.savePage(...args);
     return data; 
   }

@@ -91,7 +91,7 @@ const createPost = Devvit.createForm(
 );
 
 Devvit.addCustomPostType({
-  name: 'pInfo',
+  name: 'freestyle-ui',
   height: 'tall',
   render: App, 
 });

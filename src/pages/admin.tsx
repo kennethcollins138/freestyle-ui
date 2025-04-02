@@ -1,6 +1,7 @@
-import { Devvit } from '@devvit/public-api';
-import { Page } from '../components/Page.js';
+import { Devvit, useForm } from '@devvit/public-api';
+import { Page } from '../components/elements/Page.js';
 import type { PageProps } from '../types/page.js';
+import { getSubredditInfoById } from "@devvit/public-api/public-api.js";
 
 export const AdminPage = ({
   navigate,
@@ -11,9 +12,7 @@ export const AdminPage = ({
   postMethods: {
     updateAppPost,
   },
-}: PageProps): JSX.Element => { 
-  const { useForm } = context;
-
+}: PageProps): JSX.Element => {
   const colorForm = useForm(
     {
       fields: [
@@ -43,7 +42,7 @@ export const AdminPage = ({
     }
   );
 
-  const modifyOwnerForm = context.useForm(
+  const modifyOwnerForm = useForm(
     {
       fields: [
         {
@@ -67,7 +66,7 @@ export const AdminPage = ({
 
       const newOwners = new Set([...appPost.owners]);
 
-      const subname = await (await reddit.getSubredditById(context.subredditId!)).name;
+      const subname = (await getSubredditInfoById(context.subredditId!, undefined)).name;
       if (addData) {
         const add = addData;
         if (newOwners.has(add)) {
@@ -101,7 +100,7 @@ export const AdminPage = ({
     }
   );
 
-  const deleteConfirm = context.useForm(
+  const deleteConfirm = useForm(
     {
       fields: [
         {
