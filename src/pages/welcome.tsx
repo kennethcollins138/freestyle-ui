@@ -1,21 +1,31 @@
-import { Devvit } from '@devvit/public-api';
-import type { PageProps } from '../types/page.js';
-import { standardizeUsername } from '../util.js';
+import { Devvit, useForm, useState } from "@devvit/public-api";
+import type { PageProps } from "../types/page.js";
+import { standardizeUsername } from "../util.js";
 
-type StepProps = Pick<PageProps, 'appPost' | 'postMethods' | 'context'> & {
+type StepProps = Pick<PageProps, "appPost" | "postMethods" | "context"> & {
   onPreviousPressed: () => void;
   onNextPressed: () => void;
 };
 
 const Step1 = ({ onNextPressed }: StepProps): JSX.Element => {
-  console.log('Rendering Step1');
+  console.log("Rendering Step1");
   return (
     <vstack padding="small" alignment="center middle">
-      <text color="black white" size="large" alignment="top center" weight="bold">
+      <text
+        color="black white"
+        size="large"
+        alignment="top center"
+        weight="bold"
+      >
         Set up a Freestyle UI Post!
       </text>
       <spacer size="small" />
-      <text color="black white" size="small" alignment="top center" weight="bold">
+      <text
+        color="black white"
+        size="small"
+        alignment="top center"
+        weight="bold"
+      >
         Give Mods the power to control the UI for their needs.
       </text>
       <spacer size="small" />
@@ -34,57 +44,57 @@ const Step2 = ({
   context,
   postMethods: { updateAppPost },
 }: StepProps): JSX.Element => {
-  const { useForm } = context;
 
   // Hooks are declared at the top level
   const colorForm = useForm(
     {
       fields: [
         {
-          name: 'light',
-          label: 'Light Color',
-          type: 'string',
+          name: "light",
+          label: "Light Color",
+          type: "string",
           defaultValue: appPost.color.light,
           required: true,
         },
         {
-          name: 'dark',
-          label: 'Dark Color',
-          type: 'string',
+          name: "dark",
+          label: "Dark Color",
+          type: "string",
           defaultValue: appPost.color.dark,
           required: true,
         },
       ],
-      title: 'Update the Post Color Themes',
-      acceptLabel: 'Update',
+      title: "Update the Post Color Themes",
+      acceptLabel: "Update",
     },
     async (data) => {
       await updateAppPost({
         color: {
-          light: data['light'],
-          dark: data['dark']
+          light: data["light"],
+          dark: data["dark"],
         },
       });
-    }
+    },
   );
 
   const addOwnerForm = useForm(
     {
       fields: [
         {
-          name: 'newOwner',
-          label: 'Add user',
-          type: 'string',
+          name: "newOwner",
+          label: "Add user",
+          type: "string",
           required: true,
         },
       ],
-      title: 'Add additional post owners',
-      acceptLabel: 'Submit',
+      title: "Add additional post owners",
+      acceptLabel: "Submit",
     },
     async (data) => {
       const { reddit } = context;
 
-      const subname = await (await reddit.getSubredditById(context.subredditId!)).name;
+      const subInfo = await reddit.getSubredditInfoById(context.subredditId!);
+      const subname = subInfo.name;
       const submittedUserName = data.newOwner as string;
       const newOwner = standardizeUsername(submittedUserName);
 
@@ -103,23 +113,43 @@ const Step2 = ({
         text: `You can now manage the ${subname} hub here: ${appPost.url}`,
       });
       context.ui.showToast(`u/${newOwner} is now a post owner!`);
-    }
+    },
   );
 
   return (
     <vstack>
       <vstack padding="small">
-        <text color="black white" size="large" alignment="top center" weight="bold">
+        <text
+          color="black white"
+          size="large"
+          alignment="top center"
+          weight="bold"
+        >
           Make it your own
         </text>
         <spacer size="small" />
-        <text color="black white" size="small" alignment="top center" weight="bold">
+        <text
+          color="black white"
+          size="small"
+          alignment="top center"
+          weight="bold"
+        >
           You can do this later, too!
         </text>
       </vstack>
       <zstack>
-        <vstack cornerRadius="large" width={100} height={100} alignment="middle center">
-          <image url="squirtle-sax.gif" imageWidth={175} imageHeight={175} resizeMode="fit" />
+        <vstack
+          cornerRadius="large"
+          width={100}
+          height={100}
+          alignment="middle center"
+        >
+          <image
+            url="squirtle-sax.gif"
+            imageWidth={175}
+            imageHeight={175}
+            resizeMode="fit"
+          />
         </vstack>
         <hstack alignment="middle end" width={100} height={100} padding="small">
           <button
@@ -140,15 +170,18 @@ const Step2 = ({
             Color
           </button>
           <spacer size="small" />
-          
+
           <spacer size="small" />
-          <button onPress={() => context.ui.showForm(addOwnerForm)} icon="mod" appearance="plain">
+          <button
+            onPress={() => context.ui.showForm(addOwnerForm)}
+            icon="mod"
+            appearance="plain"
+          >
             Owners
           </button>
         </hstack>
       </vstack>
     </vstack>
-    
   );
 };
 
@@ -158,36 +191,45 @@ const Step3 = ({
 }: StepProps): JSX.Element => {
   return (
     <vstack padding="small" width={100} height={100}>
-      <text color="black white" size="large" alignment="top center" weight="bold">
+      <text
+        color="black white"
+        size="large"
+        alignment="top center"
+        weight="bold"
+      >
         Almost Done
       </text>
       <vstack gap="small" padding="medium">
         <text color="black white" size="medium" wrap>
-          Post Owners can edit this post whenever. Make sure to read Devvit documentation
-          to understand how each element works, but you can customize your post to any of your needs!
+          Post Owners can edit this post whenever. Make sure to read Devvit
+          documentation to understand how each element works, but you can
+          customize your post to any of your needs!
         </text>
         <text color="black white" size="medium" wrap>
-          You are able to have multiple posts with the current config, but make sure to delete unused posts.
-          You are limited on the amount of storage this bot has!
+          You are able to have multiple posts with the current config, but make
+          sure to delete unused posts. You are limited on the amount of storage
+          this bot has!
         </text>
         <text color="black white" size="medium" wrap>
-          Important note for Images: Image uploads work for jpeg as of now.
-          When uploading images, wait a couple of seconds and refresh your page for it to appear.
-          With that, Image uploads will only appear inside of vstacks and ztacks.
-          Hstack implementation does not work as expected and will be fixed in future!
+          Important note for Images: Image uploads work for jpeg as of now. When
+          uploading images, wait a couple of seconds and refresh your page for
+          it to appear. With that, Image uploads will only appear inside of
+          vstacks and ztacks. Hstack implementation does not work as expected
+          and will be fixed in future!
         </text>
         <text color="black white" size="medium" wrap>
-          Upcoming Feature: Get ready for seamless navigation with our new pagination support, allowing multiple pages within a single post!
+          Upcoming Feature: Get ready for seamless navigation with our new
+          pagination support, allowing multiple pages within a single post!
         </text>
         <text color="black white" size="medium" wrap>
-          For any questions, feel free to message u/TheRepDeveloper!
-          This app was fully inspired by Community Hub. Check out their app as well!
+          For any questions, feel free to message u/TheRepDeveloper! This app
+          was fully inspired by Community Hub. Check out their app as well!
         </text>
       </vstack>
       <vstack grow alignment="bottom center">
         <button
           onPress={async () => {
-            await updateAppPost({ status: 'live' });
+            await updateAppPost({ status: "live" });
             onNextPressed();
           }}
           appearance="primary"
@@ -200,7 +242,7 @@ const Step3 = ({
 };
 
 const IsNotOwner = (): JSX.Element => {
-  console.log('Rendering IsNotOwner');
+  console.log("Rendering IsNotOwner");
   return <text color="black white">Post is getting ready for launch...</text>;
 };
 
@@ -211,15 +253,14 @@ export const WelcomePage = ({
   postMethods,
   isOwner,
 }: PageProps): JSX.Element => {
-  const { useState } = context;
   const [step, setStep] = useState(1);
 
-  console.log('WelcomePage - appPost status:', appPost.status);
-  console.log('WelcomePage - isOwner:', isOwner);
+  console.log("WelcomePage - appPost status:", appPost.status);
+  console.log("WelcomePage - isOwner:", isOwner);
 
-  if (appPost.status !== 'draft') {
-    console.log('Navigating to home');
-    navigate('home');
+  if (appPost.status !== "draft") {
+    console.log("Navigating to home");
+    navigate("home");
     return null;
   }
 
@@ -227,7 +268,7 @@ export const WelcomePage = ({
     return <IsNotOwner />;
   }
 
-  console.log('Rendering WelcomePage step:', step);
+  console.log("Rendering WelcomePage step:", step);
 
   if (step === 1) {
     return (
@@ -255,7 +296,7 @@ export const WelcomePage = ({
     return (
       <Step3
         onNextPressed={() => {
-          navigate('home');
+          navigate("home");
         }}
         onPreviousPressed={() => setStep(2)}
         context={context}

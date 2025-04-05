@@ -1,7 +1,7 @@
-import { Devvit } from '@devvit/public-api';
-import type { PageProps } from '../../types/page.js';
+import { Devvit } from "@devvit/public-api";
+import type { PageProps } from "../../types/page.js";
 
-export type PageContentProps = Pick<PageProps, 'navigate'> & {
+export type PageContentProps = Pick<PageProps, "navigate"> & {
   children: JSX.Element;
   showHomeButton?: boolean;
 };
@@ -40,16 +40,14 @@ export const Page: {
 Page.Content = ({ children, navigate, showHomeButton = true }) => {
   return (
     <zstack width={100} height={100}>
-      <vstack width={100}>
-        {children}
-      </vstack>
+      <vstack width={100}>{children}</vstack>
 
       {showHomeButton && (
         <hstack alignment="top end" width={100}>
           <button
             size="small"
-            icon={'home'}
-            onPress={() => navigate('home')}
+            icon={"home"}
+            onPress={() => navigate("home")}
             appearance="primary"
           />
         </hstack>
@@ -111,15 +109,16 @@ Page.Nav = ({ buttonStart, buttonMiddle, buttonEnd, bottomBorderColor }) => {
 
   return (
     <>
-      <hstack
-        padding="xsmall"
-        gap="small"
-      >
+      <hstack padding="xsmall" gap="small">
         {sButton}
         {mButton}
         {eButton}
       </hstack>
-      <hstack width="100%" backgroundColor={bottomBorderColor?.light} height="3px" />
+      <hstack
+        width="100%"
+        backgroundColor={bottomBorderColor?.light}
+        height="3px"
+      />
     </>
   );
 };
@@ -137,8 +136,15 @@ Page.ContentHeader = ({ children }) => {
 Page.ContentSubHeader = ({ children }) => {
   return (
     <vstack alignment="center">
-      <vstack alignment="center" width={'60%'}>
-        <text color="black white" size="small" weight="bold" alignment="center" width={'100%'} wrap>
+      <vstack alignment="center" width={"60%"}>
+        <text
+          color="black white"
+          size="small"
+          weight="bold"
+          alignment="center"
+          width={"100%"}
+          wrap
+        >
           {children}
         </text>
       </vstack>

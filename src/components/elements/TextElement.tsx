@@ -1,6 +1,7 @@
-import { Devvit } from '@devvit/public-api';
+import { Devvit } from "@devvit/public-api";
 
 type TextElementProps = {
+  key: string;
   text: string;
   style?: Devvit.Blocks.TextStyle;
   size?: Devvit.Blocks.TextSize;
@@ -27,7 +28,7 @@ export const TextElement = ({
   wrap,
   overflow,
   width,
-  height
+  height,
 }: TextElementProps): JSX.Element => {
   return (
     <text

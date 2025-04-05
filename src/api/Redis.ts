@@ -1,7 +1,13 @@
-import type { Devvit } from '@devvit/public-api';
-import type { TxClient } from '@devvit/public-api/apis/redis/RedisClient.js';
-import { Schema, Config, AppInstance, PageSchema, ElementSchema, HomeSchema } from './Schema.js';
-import { z } from 'zod';
+import type { Devvit } from "@devvit/public-api";
+import type { TxClient } from "@devvit/public-api/apis/redis/RedisClient.js";
+import {
+  Schema,
+  Config,
+  AppInstance,
+  PageSchema,
+  ElementSchema,
+  HomeSchema,
+} from "./Schema.js";
 
 type CreateUpdateUpsertContext = {
   txn?: TxClient;
@@ -13,13 +19,13 @@ type CreateUpdateUpsertContext = {
  * app instances, pages, and elements.
  */
 export class Redis {
-  #redis: Devvit.Context['redis'];
+  #redis: Devvit.Context["redis"];
 
   /**
    * Initializes an instance of the Redis class.
    * @param redis - The Redis client context from Devvit.
    */
-  constructor(redis: Devvit.Context['redis']) {
+  constructor(redis: Devvit.Context["redis"]) {
     this.#redis = redis;
   }
 
@@ -73,11 +79,17 @@ export class Redis {
    * @returns The parsed and saved AppInstance.
    * @throws Error if an AppInstance with the given ID already exists.
    */
-  async appInstanceCreate(id: string, params: AppInstance, context?: CreateUpdateUpsertContext): Promise<AppInstance> {
+  async appInstanceCreate(
+    id: string,
+    params: AppInstance,
+    context?: CreateUpdateUpsertContext,
+  ): Promise<AppInstance> {
     const client = context?.txn ?? this.#redis;
     const data = await this.#redis.get(Redis.keys.appInstance(id));
     if (data) {
-      throw new Error(`Cannot create because app instance already exists for id: ${id}`);
+      throw new Error(
+        `Cannot create because app instance already exists for id: ${id}`,
+      );
     }
     const parsedParams = await Schema.appInstance.parseAsync(params);
     await client.set(Redis.keys.appInstance(id), JSON.stringify(parsedParams));
@@ -92,7 +104,11 @@ export class Redis {
    * @returns The updated AppInstance object.
    * @throws Error if the AppInstance is not found.
    */
-  async appInstanceUpdate(id: string, params: Partial<AppInstance>, context?: CreateUpdateUpsertContext): Promise<AppInstance> {
+  async appInstanceUpdate(
+    id: string,
+    params: Partial<AppInstance>,
+    context?: CreateUpdateUpsertContext,
+  ): Promise<AppInstance> {
     const client = context?.txn ?? this.#redis;
     const data = await this.#redis.get(Redis.keys.appInstance(id));
     if (!data) {
@@ -115,8 +131,10 @@ export class Redis {
     const appInstance = await this.appInstanceGet(appInstanceId);
 
     // Helper function to recursively delete the node from the element tree
-    const deleteNodeRecursive = (elements: ElementSchema[]): ElementSchema[] => {
-      return elements.filter(element => {
+    const deleteNodeRecursive = (
+      elements: ElementSchema[],
+    ): ElementSchema[] => {
+      return elements.filter((element) => {
         if (element.id === nodeId) {
           return false;
         }
@@ -130,10 +148,15 @@ export class Redis {
     // Delete node from home page and all other pages
     appInstance.home.children = deleteNodeRecursive(appInstance.home.children);
     for (const pageKey in appInstance.pages) {
-      appInstance.pages[pageKey].children = deleteNodeRecursive(appInstance.pages[pageKey].children);
+      appInstance.pages[pageKey].children = deleteNodeRecursive(
+        appInstance.pages[pageKey].children,
+      );
     }
 
-    await this.#redis.set(Redis.keys.appInstance(appInstanceId), JSON.stringify(appInstance));
+    await this.#redis.set(
+      Redis.keys.appInstance(appInstanceId),
+      JSON.stringify(appInstance),
+    );
   }
 
   /**
@@ -141,12 +164,17 @@ export class Redis {
    * @param appInstanceId - The ID of the AppInstance.
    * @param updatedElement - The updated element data.
    */
-  async editElement(appInstanceId: string, updatedElement: ElementSchema): Promise<void> {
+  async editElement(
+    appInstanceId: string,
+    updatedElement: ElementSchema,
+  ): Promise<void> {
     const appInstance = await this.appInstanceGet(appInstanceId);
 
     // Helper function to recursively update the element in the tree
-    const editElementRecursive = (elements: ElementSchema[]): ElementSchema[] => {
-      return elements.map(element => {
+    const editElementRecursive = (
+      elements: ElementSchema[],
+    ): ElementSchema[] => {
+      return elements.map((element) => {
         if (element.id === updatedElement.id) {
           return { ...element, ...updatedElement };
         }
@@ -160,10 +188,15 @@ export class Redis {
     // Update element in home page and all other pages
     appInstance.home.children = editElementRecursive(appInstance.home.children);
     for (const pageKey in appInstance.pages) {
-      appInstance.pages[pageKey].children = editElementRecursive(appInstance.pages[pageKey].children);
+      appInstance.pages[pageKey].children = editElementRecursive(
+        appInstance.pages[pageKey].children,
+      );
     }
 
-    await this.#redis.set(Redis.keys.appInstance(appInstanceId), JSON.stringify(appInstance));
+    await this.#redis.set(
+      Redis.keys.appInstance(appInstanceId),
+      JSON.stringify(appInstance),
+    );
   }
 
   /**
@@ -172,12 +205,16 @@ export class Redis {
    * @param parentElementId - The ID of the parent element.
    * @param newChild - The child element to add.
    */
-  async addChild(appInstanceId: string, parentElementId: string, newChild: ElementSchema): Promise<void> {
+  async addChild(
+    appInstanceId: string,
+    parentElementId: string,
+    newChild: ElementSchema,
+  ): Promise<void> {
     const appInstance = await this.appInstanceGet(appInstanceId);
 
     // Helper function to recursively add the child element
     const addChildRecursive = (elements: ElementSchema[]): ElementSchema[] => {
-      return elements.map(element => {
+      return elements.map((element) => {
         if (element.id === parentElementId) {
           if (!element.children) {
             element.children = [];
@@ -193,10 +230,15 @@ export class Redis {
     // Add child to home page and all other pages
     appInstance.home.children = addChildRecursive(appInstance.home.children);
     for (const pageKey in appInstance.pages) {
-      appInstance.pages[pageKey].children = addChildRecursive(appInstance.pages[pageKey].children);
+      appInstance.pages[pageKey].children = addChildRecursive(
+        appInstance.pages[pageKey].children,
+      );
     }
 
-    await this.#redis.set(Redis.keys.appInstance(appInstanceId), JSON.stringify(appInstance));
+    await this.#redis.set(
+      Redis.keys.appInstance(appInstanceId),
+      JSON.stringify(appInstance),
+    );
   }
 
   /**
@@ -205,9 +247,12 @@ export class Redis {
    * @param pageId - The ID of the page to read.
    * @returns The PageSchema or HomeSchema for the specified page.
    */
-  async readWholePage(appInstanceId: string, pageId: string): Promise<PageSchema | HomeSchema> {
+  async readWholePage(
+    appInstanceId: string,
+    pageId: string,
+  ): Promise<PageSchema | HomeSchema> {
     const appInstance = await this.appInstanceGet(appInstanceId);
-    if (pageId === 'home') {
+    if (pageId === "home") {
       return appInstance.home;
     }
     return appInstance.pages[pageId];
@@ -219,11 +264,16 @@ export class Redis {
    * @param parentElementId - The ID of the parent element.
    * @returns An array of the immediate children ElementSchema objects.
    */
-  async readImmediateChildren(appInstanceId: string, parentElementId: string): Promise<ElementSchema[]> {
+  async readImmediateChildren(
+    appInstanceId: string,
+    parentElementId: string,
+  ): Promise<ElementSchema[]> {
     const appInstance = await this.appInstanceGet(appInstanceId);
 
     // Helper function to find immediate children recursively
-    const findImmediateChildren = (elements: ElementSchema[]): ElementSchema[] => {
+    const findImmediateChildren = (
+      elements: ElementSchema[],
+    ): ElementSchema[] => {
       for (const element of elements) {
         if (element.id === parentElementId) {
           return element.children || [];
@@ -258,14 +308,22 @@ export class Redis {
    * @param parentElementId - The ID of the parent element.
    * @param newOrder - The new order of child element IDs.
    */
-  async updateChildrenOrder(appInstanceId: string, parentElementId: string, newOrder: string[]): Promise<void> {
+  async updateChildrenOrder(
+    appInstanceId: string,
+    parentElementId: string,
+    newOrder: string[],
+  ): Promise<void> {
     const appInstance = await this.appInstanceGet(appInstanceId);
 
     // Helper function to recursively update the order of children
-    const updateOrderRecursive = (elements: ElementSchema[]): ElementSchema[] => {
-      return elements.map(element => {
+    const updateOrderRecursive = (
+      elements: ElementSchema[],
+    ): ElementSchema[] => {
+      return elements.map((element) => {
         if (element.id === parentElementId) {
-          element.children = newOrder.map(id => element.children?.find((child: ElementSchema) => child.id === id)) as ElementSchema[];
+          element.children = newOrder.map((id) =>
+            element.children?.find((child: ElementSchema) => child.id === id),
+          ) as ElementSchema[];
         } else if (element.children) {
           element.children = updateOrderRecursive(element.children);
         }
@@ -276,10 +334,15 @@ export class Redis {
     // Update order in home page and all other pages
     appInstance.home.children = updateOrderRecursive(appInstance.home.children);
     for (const pageKey in appInstance.pages) {
-      appInstance.pages[pageKey].children = updateOrderRecursive(appInstance.pages[pageKey].children);
+      appInstance.pages[pageKey].children = updateOrderRecursive(
+        appInstance.pages[pageKey].children,
+      );
     }
 
-    await this.#redis.set(Redis.keys.appInstance(appInstanceId), JSON.stringify(appInstance));
+    await this.#redis.set(
+      Redis.keys.appInstance(appInstanceId),
+      JSON.stringify(appInstance),
+    );
   }
 
   /**
@@ -288,12 +351,18 @@ export class Redis {
    * @param newAppInstance - The data for the new AppInstance.
    * @throws Error if a post with the given ID already exists.
    */
-  async createNewPost(postId: string, newAppInstance: AppInstance): Promise<void> {
+  async createNewPost(
+    postId: string,
+    newAppInstance: AppInstance,
+  ): Promise<void> {
     const existingPost = await this.#redis.get(Redis.keys.appInstance(postId));
     if (existingPost) {
       throw new Error(`Post with ID ${postId} already exists.`);
     }
 
-    await this.#redis.set(Redis.keys.appInstance(postId), JSON.stringify(newAppInstance));
+    await this.#redis.set(
+      Redis.keys.appInstance(postId),
+      JSON.stringify(newAppInstance),
+    );
   }
 }

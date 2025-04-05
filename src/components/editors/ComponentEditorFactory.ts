@@ -1,10 +1,17 @@
-import { Devvit } from '@devvit/public-api';
-import { ComponentType } from '../../types/component.js';
+import { Devvit } from "@devvit/public-api";
 import { createTextEditor } from "./TextEditor.js";
 import { createButtonEditor } from "./ButtonEditor.js";
 import { createImageEditor } from "./ImageEditor.js";
 import { createStackEditor } from "./StackEditor.js";
 import { createPaginationButtonEditor } from "./PaginationButtonEditor.js";
+import {
+  ButtonElementSchema,
+  ComponentType,
+  ImageElementSchema,
+  PaginationButtonElementSchema,
+  StackSchema,
+  TextElementSchema
+} from "../../api/Schema.js";
 
 /**
  * Factory function that returns the appropriate editor based on component type
@@ -12,29 +19,35 @@ import { createPaginationButtonEditor } from "./PaginationButtonEditor.js";
 export const getComponentEditor = (
     context: Devvit.Context,
     componentType: string,
-    component?: ComponentType,
-    onSave?: (data: any) => void
+    component: (ComponentType | undefined),
+    onSave: (data: any) => void,
 ) => {
-    switch (componentType) {
-        case 'Text':
-            return createTextEditor(context, component, onSave);
+  // TODO need to be able to see original values for form
+  switch (componentType) {
+    case "Text":
+      const textComponent = component as TextElementSchema;
+      return createTextEditor(context, textComponent, onSave);
 
-        case 'Button':
-            return createButtonEditor(context, component, onSave);
+    case "Button":
+      const buttonComponent = component as ButtonElementSchema;
+      return createButtonEditor(context, buttonComponent, onSave);
 
-        case 'Image':
-            // FIX: Need to rework
-            return createImageEditor(context, component, onSave);
+    case "Image":
+      // FIX: Need to rework
+      const imageComponent = component as ImageElementSchema;
+      return createImageEditor( context, imageComponent, onSave );
 
-        case 'VStack':
-        case 'HStack':
-        case 'ZStack':
-            return createStackEditor(context, componentType, component, onSave);
+    case "VStack":
+    case "HStack":
+    case "ZStack":
+      const stackComponent = component as StackSchema
+      return createStackEditor(context, componentType, stackComponent, onSave);
 
-        case 'PaginationButton':
-            return createPaginationButtonEditor(context, component, onSave);
+    case "PaginationButton":
+      const paginationButton = component as PaginationButtonElementSchema
+      return createPaginationButtonEditor(context, paginationButton, onSave);
 
-        default:
-            throw new Error(`Unknown component type: ${componentType}`);
-    }
+    default:
+      throw new Error(`Unknown component type: ${componentType}`);
+  }
 };

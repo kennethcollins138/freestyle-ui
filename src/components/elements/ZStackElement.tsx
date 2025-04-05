@@ -1,6 +1,7 @@
-import { Devvit } from '@devvit/public-api';
+import { Devvit } from "@devvit/public-api";
 
 type ZStackProps = {
+  key: string;
   children: JSX.Element | JSX.Element[];
   gap?: Devvit.Blocks.ContainerGap;
   alignment?: Devvit.Blocks.Alignment;
@@ -11,16 +12,18 @@ type ZStackProps = {
 };
 
 export const ZStackElement = ({
+  key,
   children,
   gap = "medium",
   alignment = "center",
   width = "100%",
   height,
   padding,
-  backgroundColor
+  backgroundColor,
 }: ZStackProps): JSX.Element => {
   return (
     <zstack
+      key={key}
       gap={gap}
       alignment={alignment}
       width={width}

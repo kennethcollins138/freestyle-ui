@@ -1,4 +1,4 @@
-import { Devvit, IconName } from '@devvit/public-api';
+import { Devvit, IconName } from "@devvit/public-api";
 
 //TODO: need to fix for next update
 export type PaginationButtonProps = {
@@ -14,17 +14,17 @@ export type PaginationButtonProps = {
   context: Devvit.Context;
 };
 
-export const PaginationButtonElement = ({ 
+export const PaginationButtonElement = ({
   pageId,
-  icon, 
-  size='medium', 
-  appearance='secondary', 
-  isGrow, 
-  width=50, 
-  height=50, 
-  text, 
-  url, 
-  context
+  icon,
+  size = "medium",
+  appearance = "secondary",
+  isGrow,
+  width = 50,
+  height = 50,
+  text,
+  url,
+  context,
 }: PaginationButtonProps): JSX.Element => {
   return (
     <button

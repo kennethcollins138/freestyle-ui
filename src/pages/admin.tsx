@@ -1,7 +1,6 @@
-import { Devvit, useForm } from '@devvit/public-api';
-import { Page } from '../components/elements/Page.js';
-import type { PageProps } from '../types/page.js';
-import { getSubredditInfoById } from "@devvit/public-api/public-api.js";
+import {Devvit, getSubredditInfoById, useForm} from "@devvit/public-api";
+import { Page } from "../components/elements/Page.js";
+import type { PageProps } from "../types/page.js";
 
 export const AdminPage = ({
   navigate,
@@ -9,55 +8,53 @@ export const AdminPage = ({
   appPost,
   isOwner,
   currentUserUsername,
-  postMethods: {
-    updateAppPost,
-  },
+  postMethods: { updateAppPost },
 }: PageProps): JSX.Element => {
   const colorForm = useForm(
     {
       fields: [
         {
-          name: 'Light Mode',
+          name: "Light Mode",
           label: `Light Mode Color`,
-          type: 'string',
+          type: "string",
           defaultValue: appPost.color.light,
         },
         {
-          name: 'Dark Mode',
+          name: "Dark Mode",
           label: `Dark Mode Color`,
-          type: 'string',
+          type: "string",
           defaultValue: appPost.color.dark,
         },
       ],
-      title: 'Update the Post Color',
-      acceptLabel: 'Update',
+      title: "Update the Post Color",
+      acceptLabel: "Update",
     },
     async (data) => {
       await updateAppPost({
         color: {
-          light: data['Light Mode'],
-          dark: data['Dark Mode']
+          light: data["Light Mode"],
+          dark: data["Dark Mode"],
         },
       });
-    }
+    },
   );
 
   const modifyOwnerForm = useForm(
     {
       fields: [
         {
-          name: 'nameAdd',
+          name: "nameAdd",
           label: `Add user`,
-          type: 'string',
+          type: "string",
         },
         {
-          name: 'nameRemove',
+          name: "nameRemove",
           label: `Remove user`,
-          type: 'string',
+          type: "string",
         },
       ],
-      title: 'Who can manage this post?',
-      acceptLabel: 'Submit',
+      title: "Who can manage this post?",
+      acceptLabel: "Submit",
     },
     async (data) => {
       const { reddit } = context;
@@ -66,7 +63,9 @@ export const AdminPage = ({
 
       const newOwners = new Set([...appPost.owners]);
 
-      const subname = (await getSubredditInfoById(context.subredditId!, undefined)).name;
+      const subname = (
+        await getSubredditInfoById(context.subredditId!, undefined)
+      ).name;
       if (addData) {
         const add = addData;
         if (newOwners.has(add)) {
@@ -97,20 +96,20 @@ export const AdminPage = ({
       await updateAppPost({
         owners: [...newOwners],
       });
-    }
+    },
   );
 
   const deleteConfirm = useForm(
     {
       fields: [
         {
-          name: 'confirm',
+          name: "confirm",
           label: `Write "DELETE" to confirm`,
-          type: 'string',
+          type: "string",
         },
       ],
-      title: 'Are you sure you want to delete this post?',
-      acceptLabel: 'Delete',
+      title: "Are you sure you want to delete this post?",
+      acceptLabel: "Delete",
     },
     async (data) => {
       const { reddit, ui } = context;
@@ -119,8 +118,8 @@ export const AdminPage = ({
         ui.showToast(`failed to delete post: no postId`);
         return;
       }
-      const confirm = data.confirm || '';
-      if (confirm === 'DELETE') {
+      const confirm = data.confirm || "";
+      if ((confirm === "DELETE") && isOwner) {
         try {
           await (await reddit.getPostById(postId)).delete();
           ui.showToast(`Post successfully deleted`);
@@ -130,7 +129,7 @@ export const AdminPage = ({
       } else {
         ui.showToast(`You must write "DELETE" to remove the post`);
       }
-    }
+    },
   );
 
   const addColor: Devvit.Blocks.OnPressEventHandler = async () => {
@@ -155,24 +154,57 @@ export const AdminPage = ({
             </text>
           </hstack>
           <spacer size="medium" />
-          <text color="black white" size="small" wrap>{`Owners: ${appPost.owners.join(
-            ', '
-          )}`}</text>
+          <text
+            color="black white"
+            size="small"
+            wrap
+          >{`Owners: ${appPost.owners.join(", ")}`}</text>
           <spacer size="small" />
-          <hstack alignment="center" gap="small" maxWidth={'70%'} width={'100%'}>
+          <hstack
+            alignment="center"
+            gap="small"
+            maxWidth={"70%"}
+            width={"100%"}
+          >
             <vstack grow gap="small">
-              <button onPress={addOwner} size="small" icon="mod" appearance="secondary">
+              <button
+                onPress={addOwner}
+                size="small"
+                icon="mod"
+                appearance="secondary"
+              >
                 Owners
               </button>
-              <button onPress={async () => {context.ui.navigateTo('https://www.reddit.com/message/compose/?to=TheRepDeveloper')}} size="small" icon="message" appearance="secondary">
+              <button
+                onPress={async () => {
+                  context.ui.navigateTo(
+                    "https://www.reddit.com/message/compose/?to=TheRepDeveloper",
+                  );
+                }}
+                size="small"
+                icon="message"
+                appearance="secondary"
+              >
                 Help
               </button>
             </vstack>
             <vstack grow gap="small">
-              <button onPress={deletePInfo} size="small" icon="delete" appearance="secondary" grow>
+              <button
+                onPress={deletePInfo}
+                size="small"
+                icon="delete"
+                appearance="secondary"
+                grow
+              >
                 Delete
               </button>
-              <button onPress={addColor} size="small" icon="topic-art" appearance="secondary" grow>
+              <button
+                onPress={addColor}
+                size="small"
+                icon="topic-art"
+                appearance="secondary"
+                grow
+              >
                 Color
               </button>
             </vstack>

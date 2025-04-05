@@ -1,59 +1,72 @@
-import type { Context } from '@devvit/public-api';
-import { Devvit, useState } from '@devvit/public-api';
-import { AppController } from '../api/AppController.js';
-import type { PageProps, Route, RouteParams } from '../types/page.js';
-import { WelcomePage } from './welcome.js';
-import { HomePage } from './home.js';
-import { AdminPage } from './admin.js';
-import { HomeSchema, PageSchema } from '../api/Schema.js';
+import {Context, Devvit, useState} from "@devvit/public-api";
+import {AppController} from "../api/AppController.js";
+import type {PageProps, Route, RouteParams} from "../types/page.js";
+import {WelcomePage} from "./welcome.js";
+import {HomePage} from "./home.js";
+import {AdminPage} from "./admin.js";
+import {AppInstance, HomeSchema, PageSchema} from "../api/Schema.js";
+import {PaginationPage} from "./Pagination.js";
+import {ComponentRenderer} from "../components/ComponentRendererFactory.js";
 
 const getPageForRoute = (route: Route): ((props: PageProps) => JSX.Element) => {
   switch (route) {
-    case 'home':
+    case "home":
       return HomePage;
-    case 'welcome':
+    case "welcome":
       return WelcomePage;
-    case 'admin':
+    case "admin":
       return AdminPage;
+    case "pagination":
+      return PaginationPage;
     default:
       throw new Error(`Unhandled route: ${route}`);
   }
 };
 
 export const App: Devvit.CustomPostComponent = (context: Context) => {
-  const {  postId, reddit } = context;
+  const { postId, reddit } = context;
 
   if (!postId) {
-    console.error('No postId found in context');
+    console.error("No postId found in context");
     throw new Error(`Cannot find post id from context`);
   }
 
-  const [currentPost, setCurrentPost] = useState(async () => {
+  const [currentPost, setCurrentPost] = useState<AppInstance | null>(async () => {
     const svc = new AppController(postId, context);
     return await svc.loadAppInstance();
   });
 
-  const [[route, routeParams], setRouteConfig] = useState<[Route, RouteParams]>(async () => {
-    // TODO: won't be null need to fix this
-    // @ts-expect-error
-    if (currentPost.status === 'draft') {
-      return ['welcome', {}];
-    }
-    return ['home', {}];
-  });
+  if (!currentPost) {
+    console.error("No post found");
+    throw new Error("Cannot find post")
+  }
 
-  const [currentUserUsername] = useState(async () => {
+  const [[route, routeParams], setRouteConfig] = useState<[Route, RouteParams]>(
+    async () => {
+      if (currentPost.status === "draft") {
+        return ["welcome", {}];
+      }
+      return ["home", {}];
+    },
+  );
+
+  //  getUserByUsername(username: string): Promise<User | undefined>;
+  const [currentUserUsername] = useState<string | null>(async () => {
     const user = await reddit.getCurrentUser();
-    return user?.username;
+    return user?.username ?? null;
   });
+  //
+  // const [currentUserName]
 
-  const isOwner = currentUserUsername ? (currentPost?.owners.includes(currentUserUsername) ?? false) : false;
+  const isOwner = currentUserUsername
+    ? (currentPost?.owners.includes(currentUserUsername) ?? false)
+    : false;
 
   const navigate = (route: Route, params: RouteParams = {}): void => {
     setRouteConfig([route, params]);
   };
 
-  const updateAppPost: AppController['updateAppInstance'] = async (...args) => {
+  const updateAppPost: AppController["updateAppInstance"] = async (...args) => {
     const svc = new AppController(postId, context);
     const data = await svc.updateAppInstance(...args);
     setCurrentPost((prevState) => {
@@ -63,13 +76,13 @@ export const App: Devvit.CustomPostComponent = (context: Context) => {
     return data;
   };
 
-  const updateAppElement: AppController['editElement'] = async (...args) => {
+  const updateAppElement: AppController["editElement"] = async (...args) => {
     const svc = new AppController(postId, context);
     const data = await svc.editElement(...args);
-  
+
     setCurrentPost((prevState) => {
       if (!prevState || !data) return prevState;
-      if ('id' in data) {
+      if (data.id) {
         const updatedPages = { ...prevState.pages };
         updatedPages[data.id] = data;
         return { ...prevState, pages: updatedPages };
@@ -77,34 +90,33 @@ export const App: Devvit.CustomPostComponent = (context: Context) => {
         return { ...prevState, home: data };
       }
     });
-  
+
     return data;
   };
 
-  const deleteNode: AppController['deleteNode'] = async (pageId, elementId) => {
+  const deleteNode: AppController["deleteNode"] = async (pageId, elementId) => {
     const svc = new AppController(postId, context);
     const data = await svc.deleteNode(pageId, elementId);
-  
+
     setCurrentPost((prevState) => {
       if (!prevState || !data) return prevState;
-  
-      if (pageId === 'home') {
+
+      if (pageId === "home") {
         return { ...prevState, home: data as HomeSchema };
       }
-  
+
       const updatedPages = { ...prevState.pages };
       if (pageId in updatedPages) {
         updatedPages[pageId] = data as PageSchema;
       }
-  
+
       return { ...prevState, pages: updatedPages };
     });
-  
+
     return data;
   };
-  
 
-  const addElement: AppController['addChild'] = async (...args) => {
+  const addElement: AppController["addChild"] = async (...args) => {
     const svc = new AppController(postId, context);
     const data = await svc.addChild(...args);
     setCurrentPost((prevState) => {
@@ -118,14 +130,14 @@ export const App: Devvit.CustomPostComponent = (context: Context) => {
     return data;
   };
 
-  const clonePost: AppController['clonePost'] = async (...args) => {
+  const clonePost: AppController["clonePost"] = async (...args) => {
     const svc = new AppController(postId, context);
     const data = await svc.clonePost(...args);
     setCurrentPost(data);
     return data;
   };
 
-  const readWholePage: AppController['readWholePage'] = async (...args) => {
+  const readWholePage: AppController["readWholePage"] = async (...args) => {
     const svc = new AppController(postId, context);
     const data = await svc.readWholePage(...args);
     setCurrentPost((prevState) => {
@@ -134,51 +146,53 @@ export const App: Devvit.CustomPostComponent = (context: Context) => {
     });
     return data;
   };
-  
-//   async savePage(pageId: string, page: PageSchema) {
-//     const appInstance = await this.loadAppInstance();
-//     if (appInstance) {
-//         appInstance.pages[pageId] = page;
-//         await this.saveAppInstance(appInstance);
-//     }
-// }
-  const addOrUpdateImageData: AppController['addOrUpdateImageData'] = async (...args) => {
-    const svc = new AppController(postId, context);
-    const data= await svc.addOrUpdateImageData(...args);
-    return data;
-  }
 
-  const getImageDatabyComponentId: AppController['getImageDataByComponentId'] = async(...args) => {
+  //   async savePage(pageId: string, page: PageSchema) {
+  //     const appInstance = await this.loadAppInstance();
+  //     if (appInstance) {
+  //         appInstance.pages[pageId] = page;
+  //         await this.saveAppInstance(appInstance);
+  //     }
+  // }
+  const addOrUpdateImageData: AppController["addOrUpdateImageData"] = async (
+    ...args
+  ) => {
     const svc = new AppController(postId, context);
-    const data = await svc.getImageDataByComponentId(...args);
-    return data;
-  }
+    return await svc.addOrUpdateImageData(...args);
+  };
 
-  const savePage: AppController['savePage'] = async (...args) => {
+  const getImageDatabyComponentId: AppController["getImageDataByComponentId"] =
+    async (...args) => {
+      const svc = new AppController(postId, context);
+      return await svc.getImageDataByComponentId(...args);
+    };
+
+  const savePage: AppController["savePage"] = async (...args) => {
     const svc = new AppController(postId, context);
-    // Local variable data is redundant
-    const data = await svc.savePage(...args);
-    return data; 
-  }
-  const createNewPage: AppController['createNewPage'] = async (...args) => {
+    return await svc.savePage(...args);
+  };
+  const createNewPage: AppController["createNewPage"] = async (...args) => {
     const svc = new AppController(postId, context);
-    const data = await svc.createNewPage(...args);
-    return data;
-  }
+    return await svc.createNewPage(...args);
+  };
   const PageComponent = getPageForRoute(route);
-  console.log('Rendering page for route:', route);
+  console.log("Rendering page for route:", route);
 
   if (!currentPost) {
     return (
-      <vstack alignment='center'>
-        <text color="red">Failed to load post data. Please try again later.</text>
+      <vstack alignment="center">
+        <text color="red">
+          Failed to load post data. Please try again later.
+        </text>
       </vstack>
     );
   }
-  
 
   return (
-    <vstack lightBackgroundColor={currentPost.color.light} darkBackgroundColor={currentPost.color.dark}>
+    <vstack
+      lightBackgroundColor={currentPost.color.light}
+      darkBackgroundColor={currentPost.color.dark}
+    >
       <PageComponent
         navigate={navigate}
         route={route}
@@ -186,7 +200,7 @@ export const App: Devvit.CustomPostComponent = (context: Context) => {
         context={context}
         appPost={currentPost}
         isOwner={isOwner}
-        currentUserUsername={currentUserUsername ?? ''}
+        currentUserUsername={currentUserUsername ?? ""}
         postMethods={{
           updateAppPost,
           updateAppElement,
@@ -197,7 +211,7 @@ export const App: Devvit.CustomPostComponent = (context: Context) => {
           createNewPage,
           savePage,
           addOrUpdateImageData,
-          getImageDatabyComponentId
+          getImageDatabyComponentId,
         }}
       />
     </vstack>
