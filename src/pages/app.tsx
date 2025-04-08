@@ -52,8 +52,8 @@ export const App: Devvit.CustomPostComponent = (context: Context) => {
 
   //  getUserByUsername(username: string): Promise<User | undefined>;
   const [currentUserUsername] = useState<string | null>(async () => {
-    const user = await reddit.getCurrentUser();
-    return user?.username ?? null;
+    const username = await reddit.getCurrentUsername();
+    return username ?? null;
   });
   //
   // const [currentUserName]
@@ -147,13 +147,6 @@ export const App: Devvit.CustomPostComponent = (context: Context) => {
     return data;
   };
 
-  //   async savePage(pageId: string, page: PageSchema) {
-  //     const appInstance = await this.loadAppInstance();
-  //     if (appInstance) {
-  //         appInstance.pages[pageId] = page;
-  //         await this.saveAppInstance(appInstance);
-  //     }
-  // }
   const addOrUpdateImageData: AppController["addOrUpdateImageData"] = async (
     ...args
   ) => {

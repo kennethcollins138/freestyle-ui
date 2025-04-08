@@ -5,7 +5,6 @@ import type { PageProps, Route, RouteParams } from "../types/page.js";
 import { useComponentOperations } from "../hooks/useComponentOperations.js";
 import {ComponentType} from "../api/Schema.js";
 import {ComponentSelector} from "../components/ComponentSelector.js";
-import {ComponentRenderer} from "../components/ComponentRendererFactory.js";
 import {ComponentPicker} from "../components/ComponentPicker.js";
 
 export const HomePage = ({
@@ -18,13 +17,10 @@ export const HomePage = ({
   const [pageStructure, setPageStructure] = useState(appPost.home);
 
   const {
-    componentManager,
     componentRenderer,
     handleAddComponent,
     handleDeleteComponent,
     handleEditComponent,
-    showEditComponentPicker,
-    showDeleteComponentPicker,
     flattenComponents
   } = useComponentOperations(context, "home", setPageStructure, true);
   const flattenedComponents = flattenComponents(pageStructure.children);
@@ -34,16 +30,16 @@ export const HomePage = ({
       onSelect: handleAddComponent,
   });
 
-    const createEditForm = () => {
-        return ComponentPicker({
-            context,
-            components: flattenedComponents,
-            onSelect: (componentId, componentType) =>
-                handleEditComponent(componentId, componentType, flattenedComponents),
-            title: "Edit Component",
-            acceptLabel: "Edit",
-        });
-    };
+  const createEditForm = () => {
+    return ComponentPicker({
+        context,
+        components: flattenedComponents,
+        onSelect: (componentId, componentType) =>
+            handleEditComponent(componentId, componentType, flattenedComponents),
+        title: "Edit Component",
+        acceptLabel: "Edit",
+    });
+};
 
     // For delete component
     const createDeleteForm = () => {

@@ -1,11 +1,13 @@
-import { Devvit, useForm } from "@devvit/public-api";
+import {Devvit, StateSetter, useForm} from "@devvit/public-api";
 
 export interface ComponentSelectorProps {
+  setComponentType: (componentType : (string | null)) => void;
+  setFormType: (formType: ("add" | "edit" | "delete" | null)) => void;
   context: Devvit.Context;
   onSelect: (componentType: string) => void;
 }
 
-export const ComponentSelector = ({ context, onSelect }: ComponentSelectorProps) => {
+export const ComponentSelector = ({ context, setComponentType, setFormType, onSelect }: ComponentSelectorProps) => {
   return useForm(
     {
       fields: [
@@ -34,7 +36,9 @@ export const ComponentSelector = ({ context, onSelect }: ComponentSelectorProps)
       const componentType = Array.isArray(data.componentType)
         ? data.componentType[0]
         : data.componentType;
-      onSelect(componentType as string);
+      setFormType("add");
+      setComponentType(componentType);
+      // onSelect(componentType as string);
       context.ui.showToast(`Component ${componentType}`);
     },
   );

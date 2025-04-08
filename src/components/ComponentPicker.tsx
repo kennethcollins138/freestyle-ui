@@ -2,6 +2,9 @@ import { Devvit, useForm } from "@devvit/public-api";
 import { ComponentType } from "../api/Schema.js";
 
 export interface ComponentPickerProps {
+  setComponentType: (componentType : (string | null)) => void;
+  setFormType: (formType: ("add" | "edit" | "delete" | null)) => void;
+  setComponentId: (componentId : (string | null)) => void;
   context: Devvit.Context;
   components: ComponentType[];
   onSelect: (componentId: string, componentType: string) => void;
@@ -12,6 +15,9 @@ export interface ComponentPickerProps {
 export const ComponentPicker = ({
   context,
   components,
+  setComponentType,
+  setComponentId,
+  setFormType,
   onSelect,
   title = "Select Component",
   acceptLabel = "Select",
@@ -40,7 +46,10 @@ export const ComponentPicker = ({
     (data) => {
       const selectedComponent = data.selectedComponent as unknown as string;
       const [componentType, componentId] = selectedComponent.split(":");
-      onSelect(componentId, componentType);
+      setFormType("edit");
+      setComponentType(componentType);
+      setComponentId(componentId);
+      // onSelect(componentId, componentType);
     },
   );
 };

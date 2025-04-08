@@ -7,7 +7,6 @@ export const createButtonEditor = (
   component?: ButtonElementSchema,
   onSave?: (data: ButtonElementSchema) => void,
 ) => {
-  const buttonComponent = component as ButtonElementSchema;
   return useForm(
     {
       fields: [
@@ -16,14 +15,14 @@ export const createButtonEditor = (
           label: "Button Text",
           type: "string",
           required: true,
-          defaultValue: buttonComponent?.text,
+          defaultValue: component?.text,
         },
         {
           name: "url",
           label: "Button URL",
           type: "string",
           required: true,
-          defaultValue: buttonComponent?.url,
+          defaultValue: component?.url,
         },
         {
           name: "icon",
@@ -31,8 +30,8 @@ export const createButtonEditor = (
           type: "select",
           options: ALL_ICON_NAMES.map((icon) => ({ label: icon, value: icon })),
           required: false,
-          defaultValue: buttonComponent?.icon
-            ? [buttonComponent?.icon]
+          defaultValue: component?.icon
+            ? [component?.icon]
             : undefined,
         },
         {
@@ -45,8 +44,8 @@ export const createButtonEditor = (
             { label: "Large", value: "large" },
           ],
           required: true,
-          defaultValue: buttonComponent?.size
-            ? [buttonComponent?.size]
+          defaultValue: component?.size
+            ? [component?.size]
             : ["medium"],
         },
         {
@@ -64,28 +63,28 @@ export const createButtonEditor = (
             { label: "Success", value: "success" },
           ],
           required: true,
-          defaultValue: buttonComponent?.appearance
-            ? [buttonComponent?.appearance]
+          defaultValue: component?.appearance
+            ? [component?.appearance]
             : ["plain"],
         },
         {
           name: "isGrow",
           label: "Grow",
           type: "boolean",
-          defaultValue: buttonComponent?.isGrow || false,
+          defaultValue: component?.isGrow || false,
         },
         {
           name: "width",
           label: "Width",
           type: "string",
-          defaultValue: String(buttonComponent?.width) || "50",
+          defaultValue: String(component?.width) || "50",
           required: false,
         },
         {
           name: "height",
           label: "Height",
           type: "string",
-          defaultValue: String(buttonComponent?.height) || "50",
+          defaultValue: String(component?.height) || "50",
           required: false,
         },
       ],

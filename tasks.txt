@@ -1,3 +1,26 @@
 Simplify Component Manager
     - Break down into manager and render
     - Integrate Redis again
+
+
+Add workflow
+
+user clicks add form => add form appears setting state to add form on click and component type.
+                                                                            ||
+                                                                            ||
+ component-specific form is added <= rerender triggers on original page triggering form
+    ||
+    ||
+ form handles redis caching and data storage.
+    ||
+    ||
+ States are reset
+    ||
+rinse and repeat
+
+
+
+Edit Workflow
+
+
+user clicks edit form => edit form previews with all new components(make this handle reorder and specific update) => dive into later
