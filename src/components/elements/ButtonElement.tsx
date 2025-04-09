@@ -14,7 +14,7 @@ export type CustomButtonProps = {
 };
 
 export const CustomButton = ({
-    key,
+  key,
   icon,
   size = "medium",
   appearance = "secondary",

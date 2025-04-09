@@ -1,11 +1,13 @@
-import { Devvit, useForm } from "@devvit/public-api";
+import {UploadMediaOptions, useForm} from "@devvit/public-api";
 import { ImageElementSchema, Schema } from "../../api/Schema.js";
+import { FormProps } from "../../types/component.js";
 
-export const createImageEditor = (
-  context: Devvit.Context,
-  component: ImageElementSchema,
-  onSave: (data: ImageElementSchema) => void,
-) => {
+export const createImageEditor = ({
+  context,
+  component,
+  onSave,
+}: FormProps) => {
+  const imageComponent = component as ImageElementSchema;
   return useForm(
     {
       fields: [
@@ -15,7 +17,9 @@ export const createImageEditor = (
           helpText: "Enter a direct image URL (ending with .jpg, .png, etc.)",
           type: "string",
           required: true,
-          defaultValue: component?.url,
+          ...(imageComponent?.url && {
+            defaultValue: imageComponent.url,
+          }),
         },
         {
           name: "width",
@@ -23,7 +27,9 @@ export const createImageEditor = (
           helpText: "Use pixels (e.g., 300) or percentage (e.g., 100%)",
           type: "string",
           required: true,
-          defaultValue: String(component?.width) || "100%",
+          ...(imageComponent?.width && {
+            defaultValue: String(imageComponent.width),
+          }),
         },
         {
           name: "height",
@@ -31,7 +37,9 @@ export const createImageEditor = (
           helpText: "Use pixels (e.g., 200) or percentage (e.g., auto)",
           type: "string",
           required: true,
-          defaultValue: String(component?.height) || "auto",
+          ...(imageComponent?.height && {
+            defaultValue: String(imageComponent.height),
+          }),
         },
         {
           name: "resizeMode",
@@ -43,10 +51,9 @@ export const createImageEditor = (
             { label: "Cover (crop to fill)", value: "cover" },
           ],
           required: true,
-          // Note comeback to this as well
-          defaultValue: component?.resizeMode
-            ? [component?.resizeMode]
-            : ["fit"],
+          ...(imageComponent?.resizeMode && {
+            defaultValue: [imageComponent.resizeMode],
+          }),
         },
         {
           name: "imageWidth",
@@ -54,7 +61,9 @@ export const createImageEditor = (
           helpText: "The actual width of the image in pixels",
           type: "number",
           required: true,
-          defaultValue: Number(component?.imageWidth) || 1024,
+          ...(imageComponent?.imageWidth && {
+            defaultValue: Number(imageComponent.imageWidth),
+          }),
         },
         {
           name: "imageHeight",
@@ -62,35 +71,43 @@ export const createImageEditor = (
           helpText: "The actual height of the image in pixels",
           type: "number",
           required: true,
-          defaultValue: Number(component?.imageHeight) || 768,
+          ...(imageComponent?.imageHeight && {
+            defaultValue: Number(imageComponent.imageHeight),
+          }),
         },
         {
           name: "minWidth",
           label: "Minimum Width (optional)",
           type: "string",
           required: false,
-          defaultValue: String(component?.minWidth),
+          ...(imageComponent?.minWidth && {
+            defaultValue: String(imageComponent.minWidth),
+          }),
         },
         {
           name: "minHeight",
           label: "Minimum Height (optional)",
           type: "string",
           required: false,
-          defaultValue: String(component?.minHeight) ?? undefined,
+          ...(imageComponent?.minHeight && {
+            defaultValue: String(imageComponent.minHeight),
+          }),
         },
         {
           name: "maxWidth",
           label: "Maximum Width (optional)",
           type: "string",
           required: false,
-          defaultValue: String(component?.maxWidth) ?? undefined,
+          ...(imageComponent?.maxWidth && {
+            defaultValue: String(imageComponent.maxWidth)}),
         },
         {
           name: "maxHeight",
           label: "Maximum Height (optional)",
           type: "string",
           required: false,
-          defaultValue: String(component?.maxHeight),
+          ...(imageComponent?.maxHeight && {
+            defaultValue: String(imageComponent.maxHeight)}),
         },
         {
           name: "imageType",
@@ -104,19 +121,20 @@ export const createImageEditor = (
           required: true,
         },
       ],
-      title: component ? "Edit Image" : "Add Image",
+      title: imageComponent ? "Edit Image" : "Add Image",
       acceptLabel: "Save",
     },
     async (values) => {
+      // TODO: comeback for type of image handling
       try {
         // Upload the image using the Devvit media API
         // const context = Devvit.getSystemContext();
         const uploadUrl = values.uploadUrl as string;
 
         // If editing an existing image and URL hasn't changed, skip upload
-        if (component && component.url === uploadUrl) {
+        if (imageComponent && imageComponent.url === uploadUrl) {
           const formData = {
-            id: component.id,
+            id: imageComponent.id,
             type: "Image",
             url: uploadUrl,
             width: values.width as string,
@@ -143,15 +161,14 @@ export const createImageEditor = (
 
         // Show loading message
         context.ui.showToast("Uploading image...");
-
+        const imageType = values.imageType[0] as "image" | "gif" | "video";
         let response;
         if (values.imageType[0] !== "svg") {
           response = await context.media.upload({
             url: uploadUrl,
-            type: "image",
-          })
+            type: imageType,
+          });
         }
-
 
         // Create image data object
         const imageData = {

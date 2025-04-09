@@ -1,4 +1,4 @@
-import {Devvit, getSubredditInfoById, useForm} from "@devvit/public-api";
+import { Devvit, getSubredditInfoById, useForm } from "@devvit/public-api";
 import { Page } from "../components/elements/Page.js";
 import type { PageProps } from "../types/page.js";
 
@@ -7,7 +7,6 @@ export const AdminPage = ({
   context,
   appPost,
   isOwner,
-  currentUserUsername,
   postMethods: { updateAppPost },
 }: PageProps): JSX.Element => {
   const colorForm = useForm(
@@ -119,7 +118,7 @@ export const AdminPage = ({
         return;
       }
       const confirm = data.confirm || "";
-      if ((confirm === "DELETE") && isOwner) {
+      if (confirm === "DELETE" && isOwner) {
         try {
           await (await reddit.getPostById(postId)).delete();
           ui.showToast(`Post successfully deleted`);

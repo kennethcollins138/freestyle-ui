@@ -1,7 +1,7 @@
 import { Devvit } from "@devvit/public-api";
 
 type VStackProps = {
-  key : string;
+  key: string;
   children?: JSX.Element | JSX.Element[];
   gap?: Devvit.Blocks.ContainerGap;
   alignment?: Devvit.Blocks.Alignment;

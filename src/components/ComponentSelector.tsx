@@ -1,13 +1,18 @@
-import {Devvit, StateSetter, useForm} from "@devvit/public-api";
+import { Devvit, useForm } from "@devvit/public-api";
 
 export interface ComponentSelectorProps {
-  setComponentType: (componentType : (string | null)) => void;
-  setFormType: (formType: ("add" | "edit" | "delete" | null)) => void;
+  setComponentType: (componentType: string | null) => void;
+  setFormType: (formType: "add" | "edit" | "delete" | null) => void;
   context: Devvit.Context;
-  onSelect: (componentType: string) => void;
+  onSelect?: (componentType: string) => void;
 }
 
-export const ComponentSelector = ({ context, setComponentType, setFormType, onSelect }: ComponentSelectorProps) => {
+export const ComponentSelector = ({
+  context,
+  setComponentType,
+  setFormType,
+  onSelect,
+}: ComponentSelectorProps) => {
   return useForm(
     {
       fields: [
@@ -23,7 +28,7 @@ export const ComponentSelector = ({ context, setComponentType, setFormType, onSe
             { label: "Image", value: "Image" },
             { label: "Text", value: "Text" },
             { label: "New Page Button", value: "PaginationButton" },
-            { label: "Developer Credit", value: "PersonalPlug" },
+            // { label: "Developer Credit", value: "PersonalPlug" },
           ],
           required: true,
           multiple: false,

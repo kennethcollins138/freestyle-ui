@@ -22,7 +22,9 @@ export type HomeSchema = z.infer<typeof Schema.HomeSchema>;
 export type ImageElementSchema = z.infer<typeof Schema.ImageElementSchema>;
 export type TextElementSchema = z.infer<typeof Schema.TextElementSchema>;
 export type ButtonElementSchema = z.infer<typeof Schema.ButtonElementSchema>;
-export type PaginationButtonElementSchema = z.infer<typeof Schema.PaginationButtonElementSchema>;
+export type PaginationButtonElementSchema = z.infer<
+  typeof Schema.PaginationButtonElementSchema
+>;
 export type VStackSchema = z.infer<typeof Schema.VStackSchema>;
 export type HStackSchema = z.infer<typeof Schema.HStackSchema>;
 export type ZStackSchema = z.infer<typeof Schema.ZStackSchema>;
@@ -47,7 +49,6 @@ export class Schema {
     })
     .strict();
 
-
   // Images will hold these value. Actual image stored in Assets folder.
   static ImageElementSchema = z.object({
     id: z.string(),
@@ -55,7 +56,7 @@ export class Schema {
     url: z.string(),
     width: z.custom<Devvit.Blocks.SizeString>(),
     height: z.custom<Devvit.Blocks.SizeString>(),
-    resizeMode:z.custom<Devvit.Blocks.ImageResizeMode>(),
+    resizeMode: z.custom<Devvit.Blocks.ImageResizeMode>(),
     imageWidth: z.custom<Devvit.Blocks.SizePixels>(),
     imageHeight: z.custom<Devvit.Blocks.SizePixels>(),
     minWidth: z.custom<Devvit.Blocks.SizeString>(),
@@ -108,12 +109,12 @@ export class Schema {
     url: z.string().optional(),
     text: z.string(),
     action: z
-        .object({
-          type: z.enum(["navigate", "custom"]),
-          targetPageId: z.string().optional(), // Only required for navigate action
-          customAction: z.string().optional(), // For other types of actions
-        })
-        .optional(),
+      .object({
+        type: z.enum(["navigate", "custom"]),
+        targetPageId: z.string().optional(), // Only required for navigate action
+        customAction: z.string().optional(), // For other types of actions
+      })
+      .optional(),
     order: z.number().optional(),
   });
 

@@ -10,42 +10,41 @@ import {
   ImageElementSchema,
   PaginationButtonElementSchema,
   StackSchema,
-  TextElementSchema
+  TextElementSchema,
 } from "../../api/Schema.js";
 
 /**
  * Factory function that returns the appropriate editor based on component type
  */
 export const getComponentEditor = (
-    context: Devvit.Context,
-    componentType: string,
-    component: (ComponentType | undefined),
-    onSave: (data: any) => void,
+  context: Devvit.Context,
+  componentType: string,
+  onSave: (data: any) => void,
+  component?: ComponentType | undefined,
 ) => {
-  // TODO need to be able to see original values for form
   switch (componentType) {
     case "Text":
       const textComponent = component as TextElementSchema;
-      return createTextEditor(context, textComponent, onSave);
+      return createTextEditor({context, component: textComponent, onSave});
 
     case "Button":
       const buttonComponent = component as ButtonElementSchema;
-      return createButtonEditor(context, buttonComponent, onSave);
+      return createButtonEditor({context, component: buttonComponent, onSave});
 
     case "Image":
       // FIX: Need to rework
       const imageComponent = component as ImageElementSchema;
-      return createImageEditor( context, imageComponent, onSave );
+      return createImageEditor({context, component: imageComponent, onSave});
 
     case "VStack":
     case "HStack":
     case "ZStack":
-      const stackComponent = component as StackSchema
-      return createStackEditor(context, componentType, stackComponent, onSave);
+      const stackComponent = component as StackSchema;
+      return createStackEditor({context, componentType ,component: stackComponent, onSave});
 
     case "PaginationButton":
-      const paginationButton = component as PaginationButtonElementSchema
-      return createPaginationButtonEditor(context, paginationButton, onSave);
+      const paginationButton = component as PaginationButtonElementSchema;
+      return createPaginationButtonEditor({context, component: paginationButton , onSave});
 
     default:
       throw new Error(`Unknown component type: ${componentType}`);

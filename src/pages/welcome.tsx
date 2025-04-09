@@ -45,7 +45,6 @@ const Step2 = ({
   context,
   postMethods: { updateAppPost },
 }: StepProps): JSX.Element => {
-
   // Hooks are declared at the top level
   const colorForm = useForm(
     {

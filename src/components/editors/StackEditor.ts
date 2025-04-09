@@ -1,12 +1,18 @@
 import { Devvit, useForm } from "@devvit/public-api";
-import {StackSchema} from "../../api/Schema.js";
+import { ComponentType, StackSchema } from "../../api/Schema.js";
+import { FormProps } from "../../types/component.js";
+import {randomId} from "../../util.js";
 
-export const createStackEditor = (
-  context: Devvit.Context,
-  stackType: string,
-  component?: StackSchema,
-  onSave?: (data: any) => void,
-) => {
+type StackFormProps = FormProps & {
+  componentType: "VStack" | "HStack" | "ZStack";
+};
+export const createStackEditor = ({
+  context,
+  component,
+  componentType,
+  onSave,
+}: StackFormProps) => {
+  const stackComponent = component as StackSchema;
   return useForm(
     {
       fields: [
@@ -21,7 +27,9 @@ export const createStackEditor = (
             { label: "Large", value: "large" },
           ],
           required: false,
-          defaultValue: !component?.gap ? ["medium"] : [component?.gap[0]],
+          ...(stackComponent?.gap && {
+            defaultValue: [stackComponent.gap],
+          }),
         },
         {
           name: "alignment",
@@ -40,13 +48,17 @@ export const createStackEditor = (
             { label: "Bottom End", value: "bottom end" },
           ],
           required: false,
-          defaultValue: !component?.alignment ? undefined : [component?.alignment[0]],
+          ...(stackComponent?.alignment && {
+            defaultValue: [stackComponent.alignment],
+          }),
         },
         {
           name: "width",
           label: "Width",
           type: "string",
-          defaultValue: String(component?.width) || "100%",
+          ...(stackComponent?.width && {
+            defaultValue: String(stackComponent.width),
+          }),
           required: false,
         },
         {
@@ -54,7 +66,9 @@ export const createStackEditor = (
           label: "Height",
           type: "string",
           required: false,
-          defaultValue: String(component?.height),
+          ...(stackComponent?.height && {
+            defaultValue: String(stackComponent.height),
+          }),
         },
         {
           name: "padding",
@@ -68,31 +82,60 @@ export const createStackEditor = (
             { label: "Large", value: "large" },
           ],
           required: false,
-          defaultValue: !component?.padding ? undefined : [component?.padding[0]],
+          ...(stackComponent?.padding && {
+            defaultValue: [stackComponent.padding],
+          }),
         },
         {
           name: "backgroundColor",
           label: "Background Color",
           type: "string",
           required: false,
-          defaultValue: component?.backgroundColor,
+          ...(stackComponent?.backgroundColor && {
+            defaultValue: stackComponent.backgroundColor,
+          }),
         },
       ],
-      title: component ? `Edit ${stackType}` : `Add ${stackType}`,
+      title: component ? `Edit ${stackComponent}` : `Add ${stackComponent}`,
       acceptLabel: "Save",
     },
     async (values) => {
-      const formData = {
-        type: stackType,
-        gap: values.gap ? values.gap[0] : undefined,
-        alignment: values.alignment ? values.alignment[0] : undefined,
-        width: values.width as string,
+      const baseData = {
+        id: stackComponent?.id || `${componentType.toLowerCase()}-${randomId()}`,
+        gap: Array.isArray(values.gap) && values.gap.length > 0
+            ? values.gap[0]
+            : undefined,
+        alignment: Array.isArray(values.alignment) && values.alignment.length > 0
+            ? values.alignment[0]
+            : "center",
+        children: stackComponent?.children || [],
+        width: values.width as string || "100%",
         height: values.height as string,
-        padding: values.padding ? values.padding[0] : undefined,
+        padding: Array.isArray(values.padding) && values.padding.length > 0
+            ? values.padding[0]
+            : undefined,
         backgroundColor: values.backgroundColor as string,
       };
 
-      if (onSave) onSave(formData);
+      let formData;
+      if (componentType === "ZStack") {
+        formData = {
+          ...baseData,
+          type: "ZStack" as const,
+        };
+      } else if (componentType === "HStack") {
+        formData = {
+          ...baseData,
+          type: "HStack" as const,
+        };
+      } else {
+        formData = {
+          ...baseData,
+          type: "VStack" as const,
+        };
+      }
+      const data = formData as StackSchema;
+      onSave(data);
     },
   );
 };

@@ -1,12 +1,15 @@
 import { Devvit, useForm } from "@devvit/public-api";
 import { ALL_ICON_NAMES } from "@devvit/public-api";
 import { ButtonElementSchema } from "../../api/Schema.js";
+import { FormProps } from "../../types/component.js";
+import {randomId} from "../../util.js";
 
-export const createButtonEditor = (
-  context: Devvit.Context,
-  component?: ButtonElementSchema,
-  onSave?: (data: ButtonElementSchema) => void,
-) => {
+export const createButtonEditor = ({
+  context,
+  component,
+  onSave,
+}: FormProps) => {
+  const buttonComponent = component as ButtonElementSchema;
   return useForm(
     {
       fields: [
@@ -15,24 +18,28 @@ export const createButtonEditor = (
           label: "Button Text",
           type: "string",
           required: true,
-          defaultValue: component?.text,
+          ...(buttonComponent?.text && {
+            defaultValue: buttonComponent.text,
+          }),
         },
         {
           name: "url",
           label: "Button URL",
           type: "string",
-          required: true,
-          defaultValue: component?.url,
+          required: false,
+          ...(buttonComponent?.url && {
+            defaultValue: buttonComponent.url,
+          }),
         },
         {
           name: "icon",
           label: "Icon",
           type: "select",
           options: ALL_ICON_NAMES.map((icon) => ({ label: icon, value: icon })),
+          ...(buttonComponent?.icon && {
+            defaultValue: [buttonComponent.icon],
+          }),
           required: false,
-          defaultValue: component?.icon
-            ? [component?.icon]
-            : undefined,
         },
         {
           name: "size",
@@ -44,8 +51,8 @@ export const createButtonEditor = (
             { label: "Large", value: "large" },
           ],
           required: true,
-          defaultValue: component?.size
-            ? [component?.size]
+          defaultValue: buttonComponent?.size
+            ? [buttonComponent?.size]
             : ["medium"],
         },
         {
@@ -63,50 +70,63 @@ export const createButtonEditor = (
             { label: "Success", value: "success" },
           ],
           required: true,
-          defaultValue: component?.appearance
-            ? [component?.appearance]
-            : ["plain"],
+          defaultValue: buttonComponent?.appearance
+            ? [buttonComponent?.appearance]
+            : ["primary"],
         },
         {
           name: "isGrow",
           label: "Grow",
           type: "boolean",
-          defaultValue: component?.isGrow || false,
+          ...(buttonComponent?.isGrow && {
+            defaultValue: buttonComponent.isGrow,
+          }),
         },
         {
           name: "width",
           label: "Width",
           type: "string",
-          defaultValue: String(component?.width) || "50",
+          ...(buttonComponent?.width && {
+            defaultValue: String(buttonComponent.width),
+          }),
           required: false,
         },
         {
           name: "height",
           label: "Height",
           type: "string",
-          defaultValue: String(component?.height) || "50",
+          ...(buttonComponent?.height && {
+            defaultValue: String(buttonComponent.height),
+          }),
           required: false,
         },
       ],
-      title: component ? "Edit Button" : "Add Button",
+      title: buttonComponent ? "Edit Button" : "Add Button",
       acceptLabel: "Save",
     },
     async (values) => {
       const formData = {
-        id: values.id,
+        id: component?.id || `button-${randomId()}`,
         type: "Button" as const,
-        text: values.text as string,
-        url: values.url as string,
-        icon: values.icon[0] as ButtonElementSchema["icon"],
-        size: (values.size[0] || "medium") as ButtonElementSchema["size"],
-        appearance: (values.appearance[0] || "secondary") as ButtonElementSchema["appearance"],
-        isGrow: values.isGrow as boolean,
+        text: values.text as string || "Button",
+        url: values.url as string || "",
+        // Safely access array values with null checks
+        icon: Array.isArray(values.icon) && values.icon.length > 0
+            ? values.icon[0] as ButtonElementSchema["icon"]
+            : undefined,
+        size: (Array.isArray(values.size) && values.size.length > 0
+            ? values.size[0]
+            : "medium") as ButtonElementSchema["size"],
+        appearance: (Array.isArray(values.appearance) && values.appearance.length > 0
+            ? values.appearance[0]
+            : "primary") as ButtonElementSchema["appearance"],
+        isGrow: Boolean(values.isGrow),
         width: values.width as Devvit.Blocks.SizeString,
         height: values.height as Devvit.Blocks.SizeString,
       };
 
-      context.ui.showToast("Button Created!")
-      if (onSave) onSave(formData);
+      context.ui.showToast("Button Created!");
+      onSave(formData);
     },
   );
 };

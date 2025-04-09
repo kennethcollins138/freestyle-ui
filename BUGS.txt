@@ -1,0 +1,200 @@
+Error adding component: _ZodError: [
+  {
+    "code": "invalid_union",
+    "unionErrors": [
+      {
+        "issues": [
+          {
+            "received": "PaginationButton",
+            "code": "invalid_literal",
+            "expected": "Image",
+            "path": [
+              "home",
+              "children",
+              2,
+              "type"
+            ],
+            "message": "Invalid literal value, expected \"Image\""
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "home",
+              "children",
+              2,
+              "url"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "received": "PaginationButton",
+            "code": "invalid_literal",
+            "expected": "Text",
+            "path": [
+              "home",
+              "children",
+              2,
+              "type"
+            ],
+            "message": "Invalid literal value, expected \"Text\""
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "received": "PaginationButton",
+            "code": "invalid_literal",
+            "expected": "Button",
+            "path": [
+              "home",
+              "children",
+              2,
+              "type"
+            ],
+            "message": "Invalid literal value, expected \"Button\""
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "received": "PaginationButton",
+            "code": "invalid_literal",
+            "expected": "PersonalPlug",
+            "path": [
+              "home",
+              "children",
+              2,
+              "type"
+            ],
+            "message": "Invalid literal value, expected \"PersonalPlug\""
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "home",
+              "children",
+              2,
+              "content"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "received": "PaginationButton",
+            "code": "invalid_literal",
+            "expected": "VStack",
+            "path": [
+              "home",
+              "children",
+              2,
+              "type"
+            ],
+            "message": "Invalid literal value, expected \"VStack\""
+          },
+          {
+            "code": "invalid_type",
+            "expected": "array",
+            "received": "undefined",
+            "path": [
+              "home",
+              "children",
+              2,
+              "children"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "received": "PaginationButton",
+            "code": "invalid_literal",
+            "expected": "HStack",
+            "path": [
+              "home",
+              "children",
+              2,
+              "type"
+            ],
+            "message": "Invalid literal value, expected \"HStack\""
+          },
+          {
+            "code": "invalid_type",
+            "expected": "array",
+            "received": "undefined",
+            "path": [
+              "home",
+              "children",
+              2,
+              "children"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "received": "PaginationButton",
+            "code": "invalid_literal",
+            "expected": "ZStack",
+            "path": [
+              "home",
+              "children",
+              2,
+              "type"
+            ],
+            "message": "Invalid literal value, expected \"ZStack\""
+          },
+          {
+            "code": "invalid_type",
+            "expected": "array",
+            "received": "undefined",
+            "path": [
+              "home",
+              "children",
+              2,
+              "children"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      }
+    ],
+    "path": [
+      "home",
+      "children",
+      2
+    ],
+    "message": "Invalid input"
+  }
+]
+    at get error (main.js:14979:23)
+    at _ZodObject.parseAsync (main.js:15115:18)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async _Redis.appInstanceUpdate (main.js:18802:26)
+    at async AppController.saveAppInstance (main.js:19046:5)
+    at async AppController.updateAppInstance (main.js:19098:7)
+    at async ComponentManager.addComponentToHome (main.js:19925:5)
+    at async handleAddComponent (main.js:20363:4

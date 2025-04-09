@@ -1,12 +1,11 @@
-import {Context, Devvit, useState} from "@devvit/public-api";
-import {AppController} from "../api/AppController.js";
-import type {PageProps, Route, RouteParams} from "../types/page.js";
-import {WelcomePage} from "./welcome.js";
-import {HomePage} from "./home.js";
-import {AdminPage} from "./admin.js";
-import {AppInstance, HomeSchema, PageSchema} from "../api/Schema.js";
-import {PaginationPage} from "./Pagination.js";
-import {ComponentRenderer} from "../components/ComponentRendererFactory.js";
+import { Context, Devvit, useState } from "@devvit/public-api";
+import { AppController } from "../api/AppController.js";
+import type { PageProps, Route, RouteParams } from "../types/page.js";
+import { WelcomePage } from "./welcome.js";
+import { HomePage } from "./home.js";
+import { AdminPage } from "./admin.js";
+import { AppInstance, HomeSchema, PageSchema } from "../api/Schema.js";
+import { PaginationPage } from "./Pagination.js";
 
 const getPageForRoute = (route: Route): ((props: PageProps) => JSX.Element) => {
   switch (route) {
@@ -31,14 +30,16 @@ export const App: Devvit.CustomPostComponent = (context: Context) => {
     throw new Error(`Cannot find post id from context`);
   }
 
-  const [currentPost, setCurrentPost] = useState<AppInstance | null>(async () => {
-    const svc = new AppController(postId, context);
-    return await svc.loadAppInstance();
-  });
+  const [currentPost, setCurrentPost] = useState<AppInstance | null>(
+    async () => {
+      const svc = new AppController(postId, context);
+      return await svc.loadAppInstance();
+    },
+  );
 
   if (!currentPost) {
     console.error("No post found");
-    throw new Error("Cannot find post")
+    throw new Error("Cannot find post");
   }
 
   const [[route, routeParams], setRouteConfig] = useState<[Route, RouteParams]>(

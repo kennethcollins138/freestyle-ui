@@ -2,12 +2,12 @@ import { Devvit, useForm } from "@devvit/public-api";
 import { ComponentType } from "../api/Schema.js";
 
 export interface ComponentPickerProps {
-  setComponentType: (componentType : (string | null)) => void;
-  setFormType: (formType: ("add" | "edit" | "delete" | null)) => void;
-  setComponentId: (componentId : (string | null)) => void;
+  setComponentType: (componentType: string | null) => void;
+  setFormType: (formType: "add" | "edit" | "delete" | null) => void;
+  setComponentId: (componentId: string | null) => void;
   context: Devvit.Context;
   components: ComponentType[];
-  onSelect: (componentId: string, componentType: string) => void;
+  onDelete?: (componentId: string) => void;
   title?: string;
   acceptLabel?: string;
 }
@@ -18,13 +18,13 @@ export const ComponentPicker = ({
   setComponentType,
   setComponentId,
   setFormType,
-  onSelect,
   title = "Select Component",
   acceptLabel = "Select",
+  onDelete
 }: ComponentPickerProps) => {
   // Create options from components
   const componentOptions = components.map((component) => ({
-    label: `${component.type} - ${ component.id }`,
+    label: `${component.type} - ${component.id}`,
     value: `${component.type}:${component.id}`,
   }));
 
@@ -44,12 +44,18 @@ export const ComponentPicker = ({
       acceptLabel,
     },
     (data) => {
-      const selectedComponent = data.selectedComponent as unknown as string;
+      const selectedComponent = data.selectedComponent[0] as string;
       const [componentType, componentId] = selectedComponent.split(":");
-      setFormType("edit");
+      if (acceptLabel === "Delete"){
+        setFormType("delete");
+      } else {
+        setFormType("edit");
+      }
       setComponentType(componentType);
       setComponentId(componentId);
-      // onSelect(componentId, componentType);
+      if (onDelete) {
+        onDelete(componentId);
+      }
     },
   );
 };

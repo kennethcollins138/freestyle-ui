@@ -1,7 +1,7 @@
-Simplify Component Manager
-    - Break down into manager and render
-    - Integrate Redis again
-
+NEXT STEPS:
+- Add Back Edit and Delete
+- Trigger rerender after any of these forms so user doesnt have to refresh page
+- Pagination Button
 
 Add workflow
 

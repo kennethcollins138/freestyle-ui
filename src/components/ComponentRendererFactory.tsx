@@ -29,21 +29,27 @@ export class ComponentRenderer {
     switch (component.type) {
       case "VStack":
         return (
-            <VStackElement key={component.id} {...component}>
-              {component.children?.map((child: ComponentType) => this.renderComponent(child))}
-            </VStackElement>
+          <VStackElement key={component.id} {...component}>
+            {component.children?.map((child: ComponentType) =>
+              this.renderComponent(child),
+            )}
+          </VStackElement>
         );
       case "HStack":
         return (
-            <HStackElement key={component.id} {...component}>
-              {component.children?.map((child: ComponentType) => this.renderComponent(child))}
-            </HStackElement>
+          <HStackElement key={component.id} {...component}>
+            {component.children?.map((child: ComponentType) =>
+              this.renderComponent(child),
+            )}
+          </HStackElement>
         );
       case "ZStack":
         return (
-            <ZStackElement key={component.id} {...component}>
-              {component.children?.map((child: ComponentType) => this.renderComponent(child))}
-            </ZStackElement>
+          <ZStackElement key={component.id} {...component}>
+            {component.children?.map((child: ComponentType) =>
+              this.renderComponent(child),
+            )}
+          </ZStackElement>
         );
       case "Image":
         return <ImageElement key={component.id} {...component} />;
@@ -52,43 +58,45 @@ export class ComponentRenderer {
       case "Button":
         const buttonSize = component.size as Devvit.Blocks.ButtonSize;
         return (
-            <button
-                key={component.id}
-                icon={component.icon}
-                size={buttonSize}
-                appearance={component.appearance}
-                onPress={async () => {
-                  if (component.url) {
-                    this.context.ui.navigateTo(component.url);
-                  } else {
-                    console.error("Button has no URL:", component);
-                    this.context.ui.showToast("This button has no URL");
-                  }
-                }}
-                {...(component.width ? { width: component.width } : {})}
-                {...(component.height ? { height: component.height } : {})}
-                {...(component.isGrow ? { grow: true } : {})}
-            >
-              {component.text}
-            </button>
+          <button
+            key={component.id}
+            icon={component.icon}
+            size={buttonSize}
+            appearance={component.appearance}
+            onPress={async () => {
+              if (component.url) {
+                this.context.ui.navigateTo(component.url);
+              } else {
+                console.error("Button has no URL:", component);
+                this.context.ui.showToast("This button has no URL");
+              }
+            }}
+            {...(component.width ? { width: component.width } : {})}
+            {...(component.height ? { height: component.height } : {})}
+            {...(component.isGrow ? { grow: true } : {})}
+          >
+            {component.text}
+          </button>
         );
       case "PaginationButton":
         const { navigate } = this.options;
         const paginationButtonSize = component.size as Devvit.Blocks.ButtonSize;
         if (navigate && component.pageId) {
           return (
-              <button
-                  key={component.id}
-                  icon={component.icon}
-                  size={paginationButtonSize}
-                  appearance={component.appearance}
-                  onPress={async () => navigate("pagination", { pageId: component.pageId })}
-                  {...(component.width ? { width: component.width } : {})}
-                  {...(component.height ? { height: component.height } : {})}
-                  {...(component.isGrow ? { grow: true } : {})}
-              >
-                {component.text}
-              </button>
+            <button
+              key={component.id}
+              icon={component.icon}
+              size={paginationButtonSize}
+              appearance={component.appearance}
+              onPress={async () =>
+                navigate("pagination", { pageId: component.pageId })
+              }
+              {...(component.width ? { width: component.width } : {})}
+              {...(component.height ? { height: component.height } : {})}
+              {...(component.isGrow ? { grow: true } : {})}
+            >
+              {component.text}
+            </button>
           );
         }
         return null;
@@ -101,14 +109,14 @@ export class ComponentRenderer {
   };
 
   renderComponents = (
-      components: ElementSchema[],
-      navigateFunction?: (route: string, params?: Record<string, string>) => void
+    components: ElementSchema[],
+    navigateFunction?: (route: string, params?: Record<string, string>) => void,
   ): JSX.Element[] => {
     return components.map((component) => {
       // If navigation is provided, create a temporary renderer with it
       if (navigateFunction) {
         const tempRenderer = new ComponentRenderer(this.context, {
-          navigate: navigateFunction
+          navigate: navigateFunction,
         });
         return tempRenderer.renderComponent(component);
       }

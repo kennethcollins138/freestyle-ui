@@ -1,11 +1,10 @@
 import { Devvit, useForm } from "@devvit/public-api";
-import {TextElementSchema} from "../../api/Schema.js";
+import { TextElementSchema } from "../../api/Schema.js";
+import { FormProps } from "../../types/component.js";
+import {randomId} from "../../util.js";
 
-export const createTextEditor = (
-  context: Devvit.Context,
-  component?: TextElementSchema,
-  onSave?: (data: TextElementSchema) => void,
-) => {
+export const createTextEditor = ({ context, component, onSave }: FormProps) => {
+  const textComponent = component as TextElementSchema;
   return useForm(
     {
       fields: [
@@ -14,7 +13,7 @@ export const createTextEditor = (
           label: "Text",
           type: "string",
           required: true,
-          defaultValue: component?.text,
+          ...(textComponent?.text && {defaultValue: textComponent.text}),
         },
         {
           name: "style",
@@ -26,7 +25,7 @@ export const createTextEditor = (
             { label: "Heading", value: "heading" },
           ],
           required: false,
-          defaultValue: !component?.style ? undefined : [component.style[0]],
+          ...(textComponent?.style && {defaultValue: [textComponent.style]}),
         },
         {
           name: "size",
@@ -41,7 +40,7 @@ export const createTextEditor = (
             { label: "XXLarge", value: "xxlarge" },
           ],
           required: false,
-          defaultValue: !component?.size ? undefined : [component.size[0]],
+          ...(textComponent?.size && {defaultValue: [textComponent.size]}),
         },
         {
           name: "weight",
@@ -52,14 +51,14 @@ export const createTextEditor = (
             { label: "Bold", value: "bold" },
           ],
           required: false,
-          defaultValue: !component?.weight ? undefined : [component.weight[0]],
+          ...(textComponent?.weight && {defaultValue: [textComponent.weight]}),
         },
         {
           name: "color",
           label: "Color",
           type: "string",
           required: false,
-          defaultValue: component?.color,
+          ...(textComponent?.color && {defaultValue: textComponent.color}),
         },
         {
           name: "alignment",
@@ -77,27 +76,27 @@ export const createTextEditor = (
             { label: "Bottom End", value: "bottom end" },
           ],
           required: false,
-          defaultValue: !component?.alignment  ? undefined : [component.alignment[0]],
+          ...(textComponent?.alignment && {defaultValue: [textComponent.alignment]}),
         },
         {
           name: "wrap",
           label: "Wrap Text",
           type: "boolean",
-          defaultValue: component?.wrap || false,
+          ...(textComponent?.wrap && {defaultValue: textComponent.wrap}),
         },
         {
           name: "width",
           label: "Width",
           type: "string",
           required: false,
-          defaultValue: String(component?.width),
+          ...(textComponent?.width && {defaultValue: String(textComponent.width)}),
         },
         {
           name: "height",
           label: "Height",
           type: "string",
           required: false,
-          defaultValue: String(component?.height),
+          ...(textComponent?.height && {defaultValue: String(textComponent.height)}),
         },
       ],
       title: component ? "Edit Text" : "Add Text",
@@ -105,15 +104,23 @@ export const createTextEditor = (
     },
     async (values) => {
       const formData = {
-        id: values?.id,
+        id: component?.id || `text-${randomId()}`,
         type: "Text" as const,
-        text: values.text as string,
-        style: values.style?.[0] as TextElementSchema["style"],
-        size: values.size?.[0] as TextElementSchema["size"],
-        weight: values.weight?.[0] as TextElementSchema["weight"],
+        text: values.text as string || "Text Element",
+        style: Array.isArray(values.style) && values.style.length > 0
+            ? values.style[0] as TextElementSchema["style"]
+            : undefined,
+        size: Array.isArray(values.size) && values.size.length > 0
+            ? values.size[0] as TextElementSchema["size"]
+            : undefined,
+        weight: Array.isArray(values.weight) && values.weight.length > 0
+            ? values.weight[0] as TextElementSchema["weight"]
+            : undefined,
         color: values.color as string,
-        alignment: values.alignment?.[0] as TextElementSchema["alignment"],
-        wrap: values.wrap as boolean,
+        alignment: Array.isArray(values.alignment) && values.alignment.length > 0
+            ? values.alignment[0] as TextElementSchema["alignment"]
+            : undefined,
+        wrap: Boolean(values.wrap),
         width: values.width as Devvit.Blocks.SizeString,
         height: values.height as Devvit.Blocks.SizeString,
       };

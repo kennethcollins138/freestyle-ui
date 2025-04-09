@@ -1,13 +1,18 @@
 import { Devvit, useForm } from "@devvit/public-api";
 import { ALL_ICON_NAMES } from "@devvit/public-api";
 import { randomId } from "../../util.js";
-import { PaginationButtonElementSchema } from "../../api/Schema.js";
+import {
+  ComponentType,
+  PaginationButtonElementSchema,
+} from "../../api/Schema.js";
+import { FormProps } from "../../types/component.js";
 
-export const createPaginationButtonEditor = (
-  context: Devvit.Context,
-  component?: PaginationButtonElementSchema,
-  onSave?: (data: PaginationButtonElementSchema) => void,
-) => {
+export const createPaginationButtonEditor = ({
+  context,
+  component,
+  onSave,
+}: FormProps) => {
+  const buttonComponent = component as PaginationButtonElementSchema;
   return useForm(
     {
       fields: [
@@ -16,7 +21,9 @@ export const createPaginationButtonEditor = (
           label: "Button Text",
           type: "string",
           required: true,
-          defaultValue: component?.text,
+          ...(buttonComponent?.text && {
+            defaultValue: buttonComponent.text,
+          }),
         },
         {
           name: "icon",
@@ -24,9 +31,9 @@ export const createPaginationButtonEditor = (
           type: "select",
           options: ALL_ICON_NAMES.map((icon) => ({ label: icon, value: icon })),
           required: false,
-          defaultValue: component?.icon
-              ? [component?.icon]
-              : undefined,
+          ...(buttonComponent?.icon && {
+            defaultValue: [buttonComponent.icon],
+          }),
         },
         {
           name: "size",
@@ -38,9 +45,9 @@ export const createPaginationButtonEditor = (
             { label: "Large", value: "large" },
           ],
           required: true,
-          defaultValue: component?.size
-          ? [component?.size]
-          : ["medium"],
+          defaultValue: buttonComponent?.size
+            ? [buttonComponent?.size]
+            : ["medium"],
         },
         {
           name: "appearance",
@@ -57,28 +64,34 @@ export const createPaginationButtonEditor = (
             { label: "Success", value: "success" },
           ],
           required: true,
-          defaultValue: component?.appearance
-            ? [component?.appearance]
+          defaultValue: buttonComponent?.appearance
+            ? [buttonComponent?.appearance]
             : ["secondary"],
         },
         {
           name: "isGrow",
           label: "Grow",
           type: "boolean",
-          defaultValue: component?.isGrow || false,
+          ...(buttonComponent?.isGrow && {
+            defaultValue: buttonComponent.isGrow,
+          }),
         },
         {
           name: "width",
           label: "Width",
           type: "string",
-          defaultValue: String(component?.width) || "50",
+          ...(buttonComponent?.width && {
+            defaultValue: String(buttonComponent.width),
+          }),
           required: false,
         },
         {
           name: "height",
           label: "Height",
           type: "string",
-          defaultValue: String(component?.height) || "50",
+          ...(buttonComponent?.height && {
+            defaultValue: String(buttonComponent.height),
+          }),
           required: false,
         },
       ],
@@ -86,19 +99,30 @@ export const createPaginationButtonEditor = (
       acceptLabel: "Save",
     },
     async (values) => {
+      const newPageId = `page-${randomId()}`;
+
       const formData = {
-        id: values.id,
+        id: component?.id || `pagebutton-${randomId()}`,
         type: "PaginationButton" as const,
-        text: values.text as string,
-        // TODO: Fix should be able to backlink other pages as well
-        pageId: `page-${randomId()}`,
-        icon: values.icon[0] as PaginationButtonElementSchema["icon"],
-        size: (values.size[0] || "medium") as PaginationButtonElementSchema["size"],
-        appearance: (values.appearance?.[0] || "secondary") as PaginationButtonElementSchema["appearance"],
-        isGrow: values.isGrow as boolean,
+        text: values.text as string || "Page Button",
+        pageId: buttonComponent?.pageId || newPageId,
+        icon: Array.isArray(values.icon) && values.icon.length > 0
+            ? values.icon[0] as PaginationButtonElementSchema["icon"]
+            : undefined,
+        size: (Array.isArray(values.size) && values.size.length > 0
+            ? values.size[0]
+            : "medium") as PaginationButtonElementSchema["size"],
+        appearance: (Array.isArray(values.appearance) && values.appearance.length > 0
+            ? values.appearance[0]
+            : "secondary") as PaginationButtonElementSchema["appearance"],
+        isGrow: Boolean(values.isGrow),
         width: values.width as Devvit.Blocks.SizeString,
         height: values.height as Devvit.Blocks.SizeString,
-      };
+        action: {
+          type: "navigate",
+          targetPageId: buttonComponent?.pageId || newPageId,
+        },
+      } as PaginationButtonElementSchema;
 
       if (onSave) onSave(formData);
     },

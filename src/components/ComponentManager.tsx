@@ -144,184 +144,184 @@ export class ComponentManager {
    * @param componentType The type of component to create
    * @param onSave Callback for when the component is saved
    */
-  showComponentCreator(
-    componentType: string,
-    onSave?: (component: ElementSchema) => void,
-  ) {
-    const editor = getComponentEditor(
-      this.context,
-      componentType,
-      undefined,
-      async (formData) => {
-        let newComponent: ElementSchema;
-
-        switch (componentType) {
-          case "Text":
-            newComponent = Schema.TextElementSchema.parse({
-              id: this.generateComponentId("text"),
-              ...formData,
-            });
-            break;
-          case "Button":
-            newComponent = Schema.ButtonElementSchema.parse({
-              id: this.generateComponentId("button"),
-              ...formData,
-            });
-            break;
-          case "Image":
-            newComponent = Schema.ImageElementSchema.parse({
-              id: this.generateComponentId("image"),
-              ...formData,
-            });
-            // Handle image uploads specially
-            await this.appController.addOrUpdateImageData(
-              newComponent.id,
-              newComponent,
-            );
-            break;
-          case "VStack":
-            newComponent = Schema.VStackSchema.parse({
-              id: this.generateComponentId("vstack"),
-              ...formData,
-              children: [],
-            });
-            break;
-          case "HStack":
-            newComponent = Schema.HStackSchema.parse({
-              id: this.generateComponentId("hstack"),
-              ...formData,
-              children: [],
-            });
-            break;
-          case "ZStack":
-            newComponent = Schema.ZStackSchema.parse({
-              id: this.generateComponentId("zstack"),
-              ...formData,
-              children: [],
-            });
-            break;
-          case "PaginationButton":
-            newComponent = Schema.ButtonElementSchema.parse({
-              id: this.generateComponentId("pagebutton"),
-              ...formData,
-            });
-            break;
-          case "PersonalPlug":
-            newComponent = Schema.PersonalPlugSchema.parse({
-              id: this.generateComponentId("plug"),
-              content: "Created by /u/TheRepDeveloper",
-              ...formData,
-            });
-            break;
-          default:
-            console.error("Unknown component type:", componentType);
-            this.context.ui.showToast(
-              `Unknown component type: ${componentType}`,
-            );
-            return;
-        }
-
-        if (onSave) {
-          onSave(newComponent);
-        }
-      },
-    );
-
-    this.context.ui.showForm(editor);
-  }
+  // showComponentCreator(
+  //   componentType: string,
+  //   onSave?: (component: ElementSchema) => void,
+  // ) {
+  //   const editor = getComponentEditor(
+  //     this.context,
+  //     componentType,
+  //     undefined,
+  //     async (formData) => {
+  //       let newComponent: ElementSchema;
+  //
+  //       switch (componentType) {
+  //         case "Text":
+  //           newComponent = Schema.TextElementSchema.parse({
+  //             id: this.generateComponentId("text"),
+  //             ...formData,
+  //           });
+  //           break;
+  //         case "Button":
+  //           newComponent = Schema.ButtonElementSchema.parse({
+  //             id: this.generateComponentId("button"),
+  //             ...formData,
+  //           });
+  //           break;
+  //         case "Image":
+  //           newComponent = Schema.ImageElementSchema.parse({
+  //             id: this.generateComponentId("image"),
+  //             ...formData,
+  //           });
+  //           // Handle image uploads specially
+  //           await this.appController.addOrUpdateImageData(
+  //             newComponent.id,
+  //             newComponent,
+  //           );
+  //           break;
+  //         case "VStack":
+  //           newComponent = Schema.VStackSchema.parse({
+  //             id: this.generateComponentId("vstack"),
+  //             ...formData,
+  //             children: [],
+  //           });
+  //           break;
+  //         case "HStack":
+  //           newComponent = Schema.HStackSchema.parse({
+  //             id: this.generateComponentId("hstack"),
+  //             ...formData,
+  //             children: [],
+  //           });
+  //           break;
+  //         case "ZStack":
+  //           newComponent = Schema.ZStackSchema.parse({
+  //             id: this.generateComponentId("zstack"),
+  //             ...formData,
+  //             children: [],
+  //           });
+  //           break;
+  //         case "PaginationButton":
+  //           newComponent = Schema.ButtonElementSchema.parse({
+  //             id: this.generateComponentId("pagebutton"),
+  //             ...formData,
+  //           });
+  //           break;
+  //         case "PersonalPlug":
+  //           newComponent = Schema.PersonalPlugSchema.parse({
+  //             id: this.generateComponentId("plug"),
+  //             content: "Created by /u/TheRepDeveloper",
+  //             ...formData,
+  //           });
+  //           break;
+  //         default:
+  //           console.error("Unknown component type:", componentType);
+  //           this.context.ui.showToast(
+  //             `Unknown component type: ${componentType}`,
+  //           );
+  //           return;
+  //       }
+  //
+  //       if (onSave) {
+  //         onSave(newComponent);
+  //       }
+  //     },
+  //   );
+  //
+  //   this.context.ui.showForm(editor);
+  // }
 
   /**
    * Show the component editor form for editing an existing component
    * @param component The component to edit
    * @param onSave Callback for when the component is saved
    */
-  showComponentEditor(
-    component: ElementSchema,
-    onSave?: (component: ElementSchema) => void,
-  ) {
-    const editor = getComponentEditor(
-      this.context,
-      component.type,
-      component,
-      async (formData) => {
-        let editedComponent: ElementSchema;
-
-        // Preserve the component ID and children
-        const baseComponent = {
-          id: component.id,
-          children: component.children,
-        };
-
-        switch (component.type) {
-          case "Text":
-            editedComponent = Schema.TextElementSchema.parse({
-              ...baseComponent,
-              ...formData,
-            });
-            break;
-          case "Button":
-            editedComponent = Schema.ButtonElementSchema.parse({
-              ...baseComponent,
-              ...formData,
-            });
-            break;
-          case "Image":
-            editedComponent = Schema.ImageElementSchema.parse({
-              ...baseComponent,
-              ...formData,
-            });
-            // Handle image uploads specially
-            await this.appController.addOrUpdateImageData(
-              editedComponent.id,
-              editedComponent,
-            );
-            break;
-          case "VStack":
-            editedComponent = Schema.VStackSchema.parse({
-              ...baseComponent,
-              ...formData,
-            });
-            break;
-          case "HStack":
-            editedComponent = Schema.HStackSchema.parse({
-              ...baseComponent,
-              ...formData,
-            });
-            break;
-          case "ZStack":
-            editedComponent = Schema.ZStackSchema.parse({
-              ...baseComponent,
-              ...formData,
-            });
-            break;
-          case "PaginationButton":
-            editedComponent = Schema.ButtonElementSchema.parse({
-              ...baseComponent,
-              ...formData,
-            });
-            break;
-          case "PersonalPlug":
-            editedComponent = Schema.PersonalPlugSchema.parse({
-              ...baseComponent,
-              ...formData,
-            });
-            break;
-          default:
-            console.error("Unknown component type:", component.type);
-            this.context.ui.showToast(
-              `Unknown component type: ${component.type}`,
-            );
-            return;
-        }
-
-        if (onSave) {
-          onSave(editedComponent);
-        }
-      },
-    );
-
-    this.context.ui.showForm(editor);
-  }
+  // showComponentEditor(
+  //   component: ElementSchema,
+  //   onSave?: (component: ElementSchema) => void,
+  // ) {
+  //   const editor = getComponentEditor(
+  //     this.context,
+  //     component.type,
+  //     component,
+  //     async (formData) => {
+  //       let editedComponent: ElementSchema;
+  //
+  //       // Preserve the component ID and children
+  //       const baseComponent = {
+  //         id: component.id,
+  //         children: component.children,
+  //       };
+  //
+  //       switch (component.type) {
+  //         case "Text":
+  //           editedComponent = Schema.TextElementSchema.parse({
+  //             ...baseComponent,
+  //             ...formData,
+  //           });
+  //           break;
+  //         case "Button":
+  //           editedComponent = Schema.ButtonElementSchema.parse({
+  //             ...baseComponent,
+  //             ...formData,
+  //           });
+  //           break;
+  //         case "Image":
+  //           editedComponent = Schema.ImageElementSchema.parse({
+  //             ...baseComponent,
+  //             ...formData,
+  //           });
+  //           // Handle image uploads specially
+  //           await this.appController.addOrUpdateImageData(
+  //             editedComponent.id,
+  //             editedComponent,
+  //           );
+  //           break;
+  //         case "VStack":
+  //           editedComponent = Schema.VStackSchema.parse({
+  //             ...baseComponent,
+  //             ...formData,
+  //           });
+  //           break;
+  //         case "HStack":
+  //           editedComponent = Schema.HStackSchema.parse({
+  //             ...baseComponent,
+  //             ...formData,
+  //           });
+  //           break;
+  //         case "ZStack":
+  //           editedComponent = Schema.ZStackSchema.parse({
+  //             ...baseComponent,
+  //             ...formData,
+  //           });
+  //           break;
+  //         case "PaginationButton":
+  //           editedComponent = Schema.ButtonElementSchema.parse({
+  //             ...baseComponent,
+  //             ...formData,
+  //           });
+  //           break;
+  //         case "PersonalPlug":
+  //           editedComponent = Schema.PersonalPlugSchema.parse({
+  //             ...baseComponent,
+  //             ...formData,
+  //           });
+  //           break;
+  //         default:
+  //           console.error("Unknown component type:", component.type);
+  //           this.context.ui.showToast(
+  //             `Unknown component type: ${component.type}`,
+  //           );
+  //           return;
+  //       }
+  //
+  //       if (onSave) {
+  //         onSave(editedComponent);
+  //       }
+  //     },
+  //   );
+  //
+  //   this.context.ui.showForm(editor);
+  // }
 
   /**
    * Add a component to the home page
