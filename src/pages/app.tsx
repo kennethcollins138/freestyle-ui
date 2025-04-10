@@ -70,10 +70,27 @@ export const App: Devvit.CustomPostComponent = (context: Context) => {
   const updateAppPost: AppController["updateAppInstance"] = async (...args) => {
     const svc = new AppController(postId, context);
     const data = await svc.updateAppInstance(...args);
+
     setCurrentPost((prevState) => {
       if (!prevState) return prevState;
+
+      // Handle home structure update properly with deep merge
+      if (data && data.home) {
+        return {
+          ...prevState,
+          ...data,
+          home: {
+            ...prevState.home,
+            ...data.home,
+            // Ensure new array reference for children
+            children: [...data.home.children]
+          }
+        };
+      }
+
       return { ...prevState, ...data };
     });
+
     return data;
   };
 
@@ -155,6 +172,12 @@ export const App: Devvit.CustomPostComponent = (context: Context) => {
     return await svc.addOrUpdateImageData(...args);
   };
 
+  const loadAppInstance: AppController["loadAppInstance"] =
+      async (...args) => {
+        const svc = new AppController(postId, context);
+        return await svc.loadAppInstance(...args);
+      };
+
   const getImageDatabyComponentId: AppController["getImageDataByComponentId"] =
     async (...args) => {
       const svc = new AppController(postId, context);
@@ -169,6 +192,7 @@ export const App: Devvit.CustomPostComponent = (context: Context) => {
     const svc = new AppController(postId, context);
     return await svc.createNewPage(...args);
   };
+
   const PageComponent = getPageForRoute(route);
   console.log("Rendering page for route:", route);
 
@@ -196,6 +220,7 @@ export const App: Devvit.CustomPostComponent = (context: Context) => {
         isOwner={isOwner}
         currentUserUsername={currentUserUsername ?? ""}
         postMethods={{
+          loadAppInstance,
           updateAppPost,
           updateAppElement,
           addElement,

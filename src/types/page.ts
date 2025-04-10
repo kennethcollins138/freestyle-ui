@@ -31,6 +31,7 @@ export type PageProps = {
     savePage: AppController["savePage"];
     addOrUpdateImageData: AppController["addOrUpdateImageData"];
     getImageDatabyComponentId: AppController["getImageDataByComponentId"];
+    loadAppInstance: AppController["loadAppInstance"];
     // readImmediateChildren: AppController['readImmediateChildren'];
     // updateChildrenOrder: AppController['updateChildrenOrder'];
   };

@@ -1,7 +1,8 @@
 NEXT STEPS:
-- Add Back Edit and Delete
+- Edit
 - Trigger rerender after any of these forms so user doesnt have to refresh page
 - Pagination Button
+- add Spacers/icons as well
 
 Add workflow
 

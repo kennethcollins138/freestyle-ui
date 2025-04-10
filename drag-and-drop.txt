@@ -1,0 +1,3 @@
+vstacks with buttons
+move, collapse, add element if stack
+onPress should be a position changer in element.

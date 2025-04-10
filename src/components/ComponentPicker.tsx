@@ -22,7 +22,7 @@ export const ComponentPicker = ({
   acceptLabel = "Select",
   onDelete
 }: ComponentPickerProps) => {
-  // Create options from components
+  // TODO: Need to add like nicknames to components to make it easier for people to know which components are which
   const componentOptions = components.map((component) => ({
     label: `${component.type} - ${component.id}`,
     value: `${component.type}:${component.id}`,

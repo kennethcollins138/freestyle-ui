@@ -12,10 +12,12 @@ import { getComponentEditor } from "./editors/ComponentEditorFactory.js";
 export class ComponentManager {
   private readonly context: Devvit.Context;
   private appController: AppController;
+  private updateAppPost: Function;
 
-  constructor(context: Devvit.Context, postId: string) {
+  constructor(context: Devvit.Context, postId: string, updateAppPost: Function) {
     this.context = context;
     this.appController = new AppController(postId, context);
+    this.updateAppPost = updateAppPost;
   }
 
   /**
@@ -41,8 +43,8 @@ export class ComponentManager {
    * Updates a component in a nested structure
    */
   updateComponentRecursive(
-    elements: ElementSchema[],
-    editedComponent: ElementSchema,
+      elements: ElementSchema[],
+      editedComponent: ElementSchema,
   ): ElementSchema[] {
     return elements.map((el) => {
       if (el.id === editedComponent.id) {
@@ -69,26 +71,26 @@ export class ComponentManager {
    * Deletes a component from a nested structure
    */
   deleteComponentRecursive(
-    elements: ElementSchema[],
-    componentId: string,
+      elements: ElementSchema[],
+      componentId: string,
   ): ElementSchema[] {
     return elements
-      .map((el) => {
-        if (el.children && el.children.length > 0) {
-          el.children = this.deleteComponentRecursive(el.children, componentId);
-        }
-        return el;
-      })
-      .filter((el) => el.id !== componentId);
+        .map((el) => {
+          if (el.children && el.children.length > 0) {
+            el.children = this.deleteComponentRecursive(el.children, componentId);
+          }
+          return el;
+        })
+        .filter((el) => el.id !== componentId);
   }
 
   /**
    * Adds a component to a parent component in a nested structure
    */
   addComponentToParentRecursive(
-    elements: ElementSchema[],
-    parentId: string,
-    newComponent: ElementSchema,
+      elements: ElementSchema[],
+      parentId: string,
+      newComponent: ElementSchema,
   ): ElementSchema[] {
     return elements.map((el) => {
       if (el.id === parentId) {
@@ -101,9 +103,9 @@ export class ComponentManager {
         return {
           ...el,
           children: this.addComponentToParentRecursive(
-            el.children,
-            parentId,
-            newComponent,
+              el.children,
+              parentId,
+              newComponent,
           ),
         };
       }
@@ -122,8 +124,8 @@ export class ComponentManager {
    * Finds a component by ID in a nested structure
    */
   findComponentById(
-    elements: ElementSchema[],
-    componentId: string,
+      elements: ElementSchema[],
+      componentId: string,
   ): ElementSchema | undefined {
     for (const element of elements) {
       if (element.id === componentId) {
@@ -140,190 +142,6 @@ export class ComponentManager {
   }
 
   /**
-   * Show the component editor form for creating a new component
-   * @param componentType The type of component to create
-   * @param onSave Callback for when the component is saved
-   */
-  // showComponentCreator(
-  //   componentType: string,
-  //   onSave?: (component: ElementSchema) => void,
-  // ) {
-  //   const editor = getComponentEditor(
-  //     this.context,
-  //     componentType,
-  //     undefined,
-  //     async (formData) => {
-  //       let newComponent: ElementSchema;
-  //
-  //       switch (componentType) {
-  //         case "Text":
-  //           newComponent = Schema.TextElementSchema.parse({
-  //             id: this.generateComponentId("text"),
-  //             ...formData,
-  //           });
-  //           break;
-  //         case "Button":
-  //           newComponent = Schema.ButtonElementSchema.parse({
-  //             id: this.generateComponentId("button"),
-  //             ...formData,
-  //           });
-  //           break;
-  //         case "Image":
-  //           newComponent = Schema.ImageElementSchema.parse({
-  //             id: this.generateComponentId("image"),
-  //             ...formData,
-  //           });
-  //           // Handle image uploads specially
-  //           await this.appController.addOrUpdateImageData(
-  //             newComponent.id,
-  //             newComponent,
-  //           );
-  //           break;
-  //         case "VStack":
-  //           newComponent = Schema.VStackSchema.parse({
-  //             id: this.generateComponentId("vstack"),
-  //             ...formData,
-  //             children: [],
-  //           });
-  //           break;
-  //         case "HStack":
-  //           newComponent = Schema.HStackSchema.parse({
-  //             id: this.generateComponentId("hstack"),
-  //             ...formData,
-  //             children: [],
-  //           });
-  //           break;
-  //         case "ZStack":
-  //           newComponent = Schema.ZStackSchema.parse({
-  //             id: this.generateComponentId("zstack"),
-  //             ...formData,
-  //             children: [],
-  //           });
-  //           break;
-  //         case "PaginationButton":
-  //           newComponent = Schema.ButtonElementSchema.parse({
-  //             id: this.generateComponentId("pagebutton"),
-  //             ...formData,
-  //           });
-  //           break;
-  //         case "PersonalPlug":
-  //           newComponent = Schema.PersonalPlugSchema.parse({
-  //             id: this.generateComponentId("plug"),
-  //             content: "Created by /u/TheRepDeveloper",
-  //             ...formData,
-  //           });
-  //           break;
-  //         default:
-  //           console.error("Unknown component type:", componentType);
-  //           this.context.ui.showToast(
-  //             `Unknown component type: ${componentType}`,
-  //           );
-  //           return;
-  //       }
-  //
-  //       if (onSave) {
-  //         onSave(newComponent);
-  //       }
-  //     },
-  //   );
-  //
-  //   this.context.ui.showForm(editor);
-  // }
-
-  /**
-   * Show the component editor form for editing an existing component
-   * @param component The component to edit
-   * @param onSave Callback for when the component is saved
-   */
-  // showComponentEditor(
-  //   component: ElementSchema,
-  //   onSave?: (component: ElementSchema) => void,
-  // ) {
-  //   const editor = getComponentEditor(
-  //     this.context,
-  //     component.type,
-  //     component,
-  //     async (formData) => {
-  //       let editedComponent: ElementSchema;
-  //
-  //       // Preserve the component ID and children
-  //       const baseComponent = {
-  //         id: component.id,
-  //         children: component.children,
-  //       };
-  //
-  //       switch (component.type) {
-  //         case "Text":
-  //           editedComponent = Schema.TextElementSchema.parse({
-  //             ...baseComponent,
-  //             ...formData,
-  //           });
-  //           break;
-  //         case "Button":
-  //           editedComponent = Schema.ButtonElementSchema.parse({
-  //             ...baseComponent,
-  //             ...formData,
-  //           });
-  //           break;
-  //         case "Image":
-  //           editedComponent = Schema.ImageElementSchema.parse({
-  //             ...baseComponent,
-  //             ...formData,
-  //           });
-  //           // Handle image uploads specially
-  //           await this.appController.addOrUpdateImageData(
-  //             editedComponent.id,
-  //             editedComponent,
-  //           );
-  //           break;
-  //         case "VStack":
-  //           editedComponent = Schema.VStackSchema.parse({
-  //             ...baseComponent,
-  //             ...formData,
-  //           });
-  //           break;
-  //         case "HStack":
-  //           editedComponent = Schema.HStackSchema.parse({
-  //             ...baseComponent,
-  //             ...formData,
-  //           });
-  //           break;
-  //         case "ZStack":
-  //           editedComponent = Schema.ZStackSchema.parse({
-  //             ...baseComponent,
-  //             ...formData,
-  //           });
-  //           break;
-  //         case "PaginationButton":
-  //           editedComponent = Schema.ButtonElementSchema.parse({
-  //             ...baseComponent,
-  //             ...formData,
-  //           });
-  //           break;
-  //         case "PersonalPlug":
-  //           editedComponent = Schema.PersonalPlugSchema.parse({
-  //             ...baseComponent,
-  //             ...formData,
-  //           });
-  //           break;
-  //         default:
-  //           console.error("Unknown component type:", component.type);
-  //           this.context.ui.showToast(
-  //             `Unknown component type: ${component.type}`,
-  //           );
-  //           return;
-  //       }
-  //
-  //       if (onSave) {
-  //         onSave(editedComponent);
-  //       }
-  //     },
-  //   );
-  //
-  //   this.context.ui.showForm(editor);
-  // }
-
-  /**
    * Add a component to the home page
    * @param component The component to add
    * @returns Promise resolving to the updated home page structure
@@ -336,9 +154,14 @@ export class ComponentManager {
 
     const updatedHome = deepClone(home) as HomeSchema;
     updatedHome.children.push(component);
-    await this.appController.updateAppInstance({ home: updatedHome });
 
-    return updatedHome;
+    // Update with explicit home property to ensure proper updating
+    await this.updateAppPost({
+      home: updatedHome
+    });
+
+    // Return with new array reference
+    return {...updatedHome, children: [...updatedHome.children]};
   }
 
   /**
@@ -354,10 +177,12 @@ export class ComponentManager {
 
     const updatedHome = deepClone(home) as HomeSchema;
     updatedHome.children = this.updateComponentRecursive(
-      updatedHome.children,
-      component,
+        updatedHome.children,
+        component,
     );
-    await this.appController.updateAppInstance({ home: updatedHome });
+
+    // Use updateAppPost instead of directly calling updateAppInstance
+    await this.updateAppPost({ home: updatedHome });
 
     return updatedHome;
   }
@@ -375,10 +200,12 @@ export class ComponentManager {
 
     const updatedHome = deepClone(home) as HomeSchema;
     updatedHome.children = this.deleteComponentRecursive(
-      updatedHome.children,
-      componentId,
+        updatedHome.children,
+        componentId,
     );
-    await this.appController.updateAppInstance({ home: updatedHome });
+
+    // Use updateAppPost instead of directly calling updateAppInstance
+    await this.updateAppPost({ home: updatedHome });
 
     return updatedHome;
   }
@@ -390,8 +217,8 @@ export class ComponentManager {
    * @returns Promise resolving to the updated page structure
    */
   async addComponentToPage(
-    pageId: string,
-    component: ElementSchema,
+      pageId: string,
+      component: ElementSchema,
   ): Promise<PageSchema | HomeSchema> {
     if (pageId === "home") {
       return this.addComponentToHome(component);
@@ -416,8 +243,8 @@ export class ComponentManager {
    * @returns Promise resolving to the updated page structure
    */
   async updateComponentOnPage(
-    pageId: string,
-    component: ElementSchema,
+      pageId: string,
+      component: ElementSchema,
   ): Promise<PageSchema | HomeSchema> {
     if (pageId === "home") {
       return this.updateComponentOnHome(component);
@@ -430,8 +257,8 @@ export class ComponentManager {
 
     const updatedPage = deepClone(page) as PageSchema;
     updatedPage.children = this.updateComponentRecursive(
-      updatedPage.children,
-      component,
+        updatedPage.children,
+        component,
     );
     await this.appController.savePage(pageId, updatedPage);
 
@@ -445,8 +272,8 @@ export class ComponentManager {
    * @returns Promise resolving to the updated page structure
    */
   async deleteComponentFromPage(
-    pageId: string,
-    componentId: string,
+      pageId: string,
+      componentId: string,
   ): Promise<PageSchema | HomeSchema> {
     if (pageId === "home") {
       return this.deleteComponentFromHome(componentId);
@@ -459,8 +286,8 @@ export class ComponentManager {
 
     const updatedPage = deepClone(page) as PageSchema;
     updatedPage.children = this.deleteComponentRecursive(
-      updatedPage.children,
-      componentId,
+        updatedPage.children,
+        componentId,
     );
     await this.appController.savePage(pageId, updatedPage);
 
@@ -475,9 +302,9 @@ export class ComponentManager {
    * @returns Promise resolving to the updated page structure
    */
   async addChildComponent(
-    pageId: string,
-    parentId: string,
-    component: ElementSchema,
+      pageId: string,
+      parentId: string,
+      component: ElementSchema,
   ): Promise<PageSchema | HomeSchema> {
     if (pageId === "home") {
       const home = await this.appController.readWholePage("home");
@@ -487,11 +314,13 @@ export class ComponentManager {
 
       const updatedHome = deepClone(home) as HomeSchema;
       updatedHome.children = this.addComponentToParentRecursive(
-        updatedHome.children,
-        parentId,
-        component,
+          updatedHome.children,
+          parentId,
+          component,
       );
-      await this.appController.updateAppInstance({ home: updatedHome });
+
+      // Use updateAppPost instead of directly calling updateAppInstance
+      await this.updateAppPost({ home: updatedHome });
 
       return updatedHome;
     }
@@ -503,9 +332,9 @@ export class ComponentManager {
 
     const updatedPage = deepClone(page) as PageSchema;
     updatedPage.children = this.addComponentToParentRecursive(
-      updatedPage.children,
-      parentId,
-      component,
+        updatedPage.children,
+        parentId,
+        component,
     );
     await this.appController.savePage(pageId, updatedPage);
 
@@ -519,8 +348,8 @@ export class ComponentManager {
    * @returns Promise resolving to the ID of the new page
    */
   async createNewPageWithButton(
-    pageId: string,
-    buttonText: string,
+      pageId: string,
+      buttonText: string,
   ): Promise<string> {
     // Generate new page ID
     const newPageId = `page-${randomId()}`;
