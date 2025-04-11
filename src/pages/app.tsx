@@ -6,6 +6,7 @@ import { HomePage } from "./home.js";
 import { AdminPage } from "./admin.js";
 import { AppInstance, HomeSchema, PageSchema } from "../api/Schema.js";
 import { PaginationPage } from "./Pagination.js";
+import {EditPage} from "./editPage.js";
 
 const getPageForRoute = (route: Route): ((props: PageProps) => JSX.Element) => {
   switch (route) {
@@ -13,6 +14,8 @@ const getPageForRoute = (route: Route): ((props: PageProps) => JSX.Element) => {
       return HomePage;
     case "welcome":
       return WelcomePage;
+    case "edit":
+      return EditPage;
     case "admin":
       return AdminPage;
     case "pagination":

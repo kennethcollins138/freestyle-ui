@@ -10,7 +10,7 @@ import { createPaginationButtonEditor } from "../components/editors/PaginationBu
 import { createTextEditor } from "../components/editors/TextEditor.js";
 import { createStackEditor } from "../components/editors/StackEditor.js";
 import { createImageEditor } from "../components/editors/ImageEditor.js";
-import {ComponentRenderer} from "../components/ComponentRendererFactory.js";
+import { ComponentRenderer } from "../components/ComponentRendererFactory.js";
 
 export const HomePage = ({
                            navigate,
@@ -20,15 +20,10 @@ export const HomePage = ({
                            postMethods: { updateAppPost, loadAppInstance },
                          }: PageProps): JSX.Element => {
   const [pageStructure, setPageStructure] = useState(appPost.home);
-  const [formType, setFormType] = useState<"add" | "edit" | "delete" | null>(
-      null,
-  );
+  const [formType, setFormType] = useState<"add" | "edit" | "delete" | null>(null);
   const [componentType, setComponentType] = useState<string | null>(null);
   const [componentId, setComponentId] = useState<string | null>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
-  // const [refreshCount, setRefreshCount] = useState(0);
-
-
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const {
     handleAddComponent,
@@ -39,13 +34,19 @@ export const HomePage = ({
   const navigateAdapter = (route: string, params?: any) => {
     navigate(route as Route, params as RouteParams);
   };
+
   const componentRenderer = new ComponentRenderer(context, { navigate: navigateAdapter });
   const flattenedComponents = flattenComponents(pageStructure.children);
 
-  // TODO: refresh button works but not calling
+  // Modified forceRefresh to avoid infinite loop
   const forceRefresh = async () => {
+    // Prevent multiple refresh operations at once
+    if (isRefreshing) return;
+
     try {
+      setIsRefreshing(true);
       const appInstance = await loadAppInstance();
+
       if (appInstance && appInstance.home) {
         // Create a completely new reference
         const updatedPage = {
@@ -54,15 +55,17 @@ export const HomePage = ({
         };
         console.log("Force refresh with children count:", updatedPage.children.length);
         setPageStructure(updatedPage);
-        setRefreshKey(prev => prev + 1);
         context.ui.showToast("Page refreshed");
       }
     } catch (error) {
       console.error("Error refreshing:", error);
       context.ui.showToast("Refresh failed");
+    } finally {
+      setIsRefreshing(false);
     }
   };
 
+  const editPage = () => navigate("edit", {pageId: "home"});
   const settingsPage = () => navigate("admin");
 
   //  ADD FORMS
@@ -137,16 +140,6 @@ export const HomePage = ({
     acceptLabel: "Delete"
   });
 
-  // force rerender when pageStructure changes
-  useAsync(
-      async () => {
-        console.log("Refresh trigger detected, refreshKey =", refreshKey);
-        await forceRefresh();
-        return "ok";
-      },
-      { depends: [refreshKey] }
-  );
-
   // Handle form type changes
   useAsync(
       async () => {
@@ -200,10 +193,10 @@ export const HomePage = ({
 
   return (
       <Page>
-        <Page.Content navigate={navigate} showHomeButton={false} >
-          <vstack alignment="center" width={100} height={100}>
-            <zstack width={100} alignment="middle">
-              <hstack width={100} alignment="center middle">
+        <Page.Content navigate={navigate} showHomeButton={false}>
+          <vstack alignment="center" width="100%" height="100%">
+            <zstack width="100%" alignment="middle">
+              <hstack width="100%" alignment="center middle">
                 {isOwner && (
                     <hstack gap="small" alignment="start">
                       <button
@@ -220,7 +213,7 @@ export const HomePage = ({
                       />
                       <button
                           icon="edit"
-                          // onPress={() => showEditForm()}
+                          onPress={editPage}
                           appearance="primary"
                           size="small"
                       />
@@ -235,21 +228,28 @@ export const HomePage = ({
                           onPress={forceRefresh}
                           appearance="primary"
                           size="small"
+                          disabled={isRefreshing}
                       />
                     </hstack>
                 )}
               </hstack>
             </zstack>
 
-            {/* Debug */}
-            {/*<text size="xsmall">Components: {pageStructure.children.length} | Refreshes: {refreshCount}</text>*/}
-            {/* TODO: Figure out how to refresh stale ui*/}
-            {/*<vstack key={`component-list-${directUpdateFlag}-${refreshCount}`} alignment="center" width={100} height={100}>*/}
+            {/* Render the component tree */}
+            <vstack width="100%" height="100%" alignment="center">
               {componentRenderer.renderComponents(
-                  [...pageStructure.children] as ComponentType[],  // Force new array reference
+                  [...pageStructure.children] as ComponentType[],
                   navigateAdapter
               )}
-            {/*</vstack>*/}
+
+              {/* Show empty state if no components */}
+              {pageStructure.children.length === 0 && (
+                  <vstack alignment="center middle" gap="medium" padding="large">
+                    <text size="large" weight="bold">No Components Yet</text>
+                    <text alignment="center">Click the + button above to add your first component</text>
+                  </vstack>
+              )}
+            </vstack>
           </vstack>
         </Page.Content>
       </Page>

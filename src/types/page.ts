@@ -5,6 +5,7 @@ import type { AppController } from "../api/AppController.js";
 
 export type Route =
   | "home"
+  | "edit"
   | "admin"
   | "pagination"
   | "admin:configure"
